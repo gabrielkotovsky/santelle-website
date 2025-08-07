@@ -57,93 +57,45 @@ export default function PrivacyPolicy() {
         <h2 className="text-xl font-semibold mt-6 mb-2">5. Contact us</h2>
         <p>If you have questions, email us at: <a href="mailto:hello@santelle.com" className="underline hover:text-[#511828]">hello@santelle.com</a></p>
       </main>
-      {/* Footer Card */}
-      <section className="w-full pt-4 pb-8 px-4 md:px-8 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
-        <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 w-full">
-          <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
-            {/* Logo */}
-            <div className="w-full flex justify-center mb-2">
-              <Image src="/logo-dark.png" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} />
-            </div>
-            {/* Mission Statement */}
-            <div className="text-xl md:text-2xl font-semibold text-[#721422] mb-2">
-              [MISSION STATEMENT]
-            </div>
-            {/* Mailing List Form */}
-            <form className="w-full max-w-2xl mx-auto flex flex-col gap-2" onSubmit={handleFormSubmit}>
-              <label htmlFor="footer-email" className="text-left text-base font-medium text-black mb-1 ml-2">Your email*</label>
-              <div className="flex w-full">
-                <input
-                  type="email"
-                  required
-                  id="footer-email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleFormChange}
-                  placeholder="your@email.com"
-                  className={`flex-1 px-6 py-3 text-lg rounded-l-full border-2 border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 bg-white text-[#511828] placeholder-[#c9a6b7] ${emailValidation.error ? 'border-red-500' : emailValidation.isValid ? 'border-green-500' : 'border-pink-200'}`}
-                  aria-label="Email address"
-                  disabled={isSubmitting}
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting || (!!formData.email && !emailValidation.isValid) || rateLimit.blocked}
-                  className={`px-8 py-3 font-semibold text-lg rounded-r-full border-2 border-l-0 border-pink-200 transition-all duration-200 min-w-[180px] focus:outline-none focus:ring-2 focus:ring-pink-300
-                    ${isSubmitting ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                      : (!formData.email ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
-                        : (!emailValidation.isValid ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                          : 'bg-[#721422] text-white hover:bg-[#8a1a2a]'))}
-                  `}
-                >
-                  {isSubmitting ? 'Joining...' : rateLimit.blocked ? 'Rate limited' : 'Get early access'}
-                </button>
+        {/* Bottom Glassmorphic Card */}
+        <section className="w-full pt-4 pb-8 px-4 md:px-8 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
+          <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 w-full">
+            <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
+              {/* Logo */}
+              <div className="w-full flex justify-center mb-2">
+                <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} />
+                </div>
+
+              {/* Get Early Access Button */}
+              <button
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setTimeout(() => {
+                    window.dispatchEvent(new Event('openWaitlist'));
+                    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
+                    if (emailInput) {
+                      emailInput.focus();
+                    }
+                  }, 600);
+                }}
+                className="bg-[#721422] text-white font-bold text-lg px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer"
+              >
+                Get Early Access
+              </button>
+              {/* Divider */}
+              <hr className="w-full border-t border-[#721422]/20 my-2" />
+              {/* Footer Links and Copyright */}
+              <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2 text-sm text-[#721422] mt-2">
+                <div className="flex gap-4 mb-1 md:mb-0">
+                  <Link href="/privacy-policy" className="underline hover:text-[#18321f]">Privacy Policy</Link>
+                  <span>|</span>
+                  <Link href="/contact-us" className="underline hover:text-[#18321f]">Contact Us</Link>
+                </div>
+                <div className="text-[#721422]/60">© 2025 Santelle. All rights reserved.</div>
               </div>
-              {/* Validation and submission feedback */}
-              <div className="min-h-[28px] mt-1">
-                {emailValidation.isChecking && (
-                  <div className="text-pink-600 text-sm text-center">Checking email domain...</div>
-                )}
-                {emailValidation.error && (
-                  <div className="text-red-600 text-sm text-center">{emailValidation.error}</div>
-                )}
-                {emailValidation.isValid && !emailValidation.isChecking && (
-                  <div className="text-green-600 text-sm text-center">✓ Valid email address</div>
-                )}
-                {rateLimit.blocked && (
-                  <div className="text-red-600 text-sm text-center">
-                    Too many attempts. Please wait {Math.ceil((rateLimit.cooldownEnd - Date.now()) / 1000)} seconds before trying again.
-                  </div>
-                )}
-                {submitStatus === 'success' && (
-                  <div className="text-green-600 text-lg font-semibold text-center mt-2">
-                    ✓ You&apos;ve been added to the waitlist!
-                  </div>
-                )}
-                {submitStatus === 'error' && (
-                  <div className="text-red-600 text-lg font-semibold text-center mt-2">
-                    {rateLimit.blocked ? 'Too many submission attempts. Please wait before trying again.' : 'Something went wrong. Please try again.'}
-                  </div>
-                )}
-              </div>
-            </form>
-            {/* Divider */}
-            <hr className="w-full border-t border-[#721422]/20 my-2" />
-            {/* Footer Links and Copyright */}
-            <div className="w-full flex flex-col md:flex-row justify-between items-center gap-2 text-sm text-[#721422] mt-2">
-              <div className="flex gap-4 mb-1 md:mb-0">
-                <Link href="/privacy-policy" className="underline hover:text-[#18321f]">Privacy Policy</Link>
-                <span>|</span>
-                <a href="/terms-of-service" className="underline hover:text-[#18321f]">Terms of Service</a>
-                <span>|</span>
-                <a href="/about-us" className="underline hover:text-[#18321f]">About Us</a>
-                <span>|</span>
-                <Link href="/contact-us" className="underline hover:text-[#18321f]">Contact Us</Link>
-              </div>
-              <div className="text-[#721422]/60">© 2025 Santelle. All rights reserved.</div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
     </div>
   );
 } 

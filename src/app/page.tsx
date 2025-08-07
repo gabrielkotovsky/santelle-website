@@ -1499,17 +1499,14 @@ export default function Home() {
         </section>
 
         {/* Bottom Glassmorphic Card */}
-        <section className="w-full pt-4 pb-8 px-4 md:px-8" style={{minWidth: '100vw', width: '100vw'}}>
+        <section className="w-full pt-4 pb-8 px-4 md:px-8 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 w-full">
             <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
               {/* Logo */}
               <div className="w-full flex justify-center mb-2">
                 <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} />
                 </div>
-              {/* Mission Statement */}
-              <div className="text-xl md:text-2xl font-semibold text-[#721422] mb-2">
-                [MISSION STATEMENT]
-                </div>
+
               {/* Get Early Access Button */}
               <button
                 onClick={() => {
