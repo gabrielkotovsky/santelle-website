@@ -25,12 +25,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+
 
 /* Mobile viewport and safe area handling */
 html {
@@ -81,22 +76,7 @@ body {
     border: none !important;
   }
   
-  /* Ensure status bar area is transparent */
-  html {
-    background: transparent;
-  }
-  
-  /* Prevent any background color from affecting status bar */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-top);
-    background: transparent;
-    z-index: 9999;
-  }
+
   
   /* Ensure video background covers full mobile viewport */
   video {

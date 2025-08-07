@@ -1260,7 +1260,7 @@ export default function Home() {
         </section>
 
         {/* Mobile Unified Card - All Sections */}
-        <section className="block md:hidden w-full py-8 px-4">
+        <section className="block md:hidden w-full py-8">
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
             
             {/* Stats Section */}

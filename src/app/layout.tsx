@@ -36,10 +36,6 @@ export default function RootLayout({
       <head>
         <title>Santelle | To Her Health</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="theme-color" content="transparent" />
-        <meta name="msapplication-navbutton-color" content="transparent" />
         <meta name="apple-mobile-web-app-title" content="Santelle" />
       </head>
       <body className={`antialiased`}>

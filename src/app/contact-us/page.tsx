@@ -144,7 +144,7 @@ export default function ContactUs() {
         className="relative z-20 w-full max-w-xl bg-white/30 backdrop-blur-2xl border border-white/30 rounded-lg shadow-xl p-8 flex flex-col gap-6 mt-24 mb-16"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-3xl font-bold mb-2 text-[#18321f]">Hi there! Got a question? We&apos;d love to hear from you.</h1>
+        <h1 className="text-3xl font-bold mb-2 text-black">Hi there! Got a question? We&apos;d love to hear from you.</h1>
         <input
           type="text"
           name="name"
@@ -194,7 +194,7 @@ export default function ContactUs() {
           rows={5}
           className="px-4 py-3 rounded-lg border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 text-lg bg-white text-[#511828] placeholder-[#c9a6b7] resize-none"
         />
-        <label className="flex items-center gap-2 text-[#18321f] text-base">
+        <label className="flex items-center gap-2 text-black text-base">
           <input
             type="checkbox"
             name="updates"
