@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'ChunkoBold';
+  src: url('/fonts/Chunko-Bold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.chunko-bold {
+  font-family: 'ChunkoBold', sans-serif !important;
+  font-weight: normal !important;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* Mobile viewport and safe area handling */
+html {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--background);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  overflow-x: hidden;
+  /* Handle safe areas for iPhone */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Ensure full viewport coverage on mobile */
+#__next {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  body {
+    /* Remove default margins that might interfere with full coverage */
+    margin: 0;
+    padding: 0;
+    /* Use safe area insets for proper mobile coverage */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Remove any potential border lines */
+  nav, nav * {
+    border: none !important;
+    outline: none !important;
+  }
+  
+  /* Ensure no default borders on mobile elements */
+  .mobile-nav, .mobile-nav * {
+    border: none !important;
+  }
+  
+  /* Ensure status bar area is transparent */
+  html {
+    background: transparent;
+  }
+  
+  /* Prevent any background color from affecting status bar */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background: transparent;
+    z-index: 9999;
+  }
+  
+  /* Ensure video background covers full mobile viewport */
+  video {
+    object-fit: cover !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes slide-out-right {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+.animate-slide-out-right {
+  animation: slide-out-right 0.5s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes biomarker-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 #ff4fa366; }
+  50% { box-shadow: 0 0 0 8px #ff4fa322; }
+}
+.biomarker-highlight {
+  background: none;
+  color: #ff4fa3 !important;
+  border-radius: 9999px;
+  padding: 0;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: none;
+  animation: none;
+  transition: background 0.2s, color 0.2s;
+}
+.biomarker-highlight:hover {
+  color: #e03a8a !important;
+}
+
+.get-access-pulse {
+  animation: biomarker-pulse 1.5s infinite;
+  border-radius: 9999px;
+}
+
+.get-access-pulse,
+.bg-\[\#721422\],
+.bg-\[\#721422\]:hover,
+.bg-\[\#721422\]:focus {
+  transition: background 0.6s cubic-bezier(0.4,0,0.2,1), color 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+button, a, [role="button"], [tabindex]:not([tabindex="-1"]), .cursor-pointer {
+  cursor: pointer !important;
+}
+
+.how-it-works-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+@keyframes slide-out-right-mobile {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100vw); opacity: 0; }
+}
+@keyframes slide-in-left-mobile {
+  from { transform: translateX(-100vw); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.slide-out-right-mobile {
+  animation: slide-out-right-mobile 0.5s cubic-bezier(0.4,0,0.2,1) both;
+}
+.slide-in-left-mobile {
+  animation: slide-in-left-mobile 0.5s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 10s ease-in-out infinite;
+}
