@@ -179,31 +179,31 @@ export default function Home() {
       number: 1,
       title: 'Receive your kit',
       desc: 'A discreet kit delivered to your door each month — with everything you need to check in with your vaginal health from home.',
-      img: '/kit.png',
+      img: '/kit.webp',
     },
     {
       number: 2,
       title: 'Test in Minutes',
       desc: 'Use a small sample of discharge to test for 6 key biomarkers linked to infection, inflammation, and imbalance.',
-      img: '/step2.png',
+      img: '/step2.webp',
     },
     {
       number: 3,
       title: 'Enter Your Results in the App',
       desc: 'Match your strip to the color guide and enter your results in the Santelle app. Get instant, clear personalized insights to understand what’s going on.',
-      img: '/step3.png',
+      img: '/step3.webp',
     },
     {
       number: 4,
       title: 'Track, Learn & Take Control',
       desc: 'See patterns, get monthly tips, and stay ahead of changes — whether you’re managing symptoms, pregnancy, or just staying in tune.',
-      img: '/step4.png',
+      img: '/step4.webp',
     },
     {
       number: 5,
       title: 'About the 6 Key Biomarkers',
       desc: '', // Will render custom content
-      img: '/kit.png', // Placeholder, can be changed
+      img: '/kit.webp', // Placeholder, can be changed
     },
   ];
 
@@ -908,7 +908,7 @@ export default function Home() {
             <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-0 md:p-0 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-12 w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
           <div className="md:w-1/2 flex justify-center md:justify-end items-center p-0 py-2 md:py-0">
             <Image
-              src="/kit.png"
+              src="/kit.webp"
               alt="Santelle Kit"
               width={600}
               height={600}
@@ -983,7 +983,7 @@ export default function Home() {
                     )}
                     {/* Middle: Image */}
                     <div className={`flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 ${isBiomarkerCard ? 'my-1 md:my-0' : 'my-2 md:my-0'}`}>
-                      <img src={isBiomarkerCard ? '/step2.png' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" />
+                      <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" />
                     </div>
                     {/* Bottom: Description */}
                     <div className={`text-xl md:text-3xl w-full ${isBiomarkerCard ? 'text-center' : 'text-center md:text-left'}`}>
@@ -1060,7 +1060,7 @@ export default function Home() {
                         
                         {/* Image */}
                         <div className="flex items-center justify-center w-full h-32 mb-4">
-                          <img src={isBiomarkerCard ? '/step2.png' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-32 w-auto object-contain" />
+                          <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-32 w-auto object-contain" />
                         </div>
                         
                         {/* Description */}
@@ -1289,7 +1289,7 @@ export default function Home() {
                 </div>
                 <div className="mb-4 self-center">
                   <Image
-                    src="/kit.png"
+                    src="/kit.webp"
                     alt="Santelle Kit"
                     width={300}
                     height={300}
@@ -1356,7 +1356,7 @@ export default function Home() {
                       {/* Image */}
                       <div className="flex items-center justify-center w-full mb-3">
                         <img 
-                          src={isBiomarkerCard ? '/step2.png' : step.img} 
+                          src={isBiomarkerCard ? '/step2.webp' : step.img} 
                           alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
                           className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
                         />
