@@ -752,7 +752,7 @@ export default function Home() {
           {/* Desktop Get Early Access Button */}
             {!showEmailForm && (
               <button
-                className="bg-[#721422] text-white font-bold text-xl md:text-2xl px-8 py-4 md:px-12 md:py-6 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse mt-5"
+                className="bg-[#721422] text-white font-bold text-xl md:text-2xl px-8 py-3 md:px-12 md:py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse mt-5"
                 onClick={() => setShowEmailForm(true)}
               >
                 Get Early Access
@@ -776,7 +776,7 @@ export default function Home() {
                       value={formData.email}
                       onChange={handleFormChange}
                       placeholder="your@email.com"
-                      className={`flex-1 px-4 py-3 md:px-8 md:py-5 rounded-l-full border ${
+                      className={`flex-1 px-4 py-3 md:px-8 md:py-4 rounded-l-full border ${
                         emailValidation.error ? 'border-red-500' : 
                         emailValidation.isValid ? 'border-green-500' : 
                         'border-[#ececec]'
@@ -787,7 +787,7 @@ export default function Home() {
                     <button
                       type="submit"
                       disabled={isSubmitting || (!!formData.email && !emailValidation.isValid) || rateLimit.blocked}
-                      className={`px-6 py-3 md:px-10 md:py-5 font-semibold rounded-r-full text-sm md:text-base border transition focus:outline-none focus:ring-2 focus:ring-[#721422]/30
+                      className={`px-6 py-3 md:px-10 md:py-4 font-semibold rounded-r-full text-sm md:text-base border transition focus:outline-none focus:ring-2 focus:ring-[#721422]/30 flex items-center justify-center
                         ${isSubmitting ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                           : (!formData.email ? 'bg-[#721422] text-white border-[#721422]/40 hover:bg-[#8a1a2a] hover:text-white'
                             : (!emailValidation.isValid ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -795,7 +795,15 @@ export default function Home() {
                       `}
                       style={{ WebkitBackdropFilter: 'blur(12px)' }}
                     >
-                      {isSubmitting ? 'Joining...' : rateLimit.blocked ? 'Rate limited' : 'Get early access'}
+                      {isSubmitting ? 'Joining...' : rateLimit.blocked ? 'Rate limited' : (
+                        <Image
+                          src="/S_logo.svg"
+                          alt="Santelle Logo"
+                          width={28}
+                          height={28}
+                          className="w-7 h-7 brightness-0 invert"
+                        />
+                      )}
                     </button>
                   </div>
                   {/* Validation feedback - absolutely positioned */}
@@ -833,14 +841,15 @@ export default function Home() {
         </div>
 
         {/* Mobile Hero Content */}
-        <div className="flex md:hidden flex-col items-start justify-center w-full h-full absolute top-0 left-0 z-10 px-6" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
+        <div className="flex md:hidden flex-col items-start justify-center w-full h-full absolute top-0 left-0 z-10 px-2" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
                       {/* Mobile "Discover Santelle" text and button - centered vertically */}
             <div className="flex flex-col items-start justify-center flex-1 w-full">
-            <span 
-              className="italic text-[#000000] text-3xl font-medium text-left leading-relaxed mb-6 chunko-bold"
-            >
-              Discover Santelle, your vaginal health companion
-            </span>
+                          <span 
+                className="italic text-[#000000] text-4xl font-medium text-left leading-relaxed mb-6 chunko-bold"
+              >
+                Discover Santelle,<br />
+                Your vaginal health companion
+              </span>
             
                         {/* Mobile Get Early Access Button - just below the text */}
             {!showEmailForm && (
@@ -859,52 +868,49 @@ export default function Home() {
                 className="w-full transition-all duration-500 ease-in-out"
                 onSubmit={handleFormSubmit}
               >
-                
                 <div className="relative w-full">
-                  <input
-                    id="waitlist-email-mobile"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    placeholder="your@email.com"
-                    className={`w-full px-6 py-4 rounded-full border ${
-                      emailValidation.error ? 'border-red-500' : 
-                      emailValidation.isValid ? 'border-green-500' : 
-                      'border-[#ececec]'
-                    } bg-white text-[#721422] text-base outline-none focus:ring-2 focus:ring-[#721422]/20 transition caret-[#ff4fa3]`}
-                    required
-                    disabled={isSubmitting}
-                  />
-                  {/* Validation feedback */}
-                  <div className="mt-2">
-                    {emailValidation.isChecking && (
-                      <div className="text-blue-600 text-sm">Checking email domain...</div>
-                    )}
-                    {emailValidation.error && (
-                      <div className="text-red-600 text-sm">{emailValidation.error}</div>
-                    )}
-                    {emailValidation.isValid && !emailValidation.isChecking && (
-                      <div className="text-green-600 text-sm">✓ Valid email address</div>
-                    )}
-                    {/* Rate limiting feedback */}
-                    {rateLimit.blocked && (
-                      <div className="text-red-600 text-sm">
-                        Too many attempts. Please wait {Math.ceil((rateLimit.cooldownEnd - Date.now()) / 1000)} seconds before trying again.
-                      </div>
-                    )}
-                    {/* Submit status */}
-                    {submitStatus === 'success' && (
-                      <div className="text-green-600 text-base font-semibold mt-2">
-                        ✓ You&apos;ve been added to the waitlist!
-                      </div>
-                    )}
-                    {submitStatus === 'error' && (
-                      <div className="text-red-600 text-base font-semibold mt-2">
-                        {rateLimit.blocked ? 'Too many submission attempts. Please wait before trying again.' : 'Something went wrong. Please try again.'}
-                      </div>
-                    )}
+                  {/* Unified input and button container */}
+                  <div className="flex w-full shadow-lg rounded-full overflow-hidden">
+                    {/* Input field - left side */}
+                    <input
+                      id="waitlist-email-mobile"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleFormChange}
+                      placeholder="your@email.com"
+                      className="flex-1 px-6 py-4 bg-white text-[#721422] text-base outline-none transition caret-[#ff4fa3] border-none"
+                      required
+                      disabled={isSubmitting}
+                    />
+                    {/* Submit button - right side */}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-3 py-4 font-semibold text-sm border-none transition focus:outline-none focus:ring-2 focus:ring-[#721422]/30 flex items-center justify-center bg-[#721422] text-white hover:bg-[#8a1a2a]"
+                    >
+                      {isSubmitting ? 'Joining...' : (
+                        <Image
+                          src="/S_logo.svg"
+                          alt="Santelle Logo"
+                          width={50}
+                          height={50}
+                          className="w-8 h-8 brightness-0 invert"
+                        />
+                      )}
+                    </button>
                   </div>
+                  {/* Submit status */}
+                  {submitStatus === 'success' && (
+                    <div className="text-green-600 text-base font-semibold mt-2 text-center">
+                      ✓ You&apos;ve been added to the waitlist!
+                    </div>
+                  )}
+                  {submitStatus === 'error' && (
+                    <div className="text-red-600 text-base font-semibold mt-2 text-center">
+                      Something went wrong. Please try again.
+                    </div>
+                  )}
                 </div>
               </form>
             )}

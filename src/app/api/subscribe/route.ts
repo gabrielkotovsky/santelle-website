@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
 
     // If database save was successful, send welcome email
     try {
+      // Send welcome email to the user
       const emailData = await resend.emails.send({
         from: 'Santelle <waitlist@santellehealth.com>',
         to: email,
@@ -73,6 +74,33 @@ export async function POST(req: NextRequest) {
             <p style="font-size: 14px; color: #999; text-align: center; margin-top: 30px;">
               To Her Health,<br>
               The Santelle Team
+            </p>
+          </div>
+        `
+      });
+
+      // Send notification email to gabrielkotovsky@hotmail.com
+      await resend.emails.send({
+        from: 'Santelle <waitlist@santellehealth.com>',
+        to: 'gabrielkotovsky@hotmail.com',
+        subject: 'New Waitlist Signup - Santelle',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #721422; text-align: center;">New Waitlist Signup</h2>
+            <p style="font-size: 16px; color: #333; line-height: 1.6;">
+              Someone has joined the Santelle waitlist!
+            </p>
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+              <h3 style="color: #721422; margin-top: 0;">Signup Details</h3>
+              <p style="color: #666; margin: 0;">
+                <strong>Email:</strong> ${email}
+              </p>
+              <p style="color: #666; margin: 0;">
+                <strong>Time:</strong> ${new Date().toLocaleString()}
+              </p>
+            </div>
+            <p style="font-size: 14px; color: #999; text-align: center; margin-top: 30px;">
+              This is an automated notification from the Santelle waitlist system.
             </p>
           </div>
         `
