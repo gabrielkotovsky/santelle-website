@@ -71,7 +71,8 @@ export default function Home() {
   const [onHero, setOnHero] = useState(true);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [heroContentVisible, setHeroContentVisible] = useState(true);
-  const [headerFadeOpacity, setHeaderFadeOpacity] = useState(1);
+  const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
+
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const waitlistRef = useRef<HTMLDivElement>(null);
@@ -179,27 +180,26 @@ export default function Home() {
       setScrollProgress(progress);
       setOnHero(window.scrollY < window.innerHeight - 60);
       
-      // Calculate header fade opacity based on scroll to stats card (desktop only)
-      if (window.innerWidth >= 768) {
+      // Calculate hero fade opacity based on scroll to stats card
       const statsCard = document.getElementById('stats');
       if (statsCard) {
         const statsCardTop = statsCard.offsetTop;
-        const fadeStart = windowHeight * 0.5; // Start fading when halfway down the viewport
-        const fadeEnd = statsCardTop - windowHeight * 0.3; // End fading when stats card is 30% up the viewport
+        const statsCardHeight = statsCard.offsetHeight;
+        const fadeStart = 0; // Start fading from the top of the page
+        const fadeEnd = statsCardTop + statsCardHeight; // End fading when stats card is fully in viewport
         
         if (scrollY <= fadeStart) {
-          setHeaderFadeOpacity(1);
+          setHeroFadeOpacity(1);
         } else if (scrollY >= fadeEnd) {
-          setHeaderFadeOpacity(0);
+          setHeroFadeOpacity(0);
         } else {
           const fadeRange = fadeEnd - fadeStart;
           const fadeProgress = (scrollY - fadeStart) / fadeRange;
-          setHeaderFadeOpacity(Math.max(0, 1 - fadeProgress));
-        }
+          setHeroFadeOpacity(Math.max(0, 1 - fadeProgress));
         }
       } else {
-        // On mobile, keep header content always visible
-        setHeaderFadeOpacity(1);
+        // If stats card not found, keep hero content visible
+        setHeroFadeOpacity(1);
       }
     };
     window.addEventListener('scroll', onScroll);
@@ -711,8 +711,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-brand-blue/40 backdrop-blur-sm" />
         </div>
         {/* Desktop Hero Content */}
-        <div className="hidden md:flex flex-col items-center justify-center w-full h-full absolute top-0 left-0 z-10">
-          <div className="flex flex-col items-end w-[680px] max-w-full mx-auto" style={{ opacity: headerFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
+        <div className="hidden md:flex flex-col items-center justify-center w-full h-full absolute top-0 left-0 z-10" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
+          <div className="flex flex-col items-end w-[680px] max-w-full mx-auto">
             <Image
               src="/logo-dark.svg"
               alt="Santelle Logo"
@@ -727,7 +727,6 @@ export default function Home() {
             {!showEmailForm && (
               <button
                 className="bg-[#721422] text-white font-bold text-xl md:text-2xl px-8 py-4 md:px-12 md:py-6 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse mt-5"
-                style={{ opacity: Math.max(0, 1 - scrollProgress / 30) }}
                 onClick={() => setShowEmailForm(true)}
               >
                 Get Early Access
@@ -739,7 +738,6 @@ export default function Home() {
               <form
                 ref={emailFormRef}
                 className="flex flex-col items-center w-full max-w-2xl mt-0 px-4 md:px-0 transition-all duration-500 ease-in-out"
-                style={{ opacity: Math.max(0, 1 - scrollProgress / 30) }}
                 onSubmit={handleFormSubmit}
               >
                 <label htmlFor="waitlist-email" className="self-start mb-1 text-[#721422] font-medium text-base pl-2">Your email*</label>
@@ -809,16 +807,11 @@ export default function Home() {
         </div>
 
         {/* Mobile Hero Content */}
-        <div className="flex md:hidden flex-col items-start justify-center w-full h-full absolute top-0 left-0 z-10 px-6">
+        <div className="flex md:hidden flex-col items-start justify-center w-full h-full absolute top-0 left-0 z-10 px-6" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
                       {/* Mobile "Discover Santelle" text and button - centered vertically */}
             <div className="flex flex-col items-start justify-center flex-1 w-full">
             <span 
               className="italic text-[#000000] text-3xl font-medium text-left leading-relaxed mb-6 chunko-bold"
-              style={{ 
-                opacity: Math.max(0, 1 - scrollProgress / 15),
-                transform: `translateY(${Math.min(scrollProgress / 2, 20)}px)`,
-                transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
-              }}
             >
               Discover Santelle, your vaginal health companion
             </span>
@@ -827,11 +820,6 @@ export default function Home() {
             {!showEmailForm && (
               <button
                 className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
-                style={{ 
-                  opacity: Math.max(0, 1 - scrollProgress / 15),
-                  transform: `translateY(${Math.min(scrollProgress / 2, 20)}px)`,
-                  transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
-                }}
                 onClick={() => setShowEmailForm(true)}
               >
                 Get Early Access
@@ -843,11 +831,6 @@ export default function Home() {
               <form
                 ref={emailFormRef}
                 className="w-full transition-all duration-500 ease-in-out"
-                style={{ 
-                  opacity: Math.max(0, 1 - scrollProgress / 15),
-                  transform: `translateY(${Math.min(scrollProgress / 2, 20)}px)`,
-                  transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
-                }}
                 onSubmit={handleFormSubmit}
               >
                 
@@ -901,16 +884,9 @@ export default function Home() {
             )}
           </div>
         </div>
-        {/* Hero section blur overlay */}
-        <div
-          className="absolute inset-0 z-40 pointer-events-none" 
-                   style={{
-            backdropFilter: `blur(${Math.min(scrollProgress / 20 * 8, 8)}px)`,
-            WebkitBackdropFilter: `blur(${Math.min(scrollProgress / 20 * 8, 8)}px)`
-          }}
-            />
+
         {/* Desktop Bottom Section */}
-        <div className="hidden md:flex absolute left-0 w-full flex-col items-center justify-center gap-4 z-20 bottom-0 md:bottom-20 lg:bottom-20" style={{ opacity: Math.max(0, 1 - scrollProgress / 30) }}>
+        <div className="hidden md:flex absolute left-0 w-full flex-col items-center justify-center gap-4 z-20 bottom-0 md:bottom-20 lg:bottom-20" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
           <span className="italic text-[#721422] text-xl md:text-3xl text-center">Discover Santelle, your vaginal health companion</span>
                 <button
             className="mt-2 bg-white text-[#511828] font-bold text-lg md:text-xl px-8 py-3 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
