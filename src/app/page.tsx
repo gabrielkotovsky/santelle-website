@@ -986,7 +986,7 @@ export default function Home() {
                   )}
               </div>
                 <div className={`text-2xl md:text-3xl text-[#721422] mb-3 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}>Left untreated, this can lead to <span className="text-[#721422] font-bold">infertility</span>, <span className="text-[#721422] font-bold">pregnancy complications</span>, and <span className="text-[#721422] font-bold">long-term discomfort</span>.</div>
-                <div className={`text-3xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It's time to take charge of your vaginal health — with insights, not guesswork.</div>
+                <div className={`text-3xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It&apos;s time to take charge of your vaginal health — with insights, not guesswork.</div>
               <button
                 onClick={e => handleSmoothScroll(e, 'kit')}
                 className="mx-auto mt-10 flex items-center justify-center bg-white text-[#000000] font-bold text-base md:text-xl px-8 py-4 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
@@ -1025,12 +1025,12 @@ export default function Home() {
                   <span className="block md:inline font-normal text-2xl md:text-2xl md:text-5xl mt-0">Your Vaginal Health Companion</span>
                 </h2>
             <p className="text-xl md:text-4xl text-[#721422] mb-2 text-center md:text-left">Easy, discreet, and empowering.</p>
-                <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-4 ">
-               The Santelle Starter Kit is more than a test.<br/>
-               It's your monthly vaginal wellness ritual.<br/>
-               Our at-home kit gives you lab-quality insights.<br/>
-               No clinic visit, no waiting rooms, no shame.
-            </p>
+                                  <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-4 ">
+                 The Santelle Starter Kit is more than a test.<br/>
+                 It&apos;s your monthly vaginal wellness ritual.<br/>
+                 Our at-home kit gives you lab-quality insights.<br/>
+                 No clinic visit, no waiting rooms, no shame.
+               </p>
                 <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-6 ">
               With Santelle, you take quiet control of your intimate health, proactively.
             </p>
@@ -1134,12 +1134,12 @@ export default function Home() {
                       )}
                       {stepIdx === 2 && (
                         <>
-                          Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what's going on.
+                          Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what&apos;s going on.
                         </>
                       )}
                       {stepIdx === 3 && (
                         <>
-                          See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you're managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
+                          See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you&apos;re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
                         </>
                       )}
 
