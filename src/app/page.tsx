@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
@@ -896,7 +897,7 @@ export default function Home() {
             <div className="px-4 md:px-8 py-8 md:py-12 w-full flex justify-center items-center">
               <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
                 <div
-                  className="block md:inline-flex md:flex-row items-center md:items-start text-4xl md:text-6xl font-bold mb-2 text-center md:text-left relative cursor-pointer"
+                  className="block md:inline-flex md:flex-row items-center md:items-start text-4xl md:text-6xl font-bold mb-2 text-center relative cursor-pointer chunko-bold"
                   onClick={() => {
                     setCurrentStatIdx(idx => (idx + 1) % (extraStats.length + 1));
                   }}
@@ -1001,6 +1002,13 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Desktop Horizontal Divider */}
+        <div className="hidden md:block w-full py-12">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-1 bg-[#721422] rounded-full"></div>
+          </div>
+        </div>
+
         {/* Desktop Product Intro Section */}
           <section ref={howItWorksRef} id="how-it-works" className="hidden md:flex w-full py-20 mt-0 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
             <h2 className="hidden md:block font-bold text-5xl md:text-7xl md:text-8xl text-[#721422] mb-0 md:mb-10 text-center">
@@ -1009,13 +1017,101 @@ export default function Home() {
             <div ref={howItWorksRef} className="hidden md:block w-full max-w-7xl mx-auto space-y-8">
                {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
                  const isBiomarkerCard = showBiomarkerCard && stepIdx === 1;
-                 return (
-                   <div
-                     key={isBiomarkerCard ? 'biomarker' : step.number}
-                     className={`w-full flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-8 md:px-8 md:py-16 ${isBiomarkerCard ? 'gap-0 md:gap-0' : 'gap-4 md:gap-8'} transition-all duration-500`}
-                   >
-                    {/* Top: Step number and heading */}
-                    {!isBiomarkerCard && (
+                 
+                 // Only apply motion animation to step 2 (biomarker card)
+                 if (stepIdx === 1) {
+                   return (
+                     <AnimatePresence mode="wait" key="step2">
+                       <motion.div
+                         key={isBiomarkerCard ? 'biomarker' : step.number}
+                         className={`w-full flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-8 md:px-8 md:py-16 ${isBiomarkerCard ? 'gap-0 md:gap-0' : 'gap-4 md:gap-8'}`}
+                         initial={{ opacity: 0, y: 20 }}
+                         animate={{ opacity: 1, y: 0 }}
+                         exit={{ opacity: 0, y: -20 }}
+                         transition={{ duration: 0.6, ease: "easeInOut" }}
+                       >
+                        {/* Top: Step number and heading */}
+                        {!isBiomarkerCard && (
+                          <div className="flex flex-row items-center gap-4 md:gap-8 w-full md:w-auto mb-2 md:mb-0">
+                            <span className="text-4xl md:text-7xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 md:w-20 md:h-20 aspect-square flex items-center justify-center">
+                              {step.number}
+                            </span>
+                            <div className="text-2xl md:text-4xl font-bold">
+                              {step.title}
+                            </div>
+                          </div>
+                        )}
+                        {/* Middle: Image */}
+                        <div className={`flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 ${isBiomarkerCard ? 'my-1 md:my-0' : 'my-2 md:my-0'}`}>
+                          {howItWorksLoaded ? (
+                            <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" loading="lazy" />
+                          ) : (
+                            <div 
+                              className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
+                              style={{
+                                background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                                minWidth: '200px'
+                              }}
+                            />
+                          )}
+                        </div>
+                        {/* Bottom: Description */}
+                        <div className={`text-xl md:text-3xl w-full ${isBiomarkerCard ? 'text-center' : 'text-center md:text-left'}`}>
+                          {stepIdx === 0 && (
+                            <>
+                              A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
+                            </>
+                          )}
+                          {stepIdx === 1 && !isBiomarkerCard && (
+                            <>
+                              Use a small sample of discharge to test for <span className="biomarker-highlight" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(true); }}>6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
+                            </>
+                          )}
+                          {stepIdx === 1 && isBiomarkerCard && (
+                            <>
+                              <div className="text-left max-w-4xl mx-auto">
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                  <ul className="list-disc pl-6 space-y-3 text-lg">
+                                    <li><span className="font-bold">pH:</span> A higher-than-normal vaginal pH (&gt;4.5) may indicate bacterial vaginosis or other infections due to disrupted microbial balance.</li>
+                                    <li><span className="font-bold">H₂O₂ (Hydrogen Peroxide):</span> Hydrogen peroxide is produced by healthy Lactobacillus species and helps maintain vaginal acidity and protect against infections.</li>
+                                    <li><span className="font-bold">LE (Leukocyte Esterase):</span> The presence of leukocyte esterase signals inflammation or infection, often due to an immune response.</li>
+                                  </ul>
+                                  <ul className="list-disc pl-6 space-y-3 text-lg">
+                                    <li><span className="font-bold">SNA (Sialidase Activity):</span> Elevated sialidase activity is a biomarker for bacterial vaginosis, produced by anaerobic bacteria like Gardnerella vaginalis.</li>
+                                    <li><span className="font-bold">β-G (Beta-Glucuronidase):</span> This enzyme, when elevated, suggests bacterial overgrowth or imbalance in the vaginal microbiome.</li>
+                                    <li><span className="font-bold">B-G (Beta-Glucosidase):</span> Increased beta-glucosidase activity can be a sign of microbial dysbiosis and is linked to conditions like bacterial vaginosis.</li>
+                                  </ul>
+                                </div>
+                                <div className="text-center mt-8">
+                                  <button className="px-8 py-3 bg-[#721422] text-white rounded-full font-bold text-xl hover:bg-[#8a1a2a] transition" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(false); }}>Back</button>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                          {stepIdx === 2 && (
+                            <>
+                              Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what&apos;s going on.
+                            </>
+                          )}
+                          {stepIdx === 3 && (
+                            <>
+                              See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you&apos;re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
+                            </>
+                          )}
+
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                  );
+                 } else {
+                   // Regular cards without animation
+                   return (
+                     <div
+                       key={step.number}
+                       className={`w-full flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-8 md:px-8 md:py-16 gap-4 md:gap-8`}
+                     >
+                      {/* Top: Step number and heading */}
                       <div className="flex flex-row items-center gap-4 md:gap-8 w-full md:w-auto mb-2 md:mb-0">
                         <span className="text-4xl md:text-7xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 md:w-20 md:h-20 aspect-square flex items-center justify-center">
                           {step.number}
@@ -1024,70 +1120,28 @@ export default function Home() {
                           {step.title}
                         </div>
                       </div>
-                    )}
-                    {/* Middle: Image */}
-                    <div className={`flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 ${isBiomarkerCard ? 'my-1 md:my-0' : 'my-2 md:my-0'}`}>
-                      {howItWorksLoaded ? (
-                        <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" loading="lazy" />
-                      ) : (
-                        <div 
-                          className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
-                          style={{
-                            background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
-                            minWidth: '200px'
-                          }}
-                        />
-                      )}
+                      {/* Middle: Image */}
+                      <div className="flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 my-2 md:my-0">
+                        {howItWorksLoaded ? (
+                          <img src={step.img} alt={step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" loading="lazy" />
+                        ) : (
+                          <div 
+                            className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
+                            style={{
+                              background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                              minWidth: '200px'
+                            }}
+                          />
+                        )}
+                      </div>
+                      {/* Bottom: Description */}
+                      <div className="text-xl md:text-3xl w-full text-center md:text-left">
+                                                 {step.desc}
+                      </div>
                     </div>
-                    {/* Bottom: Description */}
-                    <div className={`text-xl md:text-3xl w-full ${isBiomarkerCard ? 'text-center' : 'text-center md:text-left'}`}>
-                      {stepIdx === 0 && (
-                        <>
-                          A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
-                        </>
-                      )}
-                      {stepIdx === 1 && !isBiomarkerCard && (
-                        <>
-                          Use a small sample of discharge to test for <span className="biomarker-highlight" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(true); }}>6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
-                        </>
-                      )}
-                      {stepIdx === 1 && isBiomarkerCard && (
-                        <>
-                          <div className="text-left max-w-4xl mx-auto">
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <ul className="list-disc pl-6 space-y-3 text-lg">
-                                <li><span className="font-bold">pH:</span> A higher-than-normal vaginal pH (&gt;4.5) may indicate bacterial vaginosis or other infections due to disrupted microbial balance.</li>
-                                <li><span className="font-bold">H₂O₂ (Hydrogen Peroxide):</span> Hydrogen peroxide is produced by healthy Lactobacillus species and helps maintain vaginal acidity and protect against infections.</li>
-                                <li><span className="font-bold">LE (Leukocyte Esterase):</span> The presence of leukocyte esterase signals inflammation or infection, often due to an immune response.</li>
-                              </ul>
-                              <ul className="list-disc pl-6 space-y-3 text-lg">
-                                <li><span className="font-bold">SNA (Sialidase Activity):</span> Elevated sialidase activity is a biomarker for bacterial vaginosis, produced by anaerobic bacteria like Gardnerella vaginalis.</li>
-                                <li><span className="font-bold">β-G (Beta-Glucuronidase):</span> This enzyme, when elevated, suggests bacterial overgrowth or imbalance in the vaginal microbiome.</li>
-                                <li><span className="font-bold">B-G (Beta-Glucosidase):</span> Increased beta-glucosidase activity can be a sign of microbial dysbiosis and is linked to conditions like bacterial vaginosis.</li>
-                              </ul>
-                            </div>
-                            <div className="text-center mt-8">
-                              <button className="px-8 py-3 bg-[#721422] text-white rounded-full font-bold text-xl hover:bg-[#8a1a2a] transition" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(false); }}>Back</button>
-                            </div>
-                          </div>
-                        </>
-                      )}
-                      {stepIdx === 2 && (
-                        <>
-                          Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what&apos;s going on.
-                        </>
-                      )}
-                      {stepIdx === 3 && (
-                        <>
-                          See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you&apos;re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
-                        </>
-                      )}
-
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                 }
+               })}
 
             </div>
 
@@ -1185,9 +1239,16 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Desktop Horizontal Divider */}
+        <div className="hidden md:block w-full py-12">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-1 bg-[#721422] rounded-full"></div>
+          </div>
+        </div>
+
         {/* Desktop Team/Leadership Section */}
         <section ref={teamSectionRef} id="team" className="hidden md:flex w-full py-5 px-8 lg:px-32 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
-          <h2 className="font-bold text-5xl md:text-7xl text-[#721422] mb-10 text-center">
+          <h2 className="font-bold text-5xl md:text-8xl text-[#721422] mb-10 text-center">
             <span className="chunko-bold">Our Team</span>
           </h2>
           {/* Logos Row */}
