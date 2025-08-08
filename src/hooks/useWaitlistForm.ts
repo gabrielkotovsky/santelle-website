@@ -54,7 +54,7 @@ export function useWaitlistForm() {
       const response = await fetch(`https://dns.google/resolve?name=${domain}&type=MX`);
       const data = await response.json();
       return data.Answer && data.Answer.length > 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -178,7 +178,7 @@ export function useWaitlistForm() {
           cooldownEnd: 0
         });
       }, 3000);
-    } catch (error) {
+    } catch {
       setIsSubmitting(false);
       setSubmitStatus('error');
       setTimeout(() => setSubmitStatus('idle'), 3000);

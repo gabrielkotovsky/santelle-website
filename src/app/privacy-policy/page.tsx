@@ -3,18 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useWaitlistForm } from '../../hooks/useWaitlistForm';
+
 
 export default function PrivacyPolicy() {
-  const {
-    formData,
-    handleFormChange,
-    handleFormSubmit,
-    emailValidation,
-    isSubmitting,
-    submitStatus,
-    rateLimit
-  } = useWaitlistForm();
 
   return (
     <div className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden">

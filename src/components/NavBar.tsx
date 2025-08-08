@@ -17,11 +17,8 @@ const navLinkActive = 'text-black font-bold';
 
 export default function NavBar() {
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const [scrolled, setScrolled] = useState(false);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   // Smooth scroll handler for nav
   function handleSmoothNavScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
@@ -37,46 +34,13 @@ export default function NavBar() {
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 1);
       setHidden(false); // Never hide the navbar
     };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    // On mount, check localStorage and set dark mode
-    const stored = localStorage.getItem('darkMode');
-    if (stored === 'true') {
-      setDarkMode(true);
-      document.documentElement.classList.add('dark');
-    } else {
-      setDarkMode(false);
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
 
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => {
-      const next = !prev;
-      if (next) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      localStorage.setItem('darkMode', next ? 'true' : 'false');
-      return next;
-    });
-  };
-
-  // Close drawer on ESC
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setDrawerOpen(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
 
   return (
     <nav

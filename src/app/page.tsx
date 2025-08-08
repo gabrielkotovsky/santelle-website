@@ -9,20 +9,13 @@ import Link from 'next/link';
 
 const HERO_HEIGHT = '100vh';
 
-const menuItems = [
-  { href: '#memberships', label: 'Memberships' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#why-santelle', label: 'Why Santelle' },
-  { href: '#products', label: 'Products' },
-  { href: '#reviews', label: 'Reviews' },
-  { href: '#support', label: 'Support' },
-];
+
 
 // Custom hook for intersection observer
 function useIntersectionObserver(options = {}) {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasIntersected, setHasIntersected] = useState(false);
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const callback = useCallback((entries: IntersectionObserverEntry[]) => {
     entries.forEach((entry) => {
@@ -68,24 +61,18 @@ export default function Home() {
     link2.href = 'https://fonts.gstatic.com';
     document.head.appendChild(link2);
   }, []);
-  const [onHero, setOnHero] = useState(true);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
-  const [heroContentVisible, setHeroContentVisible] = useState(true);
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
 
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const waitlistRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
-  const howItWorksCardsRef = useRef<HTMLDivElement>(null);
   const emailFormRef = useRef<HTMLFormElement>(null);
 
   // Lazy loading states
   const [kitSectionLoaded, setKitSectionLoaded] = useState(false);
   const [howItWorksLoaded, setHowItWorksLoaded] = useState(false);
   const [teamSectionLoaded, setTeamSectionLoaded] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(true); // Start as true to show video immediately
-  const [videoError, setVideoError] = useState(false);
 
   // Intersection observers for lazy loading
   const [kitSectionRef, kitSectionIntersecting] = useIntersectionObserver();
@@ -93,22 +80,11 @@ export default function Home() {
   const [teamSectionRef, teamSectionIntersecting] = useIntersectionObserver();
 
   // Animation state for stats card lines
-  const [showStatsLine1, setShowStatsLine1] = useState(true);
-  const [showStatsLine1b, setShowStatsLine1b] = useState(true);
-  const [showStatsLine2, setShowStatsLine2] = useState(true);
-  const [showStatsLine3, setShowStatsLine3] = useState(true);
-  const [statsInView, setStatsInView] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(true);
+  const [showStatsLine1] = useState(true);
+  const [showStatsLine2] = useState(true);
+  const [showStatsLine3] = useState(true);
 
-  // Animation control refs
-  const animationStep = useRef(0);
-  const animationStart = useRef<number | null>(null);
-  const elapsed = useRef(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Animation durations (ms)
-  const delays = [400, 4800, 3000];
-  const fadeDuration = 1200;
 
   // Handle lazy loading triggers
   useEffect(() => {
@@ -129,20 +105,14 @@ export default function Home() {
     }
   }, [teamSectionIntersecting, teamSectionLoaded]);
 
-  // Helper to clear timer
-  function clearAnimTimeout() {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }
+
 
   // Smooth scroll handler
   function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, sectionId: string) {
     e.preventDefault();
-    if (sectionId === 'how-it-works' && howItWorksCardsRef.current) {
+    if (sectionId === 'how-it-works' && howItWorksRef.current) {
       const block = (typeof window !== 'undefined' && window.innerWidth < 768) ? 'start' : 'center';
-      howItWorksCardsRef.current.scrollIntoView({ behavior: 'smooth', block });
+      howItWorksRef.current.scrollIntoView({ behavior: 'smooth', block });
       return;
     }
     const el = document.getElementById(sectionId);
@@ -152,14 +122,7 @@ export default function Home() {
     }
   }
 
-  // Add a helper for span click to scroll to stats
-  function handleSpanScrollToStats(e: React.MouseEvent<HTMLSpanElement>) {
-    e.preventDefault();
-    const el = document.getElementById('stats');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
+
 
   // Sync showSecureLabel with waitlistOpen, but delay label change on close
   useEffect(() => {
@@ -176,10 +139,7 @@ export default function Home() {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      const maxScroll = documentHeight - windowHeight;
-      const progress = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;
-      setScrollProgress(progress);
-      setOnHero(window.scrollY < window.innerHeight - 60);
+
       
       // Calculate hero fade opacity based on scroll position
       if (window.innerWidth >= 768) {
@@ -206,10 +166,8 @@ export default function Home() {
         }
       } else {
                  // Mobile: fade based on unified card
-         const unifiedCard = document.querySelector('.block.md\\:hidden.w-full.py-8') as HTMLElement;
-         if (unifiedCard) {
-           const unifiedCardTop = unifiedCard.getBoundingClientRect().top + scrollY;
-           const unifiedCardHeight = unifiedCard.offsetHeight;
+                 const unifiedCard = document.querySelector('.block.md\\:hidden.w-full.py-8') as HTMLElement;
+        if (unifiedCard) {
           const windowHeight = window.innerHeight;
           const fadeStart = windowHeight/2; // Start fading from the top of the page
           const fadeEnd = windowHeight; // End fading when unified card completely hides hero
@@ -259,8 +217,8 @@ export default function Home() {
     const statsEl = statsRef.current;
     if (!statsEl) return;
     const observer = new window.IntersectionObserver(
-      ([entry]) => {
-        setStatsInView(entry.isIntersecting);
+      () => {
+        // Stats in view tracking removed
       },
       { threshold: 0.3 }
     );
@@ -277,10 +235,7 @@ export default function Home() {
   }, []);
 
   // How It Works stacked card state
-  const [cardOrder, setCardOrder] = useState([0, 1, 2, 3]);
-  const [cardFade, setCardFade] = useState([false, false, false, false]);
-  const [cardSlideIn, setCardSlideIn] = useState([false, false, false, false]);
-  const [cardOffsets, setCardOffsets] = useState([0, 0, 0, 0]);
+  const [cardOrder] = useState([0, 1, 2, 3]);
   const howItWorksSteps = [
     {
       number: 1,
@@ -316,8 +271,6 @@ export default function Home() {
 
   // Add state to control biomarker card
   const [showBiomarkerCard, setShowBiomarkerCard] = useState(false);
-  // Add state for biomarker card slide-out
-  const [biomarkerSlideOut, setBiomarkerSlideOut] = useState(false);
 
   // Add state for cycling stats
   const [currentStatIdx, setCurrentStatIdx] = useState(0);
@@ -335,7 +288,7 @@ export default function Home() {
       '',
     ],
   ];
-  const showArrows = animationComplete && (currentStatIdx > 0 || currentStatIdx < extraStats.length);
+
 
   // Typewriter effect state
   const [typedText, setTypedText] = useState('');
@@ -361,17 +314,10 @@ export default function Home() {
 
   // Calculate card offsets after hydration to prevent hydration mismatch
   useEffect(() => {
-    const newOffsets = cardOrder.map((_, stackIdx) => 
-      (typeof window !== 'undefined' && window.innerWidth < 768) ? 0 : stackIdx * 24
-    );
-    setCardOffsets(newOffsets);
+    // Card offsets calculation removed
   }, [cardOrder]);
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const [formOpen, setFormOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [emailValidation, setEmailValidation] = useState({
     isValid: false,
     isChecking: false,
@@ -483,7 +429,6 @@ export default function Home() {
     
     // Rate limiting checks
     if (rateLimit.blocked && now < rateLimit.cooldownEnd) {
-      const remainingTime = Math.ceil((rateLimit.cooldownEnd - now) / 1000);
       setSubmitStatus('error');
       setTimeout(() => setSubmitStatus('idle'), 3000);
       return;
@@ -580,17 +525,7 @@ export default function Home() {
     }
   };
 
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>, cardIndex: number) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setMousePosition({ x, y });
-    setHoveredCard(cardIndex);
-  };
 
-  const handleCardMouseLeave = () => {
-    setHoveredCard(null);
-  };
 
   // Function to focus the hero section's email input
   const focusHeroEmailInput = () => {
@@ -604,25 +539,7 @@ export default function Home() {
     }, 600);
   };
 
-  const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [showScrollPercent, setShowScrollPercent] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 1);
-      setHidden(false); // Never hide the navbar
-      setShowScrollPercent(true);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => setShowScrollPercent(false), 1000);
-    };
-    window.addEventListener('scroll', onScroll);
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
-  }, []);
 
   // Update cooldown timer display
   useEffect(() => {
@@ -981,7 +898,6 @@ export default function Home() {
                 <div
                   className="block md:inline-flex md:flex-row items-center md:items-start text-4xl md:text-6xl font-bold mb-2 text-center md:text-left relative cursor-pointer"
                   onClick={() => {
-                    if (!animationComplete) return;
                     setCurrentStatIdx(idx => (idx + 1) % (extraStats.length + 1));
                   }}
                 >
@@ -1090,10 +1006,9 @@ export default function Home() {
             <h2 className="hidden md:block font-bold text-5xl md:text-7xl md:text-8xl text-[#721422] mb-0 md:mb-10 text-center">
               <span className="chunko-bold">How It Works</span>
             </h2>
-            <div ref={howItWorksCardsRef} className="hidden md:block w-full max-w-7xl mx-auto space-y-8">
+            <div ref={howItWorksRef} className="hidden md:block w-full max-w-7xl mx-auto space-y-8">
                {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
                  const isBiomarkerCard = showBiomarkerCard && stepIdx === 1;
-                 const isStep2Replaced = showBiomarkerCard && stepIdx === 1;
                  return (
                    <div
                      key={isBiomarkerCard ? 'biomarker' : step.number}
@@ -1286,20 +1201,8 @@ export default function Home() {
                       <div className="w-full px-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 justify-items-center">
                 {/* Left: Leonor Landeau */}
-                <div 
+                                <div 
                   className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
-                  onMouseMove={(e) => handleCardMouseMove(e, 0)}
-                  onMouseLeave={handleCardMouseLeave}
-                  style={{
-                    background: hoveredCard === 0 ?
-                      `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.13) 28%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.01) 100%),
-     radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.0) 60%),
-     rgba(255,255,255,0.3)` :
-    'rgba(255,255,255,0.3)',
-  transform: hoveredCard === 0 ?
-    `perspective(900px) rotateX(${-(mousePosition.y - 192) * 0.02}deg) rotateY(${(mousePosition.x - 160) * 0.02}deg)` :
-    'none',
-}}
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
                     backgroundImage: 'url(/profile_background.png)',
@@ -1343,18 +1246,7 @@ export default function Home() {
                 {/* Center: Roxanne Sabbag */}
                 <div 
                   className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
-                  onMouseMove={(e) => handleCardMouseMove(e, 1)}
-                  onMouseLeave={handleCardMouseLeave}
-                  style={{
-                    background: hoveredCard === 1 ?
-                      `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.13) 28%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.01) 100%),
-     radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.0) 60%),
-     rgba(255,255,255,0.3)` :
-    'rgba(255,255,255,0.3)',
-  transform: hoveredCard === 1 ?
-    `perspective(900px) rotateX(${-(mousePosition.y - 192) * 0.02}deg) rotateY(${(mousePosition.x - 160) * 0.02}deg)` :
-    'none',
-}}
+
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
                     backgroundImage: 'url(/profile_background.png)',
@@ -1398,18 +1290,7 @@ export default function Home() {
                 {/* Right: Tomasso Busolo */}
                 <div 
                   className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
-                  onMouseMove={(e) => handleCardMouseMove(e, 2)}
-                  onMouseLeave={handleCardMouseLeave}
-                  style={{
-                    background: hoveredCard === 2 ?
-                      `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.13) 28%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.01) 100%),
-     radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.0) 60%),
-     rgba(255,255,255,0.3)` :
-    'rgba(255,255,255,0.3)',
-  transform: hoveredCard === 2 ?
-    `perspective(900px) rotateX(${-(mousePosition.y - 192) * 0.02}deg) rotateY(${(mousePosition.x - 160) * 0.02}deg)` :
-    'none',
-}}
+
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
                     backgroundImage: 'url(/profile_background.png)',

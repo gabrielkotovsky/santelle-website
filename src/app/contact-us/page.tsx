@@ -42,7 +42,7 @@ export default function ContactUs() {
       const response = await fetch(`https://dns.google/resolve?name=${domain}&type=MX`);
       const data = await response.json();
       return data.Answer && data.Answer.length > 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
