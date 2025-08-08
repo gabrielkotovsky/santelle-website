@@ -900,17 +900,35 @@ export default function Home() {
                       )}
                     </button>
                   </div>
-                  {/* Submit status */}
-                  {submitStatus === 'success' && (
-                    <div className="text-green-600 text-base font-semibold mt-2 text-center">
-                      ✓ You&apos;ve been added to the waitlist!
-                    </div>
-                  )}
-                  {submitStatus === 'error' && (
-                    <div className="text-red-600 text-base font-semibold mt-2 text-center">
-                      Something went wrong. Please try again.
-                    </div>
-                  )}
+                  {/* Validation feedback */}
+                  <div className="mt-2">
+                    {emailValidation.isChecking && (
+                      <div className="text-blue-600 text-sm">Checking email domain...</div>
+                    )}
+                    {emailValidation.error && (
+                      <div className="text-red-600 text-sm">{emailValidation.error}</div>
+                    )}
+                    {emailValidation.isValid && !emailValidation.isChecking && (
+                      <div className="text-green-600 text-sm">✓ Valid email address</div>
+                    )}
+                    {/* Rate limiting feedback */}
+                    {rateLimit.blocked && (
+                      <div className="text-red-600 text-sm">
+                        Too many attempts. Please wait {Math.ceil((rateLimit.cooldownEnd - Date.now()) / 1000)} seconds before trying again.
+                      </div>
+                    )}
+                    {/* Submit status */}
+                    {submitStatus === 'success' && (
+                      <div className="text-green-600 text-base font-semibold mt-2">
+                        ✓ You&apos;ve been added to the waitlist!
+                      </div>
+                    )}
+                    {submitStatus === 'error' && (
+                      <div className="text-red-600 text-base font-semibold mt-2">
+                        {rateLimit.blocked ? 'Too many submission attempts. Please wait before trying again.' : 'Something went wrong. Please try again.'}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </form>
             )}
