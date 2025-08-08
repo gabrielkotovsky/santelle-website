@@ -167,6 +167,7 @@ export default function Home() {
   }, [waitlistOpen]);
 
   useEffect(() => {
+    // Display page at the top on load
     window.scrollTo(0, 0);
   }, []);
 
