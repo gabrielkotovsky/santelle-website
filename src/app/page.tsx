@@ -180,26 +180,52 @@ export default function Home() {
       setScrollProgress(progress);
       setOnHero(window.scrollY < window.innerHeight - 60);
       
-      // Calculate hero fade opacity based on scroll to stats card
-      const statsCard = document.getElementById('stats');
-      if (statsCard) {
-        const statsCardTop = statsCard.offsetTop;
-        const statsCardHeight = statsCard.offsetHeight;
-        const fadeStart = 0; // Start fading from the top of the page
-        const fadeEnd = statsCardTop + statsCardHeight; // End fading when stats card is fully in viewport
-        
-        if (scrollY <= fadeStart) {
-          setHeroFadeOpacity(1);
-        } else if (scrollY >= fadeEnd) {
-          setHeroFadeOpacity(0);
+      // Calculate hero fade opacity based on scroll position
+      if (window.innerWidth >= 768) {
+        // Desktop: fade based on stats card
+        const statsCard = document.getElementById('stats');
+        if (statsCard) {
+          const statsCardTop = statsCard.offsetTop;
+          const statsCardHeight = statsCard.offsetHeight;
+          const fadeStart = 0; // Start fading from the top of the page
+          const fadeEnd = statsCardTop + statsCardHeight; // End fading when stats card is fully in viewport
+          
+          if (scrollY <= fadeStart) {
+            setHeroFadeOpacity(1);
+          } else if (scrollY >= fadeEnd) {
+            setHeroFadeOpacity(0);
+          } else {
+            const fadeRange = fadeEnd - fadeStart;
+            const fadeProgress = (scrollY - fadeStart) / fadeRange;
+            setHeroFadeOpacity(Math.max(0, 1 - fadeProgress));
+          }
         } else {
-          const fadeRange = fadeEnd - fadeStart;
-          const fadeProgress = (scrollY - fadeStart) / fadeRange;
-          setHeroFadeOpacity(Math.max(0, 1 - fadeProgress));
+          // If stats card not found, keep hero content visible
+          setHeroFadeOpacity(1);
         }
       } else {
-        // If stats card not found, keep hero content visible
-        setHeroFadeOpacity(1);
+                 // Mobile: fade based on unified card
+         const unifiedCard = document.querySelector('.block.md\\:hidden.w-full.py-8') as HTMLElement;
+         if (unifiedCard) {
+           const unifiedCardTop = unifiedCard.getBoundingClientRect().top + scrollY;
+           const unifiedCardHeight = unifiedCard.offsetHeight;
+          const windowHeight = window.innerHeight;
+          const fadeStart = 0; // Start fading from the top of the page
+          const fadeEnd = unifiedCardTop + unifiedCardHeight - windowHeight; // End fading when unified card completely hides hero
+          
+          if (scrollY <= fadeStart) {
+            setHeroFadeOpacity(1);
+          } else if (scrollY >= fadeEnd) {
+            setHeroFadeOpacity(0);
+          } else {
+            const fadeRange = fadeEnd - fadeStart;
+            const fadeProgress = (scrollY - fadeStart) / fadeRange;
+            setHeroFadeOpacity(Math.max(0, 1 - fadeProgress));
+          }
+        } else {
+          // If unified card not found, keep hero content visible
+          setHeroFadeOpacity(1);
+        }
       }
     };
     window.addEventListener('scroll', onScroll);
