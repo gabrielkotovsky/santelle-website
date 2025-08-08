@@ -681,7 +681,8 @@ export default function Home() {
           left: 'env(safe-area-inset-left)',
           right: 'env(safe-area-inset-right)'
         }}>
-          <video
+          {/* Video temporarily hidden */}
+          {/* <video
             src="/background.mov"
             autoPlay
             loop
@@ -697,18 +698,16 @@ export default function Home() {
             onLoadedData={() => setVideoLoaded(true)}
             onCanPlay={() => setVideoLoaded(true)}
             onError={() => setVideoError(true)}
+          /> */}
+          {/* Fallback background - temporarily showing instead of video */}
+          <div 
+            className="absolute inset-0 w-full h-full"
+            style={{
+              background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
+              width: '100vw',
+              height: '100dvh'
+            }}
           />
-          {/* Fallback background only for video error */}
-          {videoError && (
-            <div 
-              className="absolute inset-0 w-full h-full"
-              style={{
-                background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
-                width: '100vw',
-                height: '100dvh'
-              }}
-            />
-          )}
           <div className="absolute inset-0 bg-brand-blue/40 backdrop-blur-sm" />
         </div>
         {/* Desktop Hero Content */}
@@ -1275,7 +1274,12 @@ export default function Home() {
     'none',
 }}
                 >
-                  <div className="w-full h-96 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
+                    backgroundImage: 'url(/profile_background.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}>
                     {teamSectionLoaded ? (
                       <Image
                         src="/LL.png"
@@ -1287,9 +1291,12 @@ export default function Home() {
                       />
                     ) : (
                       <div 
-                        className="w-full h-full bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
+                        className="w-full h-full animate-pulse"
                         style={{
-                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                          backgroundImage: 'url(/profile_background.png)',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat'
                         }}
                       />
                     )}
@@ -1322,7 +1329,12 @@ export default function Home() {
     'none',
 }}
                 >
-                  <div className="w-full h-96 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
+                    backgroundImage: 'url(/profile_background.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}>
                     {teamSectionLoaded ? (
                       <Image
                         src="/RS.png"
@@ -1334,9 +1346,12 @@ export default function Home() {
                       />
                     ) : (
                       <div 
-                        className="w-full h-full bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
+                        className="w-full h-full animate-pulse"
                         style={{
-                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                          backgroundImage: 'url(/profile_background.png)',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat'
                         }}
                       />
                     )}
@@ -1369,7 +1384,12 @@ export default function Home() {
     'none',
 }}
                 >
-                  <div className="w-full h-96 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] flex items-center justify-center overflow-hidden">
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
+                    backgroundImage: 'url(/profile_background.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}>
                     {teamSectionLoaded ? (
                       <Image
                         src="/TB.png"
@@ -1381,9 +1401,12 @@ export default function Home() {
                       />
                     ) : (
                       <div 
-                        className="w-full h-full bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
+                        className="w-full h-full animate-pulse"
                         style={{
-                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                          backgroundImage: 'url(/profile_background.png)',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat'
                         }}
                       />
                     )}
