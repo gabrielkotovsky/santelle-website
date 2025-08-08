@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     // If database save was successful, send welcome email
     try {
       const emailData = await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: 'Santelle <waitlist@santellehealth.com>',
         to: email,
         subject: 'Welcome to the Santelle Waitlist! 🎉',
         html: `
