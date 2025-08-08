@@ -57,10 +57,10 @@ export default function MobileNavBar() {
             <Image 
               src="/logo-dark.svg" 
               alt="Santelle Logo" 
-              width={80} 
-              height={27} 
+              width={120} 
+              height={40} 
               priority 
-              className={`h-7 w-auto transition-all duration-300 ${
+              className={`h-8 w-auto transition-all duration-300 ${
                 isOpen ? 'brightness-0 invert' : ''
               }`}
             />

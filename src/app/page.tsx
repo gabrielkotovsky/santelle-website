@@ -904,7 +904,7 @@ export default function Home() {
                   {currentStatIdx === 0 ? (
                     <>
                       <span 
-                        className={`transition-opacity duration-[1200ms] text-2xl md:text-5xl ${showStatsLine1 ? 'opacity-100' : 'opacity-0'} cursor-pointer hover:scale-105 transition-transform duration-200 select-none`} 
+                        className={`transition-opacity duration-[1200ms] text-4xl md:text-5xl ${showStatsLine1 ? 'opacity-100' : 'opacity-0'} cursor-pointer hover:scale-105 transition-transform duration-200 select-none`} 
                         style={{color: '#721422'}}
                         onClick={() => {
                           setCurrentStatIdx(idx => (idx + 1) % (extraStats.length + 1));
@@ -917,7 +917,7 @@ export default function Home() {
                     </>
                   ) : (
                     <>
-                      <span className="opacity-100 text-2xl md:text-5xl" style={{color: '#721422', minHeight: 0}}>
+                      <span className="opacity-100 text-4xl md:text-5xl" style={{color: '#721422', minHeight: 0}}>
                         {typedText}
                         <span className="inline-block w-2 animate-pulse align-baseline" style={{opacity: typing ? 1 : 0}}>|</span>
                       </span>
@@ -927,11 +927,11 @@ export default function Home() {
                     </>
                   )}
               </div>
-                <div className={`text-2xl md:text-3xl text-[#721422] mb-3 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}>Left untreated, this can lead to <span className="text-[#721422] font-bold">infertility</span>, <span className="text-[#721422] font-bold">pregnancy complications</span>, and <span className="text-[#721422] font-bold">long-term discomfort</span>.</div>
-                <div className={`text-3xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It&apos;s time to take charge of your vaginal health — with insights, not guesswork.</div>
+                <div className={`text-3xl md:text-3xl text-[#721422] mb-3 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}>Left untreated, this can lead to <span className="text-[#721422] font-bold">infertility</span>, <span className="text-[#721422] font-bold">pregnancy complications</span>, and <span className="text-[#721422] font-bold">long-term discomfort</span>.</div>
+                <div className={`text-4xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It&apos;s time to take charge of your vaginal health — with insights, not guesswork.</div>
               <button
                 onClick={e => handleSmoothScroll(e, 'kit')}
-                className="mx-auto mt-10 flex items-center justify-center bg-white text-[#000000] font-bold text-base md:text-xl px-8 py-4 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
+                className="mx-auto mt-10 flex items-center justify-center bg-white text-[#000000] font-bold text-lg md:text-xl px-8 py-4 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
                 aria-label="Scroll to kit section"
               >
                 Discover how Santelle supports you
@@ -1338,76 +1338,81 @@ export default function Home() {
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
             
             {/* Stats Section */}
-            <div className="py-6">
-              <div className="text-left">
-                <div className="text-2xl font-bold text-[#721422] mb-4">
+            <div className="py-20">
+              <div className="text-center">
+                <div className="chunko-bold text-3xl font-bold text-[#721422] mb-20">
                   Vaginal infections affect 3 in 4 women. 50% are recurrent.
                 </div>
-                <div className="text-lg text-[#721422] mb-4">
-                  Left untreated, this can lead to <span className="font-bold">infertility</span>, <span className="font-bold">pregnancy complications</span>, and <span className="font-bold">long-term discomfort</span>.
+                <div className="text-2xl text-[#721422] mb-20">
+                  Untreated, they can lead to<br/>
+                  <span className="font-bold">pregnancy complications</span><br/>
+                  <span className="font-bold">long-term discomfort</span><br/>
+                  <span className="font-bold">infertility</span>
                 </div>
-                <div className="text-xl font-bold text-[#FD9EAA] mb-6">
+                <div className="text-xl font-bold text-[#EF7D88] mb-4">
                   It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
                 </div>
               </div>
             </div>
 
-            {/* Kit Section */}
-            <div className="py-6">
+            {/* Meet Section Title */}
+            <div className="py-20">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
+                <h2 className="font-bold text-4xl text-[#721422] text-center">
+                  <span className="chunko-bold">Meet Santelle</span>
+                </h2>
+                <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
+              </div>
               <div className="flex flex-col items-start text-left">
-                <div className="flex items-center gap-4 mb-4">
-                  <h2 className="font-bold text-3xl text-[#721422]">
-                    <span className="chunko-bold">Meet Santelle</span>
-                  </h2>
-                  <div className="flex-1 h-2 bg-[#721422] rounded-full" style={{backgroundColor: '#721422'}}></div>
-                </div>
+                
                 <div className="mb-4 self-center">
                   <Image
                     src="/kit.webp"
                     alt="Santelle Kit"
                     width={300}
                     height={300}
-                    className="w-full max-w-[200px] h-auto object-contain drop-shadow-lg"
+                    className="w-full max-w-[300px] h-auto object-contain drop-shadow-lg"
                     priority
                   />
                 </div>
-                <div className="text-xl text-[#721422] text-center mb-4">
-                  Your Vaginal Health Companion
+                <div className="font-bold text-xl text-[#721422] text-left mb-4">
+                  Your vaginal health companion
                 </div>
-                <p className="text-base text-[#721422] mb-4">Easy, discreet, and empowering.</p>
-                <p className="text-sm text-[#721422] mb-4 leading-relaxed">
-                  The Santelle Starter Kit is more than a test<br/>
-                  It&apos;s your monthly vaginal wellness ritual<br/>
-                  Our at-home kit gives you lab-quality insights<br/>
-                  No clinic visit, no waiting rooms, no shame
+                <p className="font-bold text-lg text-[#721422] mb-0">Easy, Discreet, Empowering</p>
+                <p className="text-lg text-[#721422] mb-4 leading-relaxed">
+                  The Santelle Starter Kit is more than a test, it&apos;s your monthly vaginal wellness ritual. Our at-home kit gives you lab-quality insights. No clinic visit, no waiting rooms, no shame.
                 </p>
-                <p className="text-sm text-[#721422] mb-4 leading-relaxed">
-                  With Santelle, you take quiet control of your intimate health, proactively.
+                <p className="text-lg text-[#721422] mb-4 leading-relaxed">
+                  With Santelle, you take quiet control of your intimate health.
                 </p>
-                <ul className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-sm text-left">
-                  <li>Instant results from home</li>
+                <ul className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left">
+                  <li>Instant lab-grade results from home</li>
                   <li>Multi-biomarker analysis, not just pH</li>
                   <li>Connected app for tracking & personalized insights</li>
                 </ul>
                 <div className="flex flex-col gap-3 w-full">
+                <div className="flex justify-center mt-0 mb-6">
                 <button
-                    className="bg-[#721422] text-white font-bold text-base px-6 py-3 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
-                    onClick={focusHeroEmailInput}
-                    type="button"
-                  >
-                    Get Early Access
+                  className="bg-[#721422] text-white font-bold text-xl px-8 py-4 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
+                  onClick={focusHeroEmailInput}
+                  type="button"
+                >
+                  Get Early Access
                 </button>
+              </div>
               </div>
               </div>
             </div>
 
             {/* How It Works Section */}
-            <div className="py-6">
+            <div className="py-20">
               <div className="flex items-center gap-4 mb-6">
-                <h2 className="font-bold text-3xl text-[#721422] text-left">
+                <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
+                <h2 className="font-bold text-4xl text-[#721422] text-center">
                   <span className="chunko-bold">How It Works</span>
                 </h2>
-                <div className="flex-1 h-1 bg-[#721422]/50 rounded-full"></div>
+                <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
               </div>
               {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
                 const isBiomarkerCard = showBiomarkerCard && stepIdx === 1;
@@ -1418,10 +1423,10 @@ export default function Home() {
                       {/* Step number and title */}
                       {!isBiomarkerCard && (
                         <div className="flex flex-col items-center gap-3 mb-3 w-full">
-                          <span className="text-2xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 aspect-square flex items-center justify-center">
+                          <span className="text-3xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 aspect-square flex items-center justify-center">
                             {step.number}
                           </span>
-                          <div className="text-lg font-bold text-[#721422] text-center">
+                          <div className="text-2xl font-bold text-[#721422] text-center">
                             {step.title}
                           </div>
                         </div>
@@ -1438,7 +1443,7 @@ export default function Home() {
                       </div>
                       
                       {/* Description */}
-                      <div className="text-sm text-[#721422] leading-relaxed">
+                      <div className="text-lg text-[#721422] leading-relaxed">
                         {stepIdx === 0 && (
                           <>
                             A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
@@ -1488,15 +1493,27 @@ export default function Home() {
                 </div>
                 );
               })}
+              
+              {/* Get Early Access Button */}
+              <div className="flex justify-center mt-0 mb-6">
+                <button
+                  className="bg-[#721422] text-white font-bold text-xl px-8 py-4 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
+                  onClick={focusHeroEmailInput}
+                  type="button"
+                >
+                  Get Early Access
+                </button>
+              </div>
             </div>
 
             {/* Team Section */}
             <div className="py-6">
               <div className="flex items-center gap-4 mb-6">
-                <h2 className="font-bold text-3xl text-[#721422] text-left">
+                <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
+                <h2 className="font-bold text-4xl text-[#721422] text-center">
                   <span className="chunko-bold">Our Team</span>
                 </h2>
-                <div className="flex-1 h-1 bg-[#721422]/50 rounded-full"></div>
+                <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
               </div>
               
               {/* Logos Carousel */}
@@ -1529,12 +1546,12 @@ export default function Home() {
                       <Image src="/RS.png" alt="Roxanne Sabbag" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-[#721422]">Roxanne Sabbag</h3>
-                      <p className="text-sm font-semibold text-[#ff4fa3]">Founder & CEO</p>
+                      <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
+                      <p className="text-xl font-semibold text-[#ff4fa3]">Founder & CEO</p>
                     </div>
                   </div>
-                  <p className="text-xs text-[#721422]/80 leading-relaxed">
-                    Biomedical Engineer, Imperial College London, Life Sciences Strategy Consultant, McKinsey & Co., Contributor to McKinsey Women&apos;s Health Initiative, Experienced in Equity Storytelling & Fundraising
+                  <p className="text-base text-[#721422]/80 leading-relaxed">
+                    Biomedical Engineer, Imperial College London, Life Sciences Strategy Consultant, McKinsey & Co., Contributor to McKinsey Women&apos;s Health Initiative, Experienced in Equity Storytelling & Fundraising.
                   </p>
                 </div>
 
@@ -1544,12 +1561,12 @@ export default function Home() {
                       <Image src="/LL.png" alt="Leonor Landeau" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-[#721422]">Leonor Landeau</h3>
-                      <p className="text-sm font-semibold text-[#ff4fa3]">Collaborator & Advisor</p>
+                      <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
+                      <p className="text-xl font-semibold text-[#ff4fa3]">Collaborator & Advisor</p>
                     </div>
                   </div>
-                  <p className="text-xs text-[#721422]/80 leading-relaxed">
-                    Product Manager, Health tech, Expertise in startups, scale-ups, wearables, Marketing Data Science
+                  <p className="text-base text-[#721422]/80 leading-relaxed">
+                    Product Manager, Health tech, Expertise in startups, scale-ups, wearables, Marketing Data Science.
                   </p>
                 </div>
 
@@ -1559,12 +1576,12 @@ export default function Home() {
                       <Image src="/TB.png" alt="Tomasso Busolo" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-[#721422]">Tomasso Busolo</h3>
-                      <p className="text-sm font-semibold text-[#ff4fa3]">Collaborator & Advisor</p>
+                      <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>
+                      <p className="text-xl font-semibold text-[#ff4fa3]">Collaborator & Advisor</p>
                     </div>
                   </div>
-                  <p className="text-xs text-[#721422]/80 leading-relaxed">
-                    PhD in Materials Science, Founder of Smart Underwear start-up ALMA, Product Innovation
+                  <p className="text-base text-[#721422]/80 leading-relaxed">
+                    PhD in Materials Science, Founder of Smart Underwear start-up ALMA, Product Innovation.
                   </p>
                 </div>
               </div>
