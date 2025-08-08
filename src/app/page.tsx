@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
 
 import confetti from 'canvas-confetti';
@@ -18,10 +18,59 @@ const menuItems = [
   { href: '#support', label: 'Support' },
 ];
 
+// Custom hook for intersection observer
+function useIntersectionObserver(options = {}) {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const [hasIntersected, setHasIntersected] = useState(false);
+  const elementRef = useRef<HTMLElement>(null);
+
+  const callback = useCallback((entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        setIsIntersecting(true);
+        setHasIntersected(true);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(callback, {
+      rootMargin: '50px 0px',
+      threshold: 0.1,
+      ...options,
+    });
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => {
+      if (elementRef.current) {
+        observer.unobserve(elementRef.current);
+      }
+    };
+  }, [callback, options]);
+
+  return [elementRef, isIntersecting, hasIntersected] as const;
+}
+
 export default function Home() {
+  // Add preconnect hints for better performance
+  useEffect(() => {
+    // Preconnect to CDN if you're using one
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = 'https://fonts.googleapis.com';
+    document.head.appendChild(link);
+    
+    const link2 = document.createElement('link');
+    link2.rel = 'preconnect';
+    link2.href = 'https://fonts.gstatic.com';
+    document.head.appendChild(link2);
+  }, []);
   const [onHero, setOnHero] = useState(true);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
-  const [heroContentVisible, setHeroContentVisible] = useState(true); // NEW STATE
+  const [heroContentVisible, setHeroContentVisible] = useState(true);
   const [headerFadeOpacity, setHeaderFadeOpacity] = useState(1);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -29,6 +78,18 @@ export default function Home() {
   const statsRef = useRef<HTMLDivElement>(null);
   const howItWorksCardsRef = useRef<HTMLDivElement>(null);
   const emailFormRef = useRef<HTMLFormElement>(null);
+
+  // Lazy loading states
+  const [kitSectionLoaded, setKitSectionLoaded] = useState(false);
+  const [howItWorksLoaded, setHowItWorksLoaded] = useState(false);
+  const [teamSectionLoaded, setTeamSectionLoaded] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(true); // Start as true to show video immediately
+  const [videoError, setVideoError] = useState(false);
+
+  // Intersection observers for lazy loading
+  const [kitSectionRef, kitSectionIntersecting] = useIntersectionObserver();
+  const [howItWorksRef, howItWorksIntersecting] = useIntersectionObserver();
+  const [teamSectionRef, teamSectionIntersecting] = useIntersectionObserver();
 
   // Animation state for stats card lines
   const [showStatsLine1, setShowStatsLine1] = useState(true);
@@ -39,14 +100,33 @@ export default function Home() {
   const [animationComplete, setAnimationComplete] = useState(true);
 
   // Animation control refs
-  const animationStep = useRef(0); // 0: not started, 1: line1, 2: line2, 3: line3, 4: done
+  const animationStep = useRef(0);
   const animationStart = useRef<number | null>(null);
   const elapsed = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Animation durations (ms)
-  const delays = [400, 4800, 3000]; // initial, between 1-2, between 2-3
+  const delays = [400, 4800, 3000];
   const fadeDuration = 1200;
+
+  // Handle lazy loading triggers
+  useEffect(() => {
+    if (kitSectionIntersecting && !kitSectionLoaded) {
+      setKitSectionLoaded(true);
+    }
+  }, [kitSectionIntersecting, kitSectionLoaded]);
+
+  useEffect(() => {
+    if (howItWorksIntersecting && !howItWorksLoaded) {
+      setHowItWorksLoaded(true);
+    }
+  }, [howItWorksIntersecting, howItWorksLoaded]);
+
+  useEffect(() => {
+    if (teamSectionIntersecting && !teamSectionLoaded) {
+      setTeamSectionLoaded(true);
+    }
+  }, [teamSectionIntersecting, teamSectionLoaded]);
 
   // Helper to clear timer
   function clearAnimTimeout() {
@@ -190,13 +270,13 @@ export default function Home() {
     {
       number: 3,
       title: 'Enter Your Results in the App',
-      desc: 'Match your strip to the color guide and enter your results in the Santelle app. Get instant, clear personalized insights to understand what’s going on.',
+      desc: 'Match your strip to the color guide and enter your results in the Santelle app. Get instant, clear personalized insights to understand what\'s going on.',
       img: '/step3.webp',
     },
     {
       number: 4,
       title: 'Track, Learn & Take Control',
-      desc: 'See patterns, get monthly tips, and stay ahead of changes — whether you’re managing symptoms, pregnancy, or just staying in tune.',
+      desc: 'See patterns, get monthly tips, and stay ahead of changes — whether you\'re managing symptoms, pregnancy, or just staying in tune.',
       img: '/step4.webp',
     },
     {
@@ -614,7 +694,21 @@ export default function Home() {
               width: '100vw',
               height: '100dvh'
             }}
+            onLoadedData={() => setVideoLoaded(true)}
+            onCanPlay={() => setVideoLoaded(true)}
+            onError={() => setVideoError(true)}
           />
+          {/* Fallback background only for video error */}
+          {videoError && (
+            <div 
+              className="absolute inset-0 w-full h-full"
+              style={{
+                background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
+                width: '100vw',
+                height: '100dvh'
+              }}
+            />
+          )}
           <div className="absolute inset-0 bg-brand-blue/40 backdrop-blur-sm" />
         </div>
         {/* Desktop Hero Content */}
@@ -892,7 +986,7 @@ export default function Home() {
                   )}
               </div>
                 <div className={`text-2xl md:text-3xl text-[#721422] mb-3 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}>Left untreated, this can lead to <span className="text-[#721422] font-bold">infertility</span>, <span className="text-[#721422] font-bold">pregnancy complications</span>, and <span className="text-[#721422] font-bold">long-term discomfort</span>.</div>
-                <div className={`text-3xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It’s time to take charge of your vaginal health — with insights, not guesswork.</div>
+                <div className={`text-3xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It's time to take charge of your vaginal health — with insights, not guesswork.</div>
               <button
                 onClick={e => handleSmoothScroll(e, 'kit')}
                 className="mx-auto mt-10 flex items-center justify-center bg-white text-[#000000] font-bold text-base md:text-xl px-8 py-4 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
@@ -904,17 +998,26 @@ export default function Home() {
             </div>
           </section>
         {/* Desktop Kit Image Section */}
-          <section id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center mb-20 md:mb-20">
+          <section ref={kitSectionRef} id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center mb-20 md:mb-20">
             <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-0 md:p-0 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-12 w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
           <div className="md:w-1/2 flex justify-center md:justify-end items-center p-0 py-2 md:py-0">
-            <Image
-              src="/kit.webp"
-              alt="Santelle Kit"
-              width={600}
-              height={600}
-              className="w-full max-w-[28.8rem] md:w-[900px] md:max-w-[54rem] h-auto object-contain drop-shadow-lg"
-              priority
-            />
+            {kitSectionLoaded ? (
+              <Image
+                src="/kit.webp"
+                alt="Santelle Kit"
+                width={600}
+                height={600}
+                className="w-full max-w-[28.8rem] md:w-[900px] md:max-w-[54rem] h-auto object-contain drop-shadow-lg"
+                loading="lazy"
+              />
+            ) : (
+              <div 
+                className="w-full max-w-[28.8rem] md:w-[900px] md:max-w-[54rem] h-[600px] bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
+                style={{
+                  background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                }}
+              />
+            )}
           </div>
           <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center">
                 <h2 className="font-bold text-5xl md:text-7xl md:text-7xl text-[#721422] mb-0 text-left">
@@ -924,7 +1027,7 @@ export default function Home() {
             <p className="text-xl md:text-4xl text-[#721422] mb-2 text-center md:text-left">Easy, discreet, and empowering.</p>
                 <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-4 ">
                The Santelle Starter Kit is more than a test.<br/>
-               It’s your monthly vaginal wellness ritual.<br/>
+               It's your monthly vaginal wellness ritual.<br/>
                Our at-home kit gives you lab-quality insights.<br/>
                No clinic visit, no waiting rooms, no shame.
             </p>
@@ -957,7 +1060,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Product Intro Section */}
-          <section id="how-it-works" className="hidden md:flex w-full py-20 mt-0 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
+          <section ref={howItWorksRef} id="how-it-works" className="hidden md:flex w-full py-20 mt-0 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
             <h2 className="hidden md:block font-bold text-5xl md:text-7xl md:text-8xl text-[#721422] mb-0 md:mb-10 text-center">
               <span className="chunko-bold">How It Works</span>
             </h2>
@@ -983,7 +1086,17 @@ export default function Home() {
                     )}
                     {/* Middle: Image */}
                     <div className={`flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 ${isBiomarkerCard ? 'my-1 md:my-0' : 'my-2 md:my-0'}`}>
-                      <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" />
+                      {howItWorksLoaded ? (
+                        <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" loading="lazy" />
+                      ) : (
+                        <div 
+                          className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
+                          style={{
+                            background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                            minWidth: '200px'
+                          }}
+                        />
+                      )}
                     </div>
                     {/* Bottom: Description */}
                     <div className={`text-xl md:text-3xl w-full ${isBiomarkerCard ? 'text-center' : 'text-center md:text-left'}`}>
@@ -1021,12 +1134,12 @@ export default function Home() {
                       )}
                       {stepIdx === 2 && (
                         <>
-                          Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what’s going on.
+                          Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what's going on.
                         </>
                       )}
                       {stepIdx === 3 && (
                         <>
-                          See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you’re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
+                          See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you're managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
                         </>
                       )}
 
@@ -1060,7 +1173,7 @@ export default function Home() {
                         
                         {/* Image */}
                         <div className="flex items-center justify-center w-full h-32 mb-4">
-                          <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-32 w-auto object-contain" />
+                          <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-32 w-auto object-contain" loading="lazy" />
                         </div>
                         
                         {/* Description */}
@@ -1132,17 +1245,17 @@ export default function Home() {
         </section>
 
         {/* Desktop Team/Leadership Section */}
-        <section id="team" className="hidden md:flex w-full py-5 px-8 lg:px-32 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
+        <section ref={teamSectionRef} id="team" className="hidden md:flex w-full py-5 px-8 lg:px-32 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
           <h2 className="font-bold text-5xl md:text-7xl text-[#721422] mb-10 text-center">
             <span className="chunko-bold">Our Team</span>
           </h2>
           {/* Logos Row */}
           <div className="flex flex-row justify-center items-center gap-8 md:gap-12 mb-8 w-full">
-            <Image src="/ICL.png" alt="Imperial College London" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} />
-            <Image src="/INSEAD.png" alt="INSEAD" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} />
-            <Image src="/McK.png" alt="McKinsey & Co." width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} />
-            <Image src="/Nabta.png" alt="Nabta" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} />
-            <Image src="/P&G.png" alt="P&G" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} />
+            <Image src="/ICL.png" alt="Imperial College London" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+            <Image src="/INSEAD.png" alt="INSEAD" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+            <Image src="/McK.png" alt="McKinsey & Co." width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+            <Image src="/Nabta.png" alt="Nabta" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+            <Image src="/P&G.png" alt="P&G" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
           </div>
                       <div className="w-full px-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 justify-items-center">
@@ -1163,13 +1276,23 @@ export default function Home() {
 }}
                 >
                   <div className="w-full h-96 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] flex items-center justify-center overflow-hidden">
-                    <Image
-                      src="/LL.png"
-                      alt="Leonor Landeau"
-                      width={320}
-                      height={320}
-                      className="w-full h-full object-cover"
-                    />
+                    {teamSectionLoaded ? (
+                      <Image
+                        src="/LL.png"
+                        alt="Leonor Landeau"
+                        width={320}
+                        height={320}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div 
+                        className="w-full h-full bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
+                        style={{
+                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                        }}
+                      />
+                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Leonor Landeau</h3>
@@ -1200,13 +1323,23 @@ export default function Home() {
 }}
                 >
                   <div className="w-full h-96 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] flex items-center justify-center overflow-hidden">
-                    <Image
-                      src="/RS.png"
-                      alt="Roxanne Sabbag"
-                      width={320}
-                      height={320}
-                      className="w-full h-full object-cover"
-                    />
+                    {teamSectionLoaded ? (
+                      <Image
+                        src="/RS.png"
+                        alt="Roxanne Sabbag"
+                        width={320}
+                        height={320}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div 
+                        className="w-full h-full bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
+                        style={{
+                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                        }}
+                      />
+                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Roxanne Sabbag</h3>
@@ -1237,13 +1370,23 @@ export default function Home() {
 }}
                 >
                   <div className="w-full h-96 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] flex items-center justify-center overflow-hidden">
-                    <Image
-                      src="/TB.png"
-                      alt="Tomasso Busolo"
-                      width={320}
-                      height={320}
-                      className="w-full h-full object-cover"
-                    />
+                    {teamSectionLoaded ? (
+                      <Image
+                        src="/TB.png"
+                        alt="Tomasso Busolo"
+                        width={320}
+                        height={320}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div 
+                        className="w-full h-full bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
+                        style={{
+                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                        }}
+                      />
+                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Tomasso Busolo</h3>
@@ -1356,7 +1499,8 @@ export default function Home() {
                       {/* Image */}
                       <div className="flex items-center justify-center w-full mb-3">
                         <img 
-                          src={isBiomarkerCard ? '/step2.webp' : step.img} 
+                          src={isBiomarkerCard ? '/step2.webp' : step.img}
+                          loading="lazy" 
                           alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
                           className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
                         />
@@ -1429,19 +1573,19 @@ export default function Home() {
                 <div className="flex animate-scroll-left">
                   {/* First set of logos */}
                   <div className="flex items-center gap-6 flex-shrink-0 px-4">
-                    <Image src="/ICL.png" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/INSEAD.png" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/McK.png" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/Nabta.png" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/P&G.png" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
+                    <Image src="/ICL.png" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/INSEAD.png" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/McK.png" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/Nabta.png" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/P&G.png" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
                   </div>
                   {/* Duplicate set for seamless loop */}
                   <div className="flex items-center gap-6 flex-shrink-0 px-4">
-                    <Image src="/ICL.png" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/INSEAD.png" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/McK.png" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/Nabta.png" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
-                    <Image src="/P&G.png" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} />
+                    <Image src="/ICL.png" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/INSEAD.png" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/McK.png" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/Nabta.png" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/P&G.png" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
                   </div>
                 </div>
               </div>
@@ -1451,7 +1595,7 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/RS.png" alt="Roxanne Sabbag" width={48} height={48} className="w-full h-full object-cover" />
+                      <Image src="/RS.png" alt="Roxanne Sabbag" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-[#721422]">Roxanne Sabbag</h3>
@@ -1466,7 +1610,7 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/LL.png" alt="Leonor Landeau" width={48} height={48} className="w-full h-full object-cover" />
+                      <Image src="/LL.png" alt="Leonor Landeau" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-[#721422]">Leonor Landeau</h3>
@@ -1481,7 +1625,7 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/TB.png" alt="Tomasso Busolo" width={48} height={48} className="w-full h-full object-cover" />
+                      <Image src="/TB.png" alt="Tomasso Busolo" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-[#721422]">Tomasso Busolo</h3>
@@ -1504,7 +1648,7 @@ export default function Home() {
             <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
               {/* Logo */}
               <div className="w-full flex justify-center mb-2">
-                <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} />
+                <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} loading="lazy" />
                 </div>
 
               {/* Get Early Access Button */}
