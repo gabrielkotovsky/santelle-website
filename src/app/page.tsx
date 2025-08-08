@@ -210,8 +210,8 @@ export default function Home() {
            const unifiedCardTop = unifiedCard.getBoundingClientRect().top + scrollY;
            const unifiedCardHeight = unifiedCard.offsetHeight;
           const windowHeight = window.innerHeight;
-          const fadeStart = 0; // Start fading from the top of the page
-          const fadeEnd = unifiedCardTop; // End fading when unified card completely hides hero
+          const fadeStart = windowHeight/2; // Start fading from the top of the page
+          const fadeEnd = windowHeight; // End fading when unified card completely hides hero
           
           if (scrollY <= fadeStart) {
             setHeroFadeOpacity(1);
