@@ -1057,17 +1057,12 @@ export default function Home() {
                         </div>
                         {/* Bottom: Description */}
                         <div className={`text-xl md:text-3xl w-full ${isBiomarkerCard ? 'text-center' : 'text-center md:text-left'}`}>
-                          {stepIdx === 0 && (
-                            <>
-                              A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
-                            </>
-                          )}
-                          {stepIdx === 1 && !isBiomarkerCard && (
+                          {!isBiomarkerCard && (
                             <>
                               Use a small sample of discharge to test for <span className="biomarker-highlight" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(true); }}>6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
                             </>
                           )}
-                          {stepIdx === 1 && isBiomarkerCard && (
+                          {isBiomarkerCard && (
                             <>
                               <div className="text-left max-w-4xl mx-auto">
 
@@ -1089,17 +1084,6 @@ export default function Home() {
                               </div>
                             </>
                           )}
-                          {stepIdx === 2 && (
-                            <>
-                              Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what&apos;s going on.
-                            </>
-                          )}
-                          {stepIdx === 3 && (
-                            <>
-                              See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you&apos;re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
-                            </>
-                          )}
-
                         </div>
                       </motion.div>
                     </AnimatePresence>
