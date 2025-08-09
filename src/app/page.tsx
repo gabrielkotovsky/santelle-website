@@ -28,19 +28,20 @@ function useIntersectionObserver(options = {}) {
   }, []);
 
   useEffect(() => {
+    const currentElement = elementRef.current;
     const observer = new IntersectionObserver(callback, {
       rootMargin: '50px 0px',
       threshold: 0.1,
       ...options,
     });
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
+    if (currentElement) {
+      observer.observe(currentElement);
     }
 
     return () => {
-      if (elementRef.current) {
-        observer.unobserve(elementRef.current);
+      if (currentElement) {
+        observer.unobserve(currentElement);
       }
     };
   }, [callback, options]);
@@ -138,10 +139,7 @@ export default function Home() {
   useEffect(() => {
     const onScroll = () => {
       const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
 
-      
       // Calculate hero fade opacity based on scroll position
       if (window.innerWidth >= 768) {
         // Desktop: fade based on stats card
@@ -561,8 +559,9 @@ export default function Home() {
   }, [rateLimit.blocked, rateLimit.cooldownEnd]);
 
   // Section navigation with arrow keys
-  const sectionOrder = ['hero', 'stats', 'kit', 'how-it-works', 'team', 'footer'];
   useEffect(() => {
+    const sectionOrder = ['hero', 'stats', 'kit', 'how-it-works', 'team', 'footer'];
+    
     function handleKeyDown(e: KeyboardEvent) {
       if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
         e.preventDefault();
@@ -665,7 +664,7 @@ export default function Home() {
               height={360}
               priority
             />
-            <div className="mt-2 mb-2 text-black text-2xl md:text-4xl text-right w-full">To Her Health</div>
+            <h1 className="mt-2 mb-2 text-black text-2xl md:text-4xl text-right w-full">To Her Health</h1>
             </div>
             
           {/* Desktop Get Early Access Button */}
@@ -718,9 +717,9 @@ export default function Home() {
                         <Image
                           src="/S_logo.svg"
                           alt="Santelle Logo"
-                          width={28}
-                          height={28}
-                          className="w-7 h-7 brightness-0 invert"
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 brightness-0 invert"
                         />
                       )}
                     </button>
@@ -963,10 +962,10 @@ export default function Home() {
             )}
           </div>
           <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center">
-                <h2 className="font-bold text-5xl md:text-7xl md:text-7xl text-[#721422] mb-0 text-left">
+                <h1 className="font-bold text-5xl md:text-7xl md:text-7xl text-[#721422] mb-0 text-left">
                   <span className="chunko-bold">Meet Santelle</span><br className="hidden md:block" />
                   <span className="block md:inline font-normal text-2xl md:text-2xl md:text-5xl mt-0">Your Vaginal Health Companion</span>
-                </h2>
+                </h1>
             <p className="text-xl md:text-4xl text-[#721422] mb-2 text-center md:text-left">Easy, discreet, and empowering.</p>
                                   <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-4 ">
                  The Santelle Starter Kit is more than a test.<br/>

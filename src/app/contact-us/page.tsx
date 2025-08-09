@@ -70,9 +70,9 @@ export default function ContactUs() {
     setEmailValidation(prev => ({ ...prev, isChecking: true }));
     const domainValid = await validateEmailDomain(email);
     setEmailValidation({
-      isValid: formatValid && domainValid,
+      isValid: formatValid, // Only require format validation, domain validation is optional
       isChecking: false,
-      error: domainValid ? '' : 'This email domain appears to be invalid',
+      error: domainValid ? '' : 'Domain validation failed, but you can still submit',
       domainValid
     });
   };
@@ -99,8 +99,9 @@ export default function ContactUs() {
       setError('Please fill in all required fields.');
       return;
     }
-    if (!emailValidation.isValid) {
-      setError(emailValidation.error || 'Please enter a valid email address.');
+    // Only check basic email format, not domain validation for submission
+    if (!validateEmailFormat(form.email)) {
+      setError('Please enter a valid email address.');
       return;
     }
     try {
@@ -109,7 +110,10 @@ export default function ContactUs() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error('Failed to send');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to send');
+      }
       setStatus('success');
       setTimeout(() => setStatus('idle'), 3000);
       setForm({ name: '', email: '', subject: '', message: '', updates: false });
@@ -127,24 +131,22 @@ export default function ContactUs() {
 
   return (
     <div className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Video */}
-      <video
-        className="fixed top-0 left-0 w-screen h-screen object-cover z-0"
-        src="/background.mov"
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={{ objectFit: 'cover', objectPosition: 'center' }}
+      {/* Background Gradient */}
+      <div 
+        className="fixed top-0 left-0 w-screen h-screen z-0"
+        style={{
+          background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
+        }}
       />
       {/* Blur Overlay */}
-      <div className="fixed top-0 left-0 w-screen h-screen z-10 backdrop-blur-md pointer-events-none" />
+      <div className="fixed top-0 left-0 w-screen h-screen z-10 backdrop-blur-sm pointer-events-none" />
       {/* Contact Form Content */}
       <form
         className="relative z-20 w-full max-w-xl bg-white/30 backdrop-blur-2xl border border-white/30 rounded-lg shadow-xl p-8 flex flex-col gap-6 mt-24 mb-16"
         onSubmit={handleSubmit}
       >
-        <h1 className="text-3xl font-bold mb-2 text-black">Hi there! Got a question? We&apos;d love to hear from you.</h1>
+        <h1 className="text-3xl font-bold mb-2 text-black">Contact Us</h1>
+        <p className="text-lg mb-4 text-black">Hi there! Got a question? We&apos;d love to hear from you.</p>
         <input
           type="text"
           name="name"

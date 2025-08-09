@@ -9,18 +9,15 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Video */}
-      <video
-        className="fixed top-0 left-0 w-screen h-screen object-cover z-0"
-        src="/background.mov"
-        autoPlay
-        loop
-        muted
-        playsInline
-        style={{ objectFit: 'cover', objectPosition: 'center' }}
+      {/* Background Gradient */}
+      <div 
+        className="fixed top-0 left-0 w-screen h-screen z-0"
+        style={{
+          background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
+        }}
       />
       {/* Blur Overlay */}
-      <div className="fixed top-0 left-0 w-screen h-screen z-10 backdrop-blur-md pointer-events-none" />
+      <div className="fixed top-0 left-0 w-screen h-screen z-10 backdrop-blur-sm pointer-events-none" />
       {/* Privacy Policy Content */}
       <main className="relative z-20 max-w-4xl mx-auto px-8 py-24 min-h-[1100px] text-black bg-white/30 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-xl mt-32 mb-20 text-lg">
         <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>

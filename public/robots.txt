@@ -1,0 +1,22 @@
+# Robots.txt for Santelle Website
+# Allow all search engines to crawl the site
+User-agent: *
+
+# Allow crawling of all pages
+Allow: /
+
+# Disallow API routes and sensitive areas
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /private/
+
+# Allow specific important pages
+Allow: /contact-us
+Allow: /privacy-policy
+
+# Sitemap location
+Sitemap: https://santellehealth.com/sitemap.xml
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1
