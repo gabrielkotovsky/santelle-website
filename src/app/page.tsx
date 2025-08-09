@@ -113,8 +113,7 @@ export default function Home() {
   function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, sectionId: string) {
     e.preventDefault();
     if (sectionId === 'how-it-works' && howItWorksRef.current) {
-      const block = (typeof window !== 'undefined' && window.innerWidth < 768) ? 'start' : 'center';
-      howItWorksRef.current.scrollIntoView({ behavior: 'smooth', block });
+      howItWorksRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     const el = document.getElementById(sectionId);
@@ -205,7 +204,7 @@ export default function Home() {
 
   useEffect(() => {
     function openWaitlistListener() {
-      setWaitlistOpen(true);
+      setShowEmailForm(true);
     }
     window.addEventListener('openWaitlist', openWaitlistListener);
     return () => window.removeEventListener('openWaitlist', openWaitlistListener);
@@ -288,10 +287,43 @@ export default function Home() {
     ],
   ];
 
+  // Add state for demo screens
+  const [currentDemoIdx, setCurrentDemoIdx] = useState(0);
+  const [selectedFeature, setSelectedFeature] = useState(0);
+  const demoImages = [
+    '/Demo_Home.png',
+    '/Demo_QR.png', 
+    '/Demo_Step1.png',
+    '/Demo_pH.png',
+    '/Demo_Biomarkers.png',
+    '/Demo_History.png'
+  ];
+
+  const featureData = [
+    {
+      title: "Get personalised recommendations and articles",
+      description: "Receive tailored insights and educational content based on your test results and health patterns. Our AI-powered recommendations help you understand your vaginal health and provide actionable advice."
+    },
+    {
+      title: "Scan your Santelle self-test to activate your kit",
+      description: "Simply scan the QR code on your test kit to connect it to your account. This activates your personalized testing experience and ensures accurate result tracking."
+    },
+    {
+      title: "Get step-by-step guidance to perform your test",
+      description: "Follow our clear, easy-to-understand instructions with visual guides. Each step is designed to make testing simple, accurate, and stress-free from the comfort of your home. Test for pH and 5 other key biomarkers to get comprehensive insights into your vaginal health."
+    },
+    {
+      title: "Access your vaginal health history",
+      description: "View your complete testing history, track patterns over time, and monitor your health journey. All your data is securely stored and easily accessible whenever you need it."
+    }
+  ];
+
 
   // Typewriter effect state
   const [typedText, setTypedText] = useState('');
   const [typing, setTyping] = useState(false);
+
+
 
   useEffect(() => {
     if (currentStatIdx === 0) return;
@@ -528,14 +560,12 @@ export default function Home() {
 
   // Function to focus the hero section's email input
   const focusHeroEmailInput = () => {
+    setShowEmailForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      setShowEmailForm(true);
-      const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-      if (emailInput) {
-        emailInput.focus();
-      }
-    }, 600);
+    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
+    if (emailInput) {
+      emailInput.focus();
+    }
   };
 
 
@@ -667,23 +697,25 @@ export default function Home() {
             <h2 className="mt-2 mb-2 text-black text-2xl md:text-4xl text-right w-full">To Her Health</h2>
             </div>
             
-          {/* Desktop Get Early Access Button */}
-            {!showEmailForm && (
-              <button
-                className="bg-[#721422] text-white font-bold text-xl md:text-2xl px-8 py-3 md:px-12 md:py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse mt-5"
-                onClick={() => setShowEmailForm(true)}
-              >
-                Get Early Access
-              </button>
-            )}
-            
-          {/* Desktop Email Form */}
-            {showEmailForm && (
-              <form
-                ref={emailFormRef}
-                className="flex flex-col items-center w-full max-w-2xl mt-0 px-4 md:px-0 transition-all duration-500 ease-in-out"
-                onSubmit={handleFormSubmit}
-              >
+          {/* Desktop Get Early Access Button and Email Form Container */}
+            <div className="relative">
+              {/* Desktop Get Early Access Button */}
+              <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
+                <button
+                  className="bg-[#721422] text-white font-bold text-xl md:text-2xl px-8 py-3 md:px-12 md:py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse mt-5"
+                  onClick={focusHeroEmailInput}
+                >
+                  Get Early Access
+                </button>
+              </div>
+              
+              {/* Desktop Email Form */}
+              <div className={`transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}>
+                <form
+                  ref={emailFormRef}
+                  className="flex flex-col items-center w-full max-w-2xl mt-0 px-4 md:px-0"
+                  onSubmit={handleFormSubmit}
+                >
                 <label htmlFor="waitlist-email" className="self-start mb-1 text-[#721422] font-medium text-base pl-2">Your email*</label>
                 <div className="relative w-full">
                   <div className="get-access-pulse flex w-full">
@@ -755,7 +787,8 @@ export default function Home() {
                   </div>
                 </div>
               </form>
-            )}
+            </div>
+            </div>
         </div>
 
         {/* Mobile Hero Content */}
@@ -769,23 +802,25 @@ export default function Home() {
                 Your vaginal health companion
               </span>
             
-                        {/* Mobile Get Early Access Button - just below the text */}
-            {!showEmailForm && (
-              <button
-                className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
-                onClick={() => setShowEmailForm(true)}
-              >
-                Get Early Access
-              </button>
-            )}
-            
-            {/* Mobile Email Form */}
-            {showEmailForm && (
-              <form
-                ref={emailFormRef}
-                className="w-full transition-all duration-500 ease-in-out"
-                onSubmit={handleFormSubmit}
-              >
+                        {/* Mobile Get Early Access Button and Email Form Container */}
+            <div className="relative">
+              {/* Mobile Get Early Access Button */}
+              <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
+                <button
+                  className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
+                  onClick={focusHeroEmailInput}
+                >
+                  Get Early Access
+                </button>
+              </div>
+              
+              {/* Mobile Email Form */}
+              <div className={`transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}>
+                <form
+                  ref={emailFormRef}
+                  className="w-full"
+                  onSubmit={handleFormSubmit}
+                >
                 <div className="relative w-full">
                   {/* Unified input and button container */}
                   <div className="flex w-full shadow-lg rounded-full overflow-hidden">
@@ -849,7 +884,8 @@ export default function Home() {
                   </div>
                 </div>
               </form>
-            )}
+            </div>
+            </div>
           </div>
         </div>
 
@@ -939,6 +975,9 @@ export default function Home() {
               </div>
             </div>
           </section>
+
+
+
         {/* Desktop Kit Image Section */}
           <section ref={kitSectionRef} id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center mb-20 md:mb-20">
             <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-0 md:p-0 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-12 w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
@@ -1011,7 +1050,7 @@ export default function Home() {
         {/* Desktop Product Intro Section */}
           <section ref={howItWorksRef} id="how-it-works" className="hidden md:flex w-full py-20 mt-0 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
             <h2 className="hidden md:block font-bold text-5xl md:text-7xl md:text-8xl text-[#721422] mb-0 md:mb-10 text-center">
-              <span className="chunko-bold">How It Works</span>
+              <span className="chunko-bold">How you&apos;ll use it</span>
             </h2>
             <div ref={howItWorksRef} className="hidden md:block w-full max-w-7xl mx-auto space-y-8">
                {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
@@ -1133,10 +1172,28 @@ export default function Home() {
                           />
                         )}
                       </div>
-                      {/* Bottom: Description */}
-                      <div className="text-xl md:text-3xl w-full text-center md:text-left">
-                                                 {step.desc}
-                      </div>
+                                              {/* Bottom: Description */}
+                        <div className="text-xl md:text-3xl w-full text-center md:text-left">
+                          {stepIdx === 2 ? (
+                            <>
+                              Match your strip to the color guide and enter your results in the{' '}
+                              <span 
+                                className="text-[#ff4fa3] font-bold cursor-pointer hover:text-[#ff4fa3]/80 transition-colors duration-200"
+                                onClick={() => {
+                                  const demoSection = document.getElementById('demo-section');
+                                  if (demoSection) {
+                                    demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }
+                                }}
+                              >
+                                Santelle app
+                              </span>
+                              . Get instant, clear personalized insights to understand what&apos;s going on.
+                            </>
+                          ) : (
+                            step.desc
+                          )}
+                        </div>
                     </div>
                   );
                  }
@@ -1253,6 +1310,124 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Desktop New Section Between How It Works and Team */}
+        <section id="demo-section" className="hidden md:flex w-screen min-h-screen flex-col justify-center items-center gap-2 p-0 m-0">
+          <div className="px-4 md:px-8 py-8 md:py-12 w-full flex justify-center items-center">
+            <div className="px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center gap-8 md:gap-16 w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
+              {/* Section Title */}
+              <div className="w-full text-center mb-8">
+                <h2 className="text-5xl md:text-7xl font-bold text-[#721422] mb-4">
+                  <span className="chunko-bold">Vaginal health on autopilot.</span>
+                </h2>
+              </div>
+              
+              {/* Content Row */}
+              <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-0 w-full">
+              {/* Left: Demo Screens */}
+              <div className="md:w-1/2 flex flex-col justify-center items-center gap-6">
+                <div className="relative w-[390px] h-[800px]">
+                  {/* iPhone Frame */}
+                  <div className="absolute inset-0 bg-black rounded-[5rem] p-3 shadow-2xl">
+                    {/* Screen Bezel */}
+                    <div className="w-full h-full bg-black rounded-[4.5rem] p-2">
+                      {/* Screen Content */}
+                      <div className="w-full h-full rounded-[4rem] overflow-hidden relative">
+                        {/* Demo Images */}
+                        {demoImages.map((image, index) => (
+                          <Image
+                            key={image}
+                            src={image}
+                            alt={`Demo Screen ${index + 1}`}
+                            width={300}
+                            height={600}
+                            className={`absolute top-0 left-0 w-full h-full object-contain ${
+                              index === currentDemoIdx ? 'opacity-100' : 'opacity-0'
+                            }`}
+                            loading="lazy"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+
+              </div>
+              
+              {/* Right: Content */}
+              <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center text-center md:text-left gap-6">
+                {featureData.map((feature, index) => (
+                  <div key={index} className="w-full">
+                    <button
+                      onClick={() => {
+                        setSelectedFeature(index);
+                        // Link to corresponding demo image
+                        const demoIndex = index === 3 ? 5 : index; // 4th title links to last image (index 5)
+                        setCurrentDemoIdx(demoIndex);
+                      }}
+                      className={`text-2xl md:text-3xl font-bold text-left w-full transition-all duration-300 cursor-pointer hover:scale-105 ${
+                        index === selectedFeature 
+                          ? 'text-[#721422]' 
+                          : 'text-[#721422]/40 hover:text-[#721422]/60'
+                      }`}
+                    >
+                      {feature.title}
+                    </button>
+                    <div 
+                      className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                        index === selectedFeature ? 'max-h-32 opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
+                      }`}
+                    >
+                      <div className="text-lg md:text-xl text-[#721422]/80 leading-relaxed">
+                        {index === 2 ? (
+                          <>
+                            Follow our clear, easy-to-understand instructions with visual guides. Each step is designed to make testing simple, accurate, and stress-free from the comfort of your home. Test for{' '}
+                            <button
+                              onClick={() => {
+                                setCurrentDemoIdx(3); // Demo_pH.png
+                              }}
+                              className="font-bold text-[#721422] hover:text-[#721422]/80 transition-colors duration-200 cursor-pointer"
+                            >
+                              pH
+                            </button>
+                            {' '}and{' '}
+                            <button
+                              onClick={() => {
+                                setCurrentDemoIdx(4); // Demo_Biomarkers.png
+                              }}
+                              className="font-bold text-[#721422] hover:text-[#721422]/80 transition-colors duration-200 cursor-pointer"
+                            >
+                              5 other key biomarkers
+                            </button>
+                            {' '}to get comprehensive insights into your vaginal health.
+                          </>
+                        ) : (
+                          feature.description
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Additional Title */}
+                <div className="w-full">
+                  <div className="text-2xl md:text-3xl font-bold text-left w-full text-[#FD9EAA]">
+                    Benefit from AI-powered analytics based on multiple biomarkers (coming soon!)
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Desktop Horizontal Divider */}
+        <div className="hidden md:block w-full py-12">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-1 bg-[#721422] rounded-full"></div>
+          </div>
+        </div>
+
         {/* Desktop Team/Leadership Section */}
         <section ref={teamSectionRef} id="team" className="hidden md:flex w-full py-5 px-8 lg:px-32 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
           <h2 className="font-bold text-5xl md:text-8xl text-[#721422] mb-10 text-center">
@@ -1267,10 +1442,10 @@ export default function Home() {
                     <Image src="/P&G.webp" alt="P&G" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
           </div>
                       <div className="w-full px-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 justify-items-center">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                 {/* Left: Leonor Landeau */}
                                 <div 
-                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
+                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full max-w-sm"
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
                     backgroundImage: 'url(/profile_background.webp)',
@@ -1278,26 +1453,6 @@ export default function Home() {
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
-                    {teamSectionLoaded ? (
-                      <Image
-                        src="/LL.webp"
-                        alt="Leonor Landeau"
-                        width={320}
-                        height={320}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div 
-                        className="w-full h-full animate-pulse"
-                        style={{
-                          backgroundImage: 'url(/profile_background.webp)',
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat'
-                        }}
-                      />
-                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Leonor Landeau</h3>
@@ -1313,7 +1468,7 @@ export default function Home() {
 
                 {/* Center: Roxanne Sabbag */}
                 <div 
-                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
+                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full max-w-sm"
 
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
@@ -1322,26 +1477,6 @@ export default function Home() {
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
-                    {teamSectionLoaded ? (
-                      <Image
-                        src="/RS.webp"
-                        alt="Roxanne Sabbag"
-                        width={320}
-                        height={320}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div 
-                        className="w-full h-full animate-pulse"
-                        style={{
-                          backgroundImage: 'url(/profile_background.webp)',
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat'
-                        }}
-                      />
-                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Roxanne Sabbag</h3>
@@ -1357,7 +1492,7 @@ export default function Home() {
 
                 {/* Right: Tomasso Busolo */}
                 <div 
-                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
+                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full max-w-sm"
 
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
@@ -1366,26 +1501,6 @@ export default function Home() {
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
-                    {teamSectionLoaded ? (
-                      <Image
-                        src="/TB.webp"
-                        alt="Tomasso Busolo"
-                        width={320}
-                        height={320}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div 
-                        className="w-full h-full animate-pulse"
-                        style={{
-                          backgroundImage: 'url(/profile_background.webp)',
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat'
-                        }}
-                      />
-                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Tomasso Busolo</h3>
@@ -1614,7 +1729,6 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/RS.webp" alt="Roxanne Sabbag" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
@@ -1629,7 +1743,6 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/LL.webp" alt="Leonor Landeau" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
@@ -1644,7 +1757,6 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/TB.webp" alt="Tomasso Busolo" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>

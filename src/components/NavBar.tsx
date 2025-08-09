@@ -5,12 +5,15 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const menuItems = [
+  { href: '#why-santelle', label: 'Why Santelle' },
   { href: '#how-it-works', label: 'How It Works' },
+  { href: '#roadmap', label: 'Roadmap' },
   { href: '#team', label: 'Our Team' },
+  { href: '#investors', label: 'Investors' },
 ];
 
 const navLinkBase =
-  'font-bold text-xl transition duration-500 flex items-center h-full';
+  'font-bold text-lg transition duration-500 flex items-center h-full';
 const navLinkNormal = 'text-black hover:text-black/80';
 const navLinkDimmed = 'text-black/50';
 const navLinkActive = 'text-black font-bold';
@@ -19,6 +22,7 @@ export default function NavBar() {
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   // Smooth scroll handler for nav
   function handleSmoothNavScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
@@ -34,18 +38,28 @@ export default function NavBar() {
 
   useEffect(() => {
     const onScroll = () => {
-      setHidden(false); // Never hide the navbar
+      const currentScrollY = window.scrollY;
+      
+      // Hide navbar when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setHidden(true); // Hide when scrolling down and not at top
+      } else {
+        setHidden(false); // Show when scrolling up or at top
+      }
+      
+      setLastScrollY(currentScrollY);
     };
+    
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [lastScrollY]);
 
 
 
   return (
     <nav
-      className={`w-[95%] max-w-7xl mx-auto flex items-center justify-between px-2 md:pl-8 md:pr-1 py-2 fixed left-1/2 -translate-x-1/2 z-30 h-12 md:h-14 transition-all duration-500 bg-white/10 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-xl
-        ${hidden ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'}
+      className={`w-[95%] max-w-7xl mx-auto flex items-center justify-between px-2 md:pl-8 md:pr-1 py-2 fixed left-1/2 -translate-x-1/2 z-30 h-12 md:h-14 transition-transform duration-500 bg-white/10 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-xl
+        ${hidden ? '-translate-y-[200%] pointer-events-none' : 'translate-y-0'}
       `}
       style={{
         top: 'calc(1.5rem + env(safe-area-inset-top))',
@@ -116,16 +130,13 @@ export default function NavBar() {
             if (pathname !== '/') {
               window.location.href = '/';
             } else {
+              // Use the same function as other Get Early Access buttons
+              window.dispatchEvent(new Event('openWaitlist'));
               window.scrollTo({ top: 0, behavior: 'smooth' });
-              setTimeout(() => {
-                // Trigger the email form to open
-                window.dispatchEvent(new Event('openWaitlist'));
-                // Focus on the email input
-                const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-                if (emailInput) {
-                  emailInput.focus();
-                }
-              }, 600);
+              const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
+              if (emailInput) {
+                emailInput.focus();
+              }
             }
           }}
           type="button"
