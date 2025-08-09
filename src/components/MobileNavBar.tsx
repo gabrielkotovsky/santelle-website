@@ -5,8 +5,11 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const menuItems = [
+  { href: '#why-santelle', label: 'Why Santelle' },
   { href: '#how-it-works', label: 'How It Works' },
+  { href: '#roadmap', label: 'Roadmap' },
   { href: '#team', label: 'Our Team' },
+  { href: '#investors', label: 'Investors' },
 ];
 
 export default function MobileNavBar() {
@@ -33,14 +36,12 @@ export default function MobileNavBar() {
 
   const handleGetAccess = () => {
     setIsOpen(false);
+    window.dispatchEvent(new Event('openWaitlist'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      window.dispatchEvent(new Event('openWaitlist'));
-      const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-      if (emailInput) {
-        emailInput.focus();
-      }
-    }, 600);
+    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
+    if (emailInput) {
+      emailInput.focus();
+    }
   };
 
   return (
@@ -106,7 +107,7 @@ export default function MobileNavBar() {
                   <Link
                     href={item.href}
                     onClick={(e) => handleSmoothScroll(e, item.href)}
-                    className="block text-lg font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-2"
+                    className="block text-base font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-2"
                   >
                     {item.label}
                   </Link>
