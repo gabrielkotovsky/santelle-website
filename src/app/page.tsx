@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import confetti from 'canvas-confetti';
@@ -592,6 +593,9 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>Santelle | To Her Health</title>
+      </Head>
       <main className="flex flex-col items-center w-full bg-brand-blue overflow-x-hidden overflow-hidden" style={{
         minHeight: '100dvh',
         paddingTop: 'env(safe-area-inset-top)',
@@ -958,10 +962,10 @@ export default function Home() {
             )}
           </div>
           <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center">
-                <h2 className="font-bold text-5xl md:text-7xl md:text-7xl text-[#721422] mb-0 text-left">
+                <h1 className="font-bold text-5xl md:text-7xl md:text-7xl text-[#721422] mb-0 text-left">
                   <span className="chunko-bold">Meet Santelle</span><br className="hidden md:block" />
                   <span className="block md:inline font-normal text-2xl md:text-2xl md:text-5xl mt-0">Your Vaginal Health Companion</span>
-                </h2>
+                </h1>
             <p className="text-xl md:text-4xl text-[#721422] mb-2 text-center md:text-left">Easy, discreet, and empowering.</p>
                                   <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-4 ">
                  The Santelle Starter Kit is more than a test.<br/>
