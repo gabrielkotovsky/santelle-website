@@ -10,7 +10,7 @@ import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: {
-    default: "Santelle | Your Vaginal Health Companion - At-Home Testing Kit",
+    default: "Santelle | To Her Health",
     template: "%s | Santelle"
   },
   description: "Discover Santelle, your vaginal health companion. Get lab-quality insights from home with our at-home testing kit. Easy, discreet, and empowering vaginal wellness.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://santellehealth.com',
-    title: 'Santelle | Your Vaginal Health Companion',
+    title: 'Santelle | To Her Health',
     description: 'Discover Santelle, your vaginal health companion. Get lab-quality insights from home with our at-home testing kit.',
     siteName: 'Santelle',
     images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Santelle | Your Vaginal Health Companion',
+    title: 'Santelle | To Her Health',
     description: 'Discover Santelle, your vaginal health companion. Get lab-quality insights from home.',
     images: ['/kit.webp'],
   },
@@ -84,7 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.className}>
       <head>
-        <title>Santelle | Vaginal Health Companion - At-Home Testing</title>
+        <title>Santelle | To Her Health</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-title" content="Santelle" />
         
