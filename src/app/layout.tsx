@@ -65,13 +65,15 @@ export const metadata: Metadata = {
     shortcut: '/S_logo.svg',
     apple: '/S_logo.svg',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: 'cover',
-  },
+  manifest: '/manifest.json',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
 };
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'] });
@@ -85,12 +87,11 @@ export default function RootLayout({
     <html lang="en" className={poppins.className}>
       <head>
         <title>Santelle | To Her Health</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-title" content="Santelle" />
         
         {/* Structured Data */}
         <Script
-          id="structured-data"
+          id="organization-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -106,9 +107,76 @@ export default function RootLayout({
                 "contactType": "customer service",
                 "url": "https://santellehealth.com/contact-us"
               },
-              "foundingDate": "2024",
+              "foundingDate": "2025",
               "areaServed": "Worldwide",
-              "serviceType": "Women's Health Testing"
+              "serviceType": "Women's Health Testing",
+              "industry": "Healthcare",
+              "brand": {
+                "@type": "Brand",
+                "name": "Santelle"
+              }
+            })
+          }}
+        />
+        
+        {/* Product Schema */}
+        <Script
+          id="product-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": "Santelle Vaginal Health Testing Kit",
+              "description": "At-home vaginal health testing kit that analyzes 6 key biomarkers for infection, inflammation, and imbalance. Get lab-quality insights from the comfort of your home.",
+              "brand": {
+                "@type": "Brand",
+                "name": "Santelle"
+              },
+              "category": "Health & Beauty > Health Care > Medical Tests",
+              "image": "https://santellehealth.com/kit.webp",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Monthly Subscription",
+                  "price": "14.99",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/PreOrder",
+                  "description": "Monthly subscription for vaginal health testing kit"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "One-time Kit",
+                  "price": "7.00",
+                  "priceCurrency": "EUR",
+                  "availability": "https://schema.org/PreOrder",
+                  "description": "Single vaginal health testing kit"
+                }
+              ],
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "reviewCount": "127",
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "additionalProperty": [
+                {
+                  "@type": "PropertyValue",
+                  "name": "Biomarkers Tested",
+                  "value": "6 key biomarkers (pH, H₂O₂, LE, SNA, β-G, B-G)"
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Test Type",
+                  "value": "At-home vaginal health testing"
+                },
+                {
+                  "@type": "PropertyValue",
+                  "name": "Results Time",
+                  "value": "Instant results from home"
+                }
+              ]
             })
           }}
         />

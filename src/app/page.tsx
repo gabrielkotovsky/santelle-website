@@ -664,7 +664,7 @@ export default function Home() {
               height={360}
               priority
             />
-            <h1 className="mt-2 mb-2 text-black text-2xl md:text-4xl text-right w-full">To Her Health</h1>
+            <h2 className="mt-2 mb-2 text-black text-2xl md:text-4xl text-right w-full">To Her Health</h2>
             </div>
             
           {/* Desktop Get Early Access Button */}
@@ -1043,7 +1043,15 @@ export default function Home() {
                         {/* Middle: Image */}
                         <div className={`flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 ${isBiomarkerCard ? 'my-1 md:my-0' : 'my-2 md:my-0'}`}>
                           {howItWorksLoaded ? (
-                            <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" loading="lazy" />
+                            <Image 
+                              src={isBiomarkerCard ? '/step2.webp' : step.img} 
+                              alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
+                              width={224}
+                              height={224}
+                              className="h-48 md:h-56 w-auto object-contain mx-auto"
+                              loading="lazy"
+                              unoptimized
+                            />
                           ) : (
                             <div 
                               className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
@@ -1106,7 +1114,15 @@ export default function Home() {
                       {/* Middle: Image */}
                       <div className="flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 my-2 md:my-0">
                         {howItWorksLoaded ? (
-                          <img src={step.img} alt={step.title} className="h-48 md:h-56 w-auto object-contain mx-auto" loading="lazy" />
+                          <Image 
+                            src={step.img} 
+                            alt={step.title} 
+                            width={224}
+                            height={224}
+                            className="h-48 md:h-56 w-auto object-contain mx-auto"
+                            loading="lazy"
+                            unoptimized
+                          />
                         ) : (
                           <div 
                             className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
@@ -1151,7 +1167,15 @@ export default function Home() {
                         
                         {/* Image */}
                         <div className="flex items-center justify-center w-full h-32 mb-4">
-                          <img src={isBiomarkerCard ? '/step2.webp' : step.img} alt={isBiomarkerCard ? 'Biomarkers' : step.title} className="h-32 w-auto object-contain" loading="lazy" />
+                          <Image 
+                            src={isBiomarkerCard ? '/step2.webp' : step.img} 
+                            alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
+                            width={128}
+                            height={128}
+                            className="h-32 w-auto object-contain"
+                            loading="lazy"
+                            unoptimized
+                          />
                         </div>
                         
                         {/* Description */}
@@ -1236,11 +1260,11 @@ export default function Home() {
           </h2>
           {/* Logos Row */}
           <div className="flex flex-row justify-center items-center gap-8 md:gap-12 mb-8 w-full">
-            <Image src="/ICL.png" alt="Imperial College London" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-            <Image src="/INSEAD.png" alt="INSEAD" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-            <Image src="/McK.png" alt="McKinsey & Co." width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-            <Image src="/Nabta.png" alt="Nabta" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-            <Image src="/P&G.png" alt="P&G" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                                <Image src="/ICL.webp" alt="Imperial College London" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/INSEAD.webp" alt="INSEAD" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/McK.webp" alt="McKinsey & Co." width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/Nabta.webp" alt="Nabta" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/P&G.webp" alt="P&G" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
           </div>
                       <div className="w-full px-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 justify-items-center">
@@ -1249,14 +1273,14 @@ export default function Home() {
                   className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative"
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
-                    backgroundImage: 'url(/profile_background.png)',
+                    backgroundImage: 'url(/profile_background.webp)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
                     {teamSectionLoaded ? (
                       <Image
-                        src="/LL.png"
+                        src="/LL.webp"
                         alt="Leonor Landeau"
                         width={320}
                         height={320}
@@ -1267,7 +1291,7 @@ export default function Home() {
                       <div 
                         className="w-full h-full animate-pulse"
                         style={{
-                          backgroundImage: 'url(/profile_background.png)',
+                          backgroundImage: 'url(/profile_background.webp)',
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat'
@@ -1293,14 +1317,14 @@ export default function Home() {
 
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
-                    backgroundImage: 'url(/profile_background.png)',
+                    backgroundImage: 'url(/profile_background.webp)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
                     {teamSectionLoaded ? (
                       <Image
-                        src="/RS.png"
+                        src="/RS.webp"
                         alt="Roxanne Sabbag"
                         width={320}
                         height={320}
@@ -1311,7 +1335,7 @@ export default function Home() {
                       <div 
                         className="w-full h-full animate-pulse"
                         style={{
-                          backgroundImage: 'url(/profile_background.png)',
+                          backgroundImage: 'url(/profile_background.webp)',
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat'
@@ -1337,14 +1361,14 @@ export default function Home() {
 
                 >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
-                    backgroundImage: 'url(/profile_background.png)',
+                    backgroundImage: 'url(/profile_background.webp)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
                     {teamSectionLoaded ? (
                       <Image
-                        src="/TB.png"
+                        src="/TB.webp"
                         alt="Tomasso Busolo"
                         width={320}
                         height={320}
@@ -1355,7 +1379,7 @@ export default function Home() {
                       <div 
                         className="w-full h-full animate-pulse"
                         style={{
-                          backgroundImage: 'url(/profile_background.png)',
+                          backgroundImage: 'url(/profile_background.webp)',
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat'
@@ -1478,11 +1502,14 @@ export default function Home() {
                       
                       {/* Image */}
                       <div className="flex items-center justify-center w-full mb-3">
-                        <img 
+                        <Image 
                           src={isBiomarkerCard ? '/step2.webp' : step.img}
+                          width={240}
+                          height={240}
                           loading="lazy" 
                           alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
                           className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
+                          unoptimized
                         />
                       </div>
                       
@@ -1565,19 +1592,19 @@ export default function Home() {
                 <div className="flex animate-scroll-left">
                   {/* First set of logos */}
                   <div className="flex items-center gap-6 flex-shrink-0 px-4">
-                    <Image src="/ICL.png" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/INSEAD.png" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/McK.png" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/Nabta.png" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/P&G.png" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/ICL.webp" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/INSEAD.webp" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/McK.webp" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/Nabta.webp" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/P&G.webp" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
                   </div>
                   {/* Duplicate set for seamless loop */}
                   <div className="flex items-center gap-6 flex-shrink-0 px-4">
-                    <Image src="/ICL.png" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/INSEAD.png" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/McK.png" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/Nabta.png" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/P&G.png" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/ICL.webp" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/INSEAD.webp" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/McK.webp" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/Nabta.webp" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
+                    <Image src="/P&G.webp" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
                   </div>
                 </div>
               </div>
@@ -1587,7 +1614,7 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/RS.png" alt="Roxanne Sabbag" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
+                      <Image src="/RS.webp" alt="Roxanne Sabbag" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
@@ -1602,7 +1629,7 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/LL.png" alt="Leonor Landeau" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
+                      <Image src="/LL.webp" alt="Leonor Landeau" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
@@ -1617,7 +1644,7 @@ export default function Home() {
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                      <Image src="/TB.png" alt="Tomasso Busolo" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
+                      <Image src="/TB.webp" alt="Tomasso Busolo" width={48} height={48} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>

@@ -1,0 +1,69 @@
+{
+  "name": "Santelle - Your Vaginal Health Companion",
+  "short_name": "Santelle",
+  "description": "Get lab-quality vaginal health insights from home with our at-home testing kit. Easy, discreet, and empowering.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FD9EAA",
+  "theme_color": "#721422",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    {
+      "src": "/S_logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/kit.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Santelle Testing Kit"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Contact Us",
+      "short_name": "Contact",
+      "description": "Get in touch with the Santelle team",
+      "url": "/contact-us",
+      "icons": [
+        {
+          "src": "/S_logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Privacy Policy",
+      "short_name": "Privacy",
+      "description": "View our privacy policy",
+      "url": "/privacy-policy",
+      "icons": [
+        {
+          "src": "/S_logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
