@@ -36,10 +36,10 @@ export const metadata: Metadata = {
     siteName: 'Santelle',
     images: [
       {
-        url: '/kit.webp',
-        width: 1200,
-        height: 630,
-        alt: 'Santelle Vaginal Health Testing Kit',
+        url: '/logo-dark.svg',
+        width: 916,
+        height: 272,
+        alt: 'Santelle Logo',
       },
     ],
   },
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Santelle | To Her Health',
     description: 'Discover Santelle, your vaginal health companion. Get lab-quality insights from home.',
-    images: ['/kit.webp'],
+    images: ['/logo-dark.svg'],
   },
   robots: {
     index: true,
