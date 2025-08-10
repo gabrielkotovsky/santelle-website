@@ -135,13 +135,16 @@ export default function RootLayout({
               },
               "category": "Health & Beauty > Health Care > Medical Tests",
               "image": "https://santellehealth.com/kit.webp",
+              "review": null,
+              "aggregateRating": null,
               "offers": [
                 {
                   "@type": "Offer",
                   "name": "Monthly Subscription",
                   "price": "14.99",
                   "priceCurrency": "EUR",
-                  "availability": "https://schema.org/ComingSoon",
+                  "availability": "https://schema.org/PreOrder",
+                  "priceValidUntil": null,
                   "shippingDetails": "not included",
                   "hasMerchantReturnPolicy": "no",
                   "description": "Monthly subscription for vaginal health testing kit - Coming Soon"
@@ -151,7 +154,8 @@ export default function RootLayout({
                   "name": "One-time Kit",
                   "price": "7.00",
                   "priceCurrency": "EUR",
-                  "availability": "https://schema.org/ComingSoon",
+                  "availability": "https://schema.org/PreOrder",
+                  "priceValidUntil": null,
                   "shippingDetails": "not included",
                   "hasMerchantReturnPolicy": "no",
                   "description": "Single vaginal health testing kit - Coming Soon"
