@@ -5,11 +5,9 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const menuItems = [
-  { href: '#why-santelle', label: 'Why Santelle' },
+  { href: '#stats', label: 'Why Santelle' },
   { href: '#how-it-works', label: 'How It Works' },
-  { href: '#roadmap', label: 'Roadmap' },
   { href: '#team', label: 'Our Team' },
-  { href: '#investors', label: 'Investors' },
 ];
 
 const navLinkBase =

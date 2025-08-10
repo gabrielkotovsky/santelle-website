@@ -5,11 +5,10 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const menuItems = [
-  { href: '#why-santelle', label: 'Why Santelle' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#roadmap', label: 'Roadmap' },
-  { href: '#team', label: 'Our Team' },
-  { href: '#investors', label: 'Investors' },
+  { href: '#mobile-stats', label: 'Why Santelle', section: 'stats' },
+  { href: '#mobile-meet', label: 'Meet Santelle', section: 'meet' },
+  { href: '#mobile-how-it-works', label: 'How It Works', section: 'how-it-works' },
+  { href: '#mobile-team', label: 'Our Team', section: 'team' },
 ];
 
 export default function MobileNavBar() {
@@ -24,24 +23,71 @@ export default function MobileNavBar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string, section?: string) => {
     e.preventDefault();
     setIsOpen(false);
-    const id = href.replace('#', '');
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    
+    // Close menu with animation
+    setTimeout(() => {
+      // Always target the mobile unified card
+      const unifiedCard = document.getElementById('mobile-unified-card');
+      
+      if (unifiedCard && section) {
+        // Calculate offset for mobile header
+        const headerHeight = 64; // Mobile header height
+        
+        // Find the specific section within the unified card
+        const sectionElements = unifiedCard.querySelectorAll('[data-section]');
+        const targetSection = Array.from(sectionElements).find(el => 
+          el.getAttribute('data-section') === section
+        );
+        
+        if (targetSection) {
+          const elementTop = targetSection.getBoundingClientRect().top + window.scrollY - headerHeight;
+          
+          // Smooth scroll to element
+          window.scrollTo({
+            top: elementTop,
+            behavior: 'smooth'
+          });
+        } else {
+          // Fallback: scroll to unified card
+          const elementTop = unifiedCard.offsetTop - headerHeight;
+          window.scrollTo({
+            top: elementTop,
+            behavior: 'smooth'
+          });
+        }
+      } else {
+        // Fallback: scroll to top if element not found
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    }, 300); // Wait for menu close animation
   };
 
   const handleGetAccess = () => {
     setIsOpen(false);
-    window.dispatchEvent(new Event('openWaitlist'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-    if (emailInput) {
-      emailInput.focus();
-    }
+    
+    // Wait for menu close animation, then trigger waitlist
+    setTimeout(() => {
+      window.dispatchEvent(new Event('openWaitlist'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Focus on mobile email input if available
+      setTimeout(() => {
+        const mobileEmailInput = document.getElementById('waitlist-email-mobile') as HTMLInputElement;
+        const desktopEmailInput = document.getElementById('waitlist-email') as HTMLInputElement;
+        
+        if (mobileEmailInput) {
+          mobileEmailInput.focus();
+        } else if (desktopEmailInput) {
+          desktopEmailInput.focus();
+        }
+      }, 600); // Wait for scroll to complete
+    }, 300);
   };
 
   return (
@@ -98,7 +144,7 @@ export default function MobileNavBar() {
       <div className={`fixed top-0 left-0 right-0 bg-black z-40 transition-all duration-300 ${
         isOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
       }`}>
-        <div className="px-4 py-6 mt-16">
+        <div className="px-4 py-6 mt-16 safe-top">
           {/* Menu Items */}
           <nav className="mb-6">
             <ul className="space-y-4">
@@ -106,8 +152,9 @@ export default function MobileNavBar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={(e) => handleSmoothScroll(e, item.href)}
-                    className="block text-base font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-2"
+                    onClick={(e) => handleSmoothScroll(e, item.href, item.section)}
+                    className="block text-lg font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-3 touch-target"
+                    aria-label={`Navigate to ${item.label} section`}
                   >
                     {item.label}
                   </Link>
@@ -119,10 +166,16 @@ export default function MobileNavBar() {
           {/* Get Early Access Button */}
           <button
             onClick={handleGetAccess}
-            className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
+            className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target shadow-lg"
+            aria-label="Get early access to Santelle"
           >
             Get Early Access
           </button>
+          
+          {/* Close Menu Hint */}
+          <p className="text-gray-400 text-sm text-center mt-4">
+            Tap outside to close menu
+          </p>
         </div>
       </div>
 
