@@ -1517,11 +1517,11 @@ export default function Home() {
         </section>
 
         {/* Mobile Unified Card - All Sections */}
-        <section className="block md:hidden w-full py-8">
+        <section id="mobile-unified-card" className="block md:hidden w-full py-8">
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
             
             {/* Stats Section */}
-            <div className="py-20">
+            <div data-section="stats" className="py-20">
               <div className="text-center">
                 <div className="chunko-bold text-3xl font-bold text-[#721422] mb-20">
                   Vaginal infections affect 3 in 4 women. 50% are recurrent.
@@ -1539,7 +1539,7 @@ export default function Home() {
             </div>
 
             {/* Meet Section Title */}
-            <div className="py-20">
+            <div data-section="meet" className="py-20">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
                 <h2 className="font-bold text-4xl text-[#721422] text-center">
@@ -1589,7 +1589,7 @@ export default function Home() {
             </div>
 
             {/* How It Works Section */}
-            <div className="py-20">
+            <div data-section="how-it-works" className="py-20">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
                 <h2 className="font-bold text-4xl text-[#721422] text-center">
@@ -1693,7 +1693,7 @@ export default function Home() {
             </div>
 
             {/* Team Section */}
-            <div className="py-6">
+            <div data-section="team" className="py-6">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
                 <h2 className="font-bold text-4xl text-[#721422] text-center">
