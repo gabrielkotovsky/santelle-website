@@ -137,6 +137,7 @@ export default function ContactUs() {
         style={{
           background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
         }}
+        
       />
       {/* Blur Overlay */}
       <div className="fixed top-0 left-0 w-screen h-screen z-10 backdrop-blur-sm pointer-events-none" />

@@ -142,6 +142,8 @@ export default function RootLayout({
                   "price": "14.99",
                   "priceCurrency": "EUR",
                   "availability": "https://schema.org/PreOrder",
+                  "shippingDetails": "not included",
+                  "hasMerchantReturnPolicy": "no",
                   "description": "Monthly subscription for vaginal health testing kit"
                 },
                 {
@@ -150,6 +152,8 @@ export default function RootLayout({
                   "price": "7.00",
                   "priceCurrency": "EUR",
                   "availability": "https://schema.org/PreOrder",
+                  "shippingDetails": "not included",
+                  "hasMerchantReturnPolicy": "no",
                   "description": "Single vaginal health testing kit"
                 }
               ],
