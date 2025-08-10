@@ -141,25 +141,23 @@ export default function RootLayout({
                   "name": "Monthly Subscription",
                   "price": "14.99",
                   "priceCurrency": "EUR",
-                  "availability": "https://schema.org/PreOrder",
-                  "description": "Monthly subscription for vaginal health testing kit"
+                  "availability": "https://schema.org/ComingSoon",
+                  "shippingDetails": "not included",
+                  "hasMerchantReturnPolicy": "no",
+                  "description": "Monthly subscription for vaginal health testing kit - Coming Soon"
                 },
                 {
                   "@type": "Offer",
                   "name": "One-time Kit",
                   "price": "7.00",
                   "priceCurrency": "EUR",
-                  "availability": "https://schema.org/PreOrder",
-                  "description": "Single vaginal health testing kit"
+                  "availability": "https://schema.org/ComingSoon",
+                  "shippingDetails": "not included",
+                  "hasMerchantReturnPolicy": "no",
+                  "description": "Single vaginal health testing kit - Coming Soon"
                 }
               ],
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "reviewCount": "127",
-                "bestRating": "5",
-                "worstRating": "1"
-              },
+
               "additionalProperty": [
                 {
                   "@type": "PropertyValue",
