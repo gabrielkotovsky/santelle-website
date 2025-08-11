@@ -65,6 +65,7 @@ export default function Home() {
   }, []);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
+  const [animatedBackground, setAnimatedBackground] = useState(false);
 
   const [showEmailForm, setShowEmailForm] = useState(false);
   const waitlistRef = useRef<HTMLDivElement>(null);
@@ -208,6 +209,14 @@ export default function Home() {
     }
     window.addEventListener('openWaitlist', openWaitlistListener);
     return () => window.removeEventListener('openWaitlist', openWaitlistListener);
+  }, []);
+
+  useEffect(() => {
+    function toggleBackgroundListener(event: CustomEvent) {
+      setAnimatedBackground(event.detail.animated);
+    }
+    window.addEventListener('toggleBackground', toggleBackgroundListener as EventListener);
+    return () => window.removeEventListener('toggleBackground', toggleBackgroundListener as EventListener);
   }, []);
 
   useEffect(() => {
@@ -648,41 +657,75 @@ export default function Home() {
           paddingRight: 'env(safe-area-inset-right)'
         }}
       >
-        {/* Video background and overlay restored */}
+        {/* Background with toggle between static and animated */}
         <div className="absolute inset-0 -z-10 flex items-center justify-center" style={{
           top: 0,
           bottom: 'env(safe-area-inset-bottom)',
           left: 'env(safe-area-inset-left)',
           right: 'env(safe-area-inset-right)'
         }}>
-          {/* Video temporarily hidden */}
-          {/* <video
-            src="/background.mov"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
+          {/* Static Backgrounds (Default) */}
+          <Image
+            src="/background_desktop_static.webp"
+            alt="Background"
+            fill
+            className="absolute inset-0 object-cover hidden md:block"
             style={{ 
-              objectFit: 'cover', 
-              objectPosition: 'center',
-              width: '100vw',
-              height: '100dvh'
+              objectPosition: 'center'
             }}
-            onLoadedData={() => setVideoLoaded(true)}
-            onCanPlay={() => setVideoLoaded(true)}
-            onError={() => setVideoError(true)}
-          /> */}
-          {/* Fallback background - temporarily showing instead of video */}
-          <div 
-            className="absolute inset-0 w-full h-full"
-            style={{
-              background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
-              width: '100vw',
-              height: '100dvh'
-            }}
+            priority
           />
-          <div className="absolute inset-0 bg-brand-blue/40 backdrop-blur-sm" />
+          
+          <Image
+            src="/background_mobile_static.webp"
+            alt="Background"
+            fill
+            className="absolute inset-0 object-cover block md:hidden"
+            style={{ 
+              objectPosition: 'center'
+            }}
+            priority
+          />
+          
+          {/* Animated Backgrounds (Conditional) */}
+          {animatedBackground && (
+            <>
+              {/* Desktop Video Background */}
+              <video
+                src="/background_desktop.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover hidden md:block"
+                style={{ 
+                  objectFit: 'cover', 
+                  objectPosition: 'center',
+                  width: '100vw',
+                  height: '100dvh'
+                }}
+              />
+              
+              {/* Mobile Video Background */}
+              <video
+                src="/background_mobile.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover block md:hidden"
+                style={{ 
+                  objectFit: 'cover', 
+                  objectPosition: 'center',
+                  width: '100vw',
+                  height: '100dvh'
+                }}
+              />
+            </>
+          )}
+          
+          {/* Overlay - Blur only, no color */}
+          <div className="absolute inset-0 backdrop-blur-lg" />
         </div>
         {/* Desktop Hero Content */}
         <div className="hidden md:flex flex-col items-center justify-center w-full h-full absolute top-0 left-0 z-10" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>

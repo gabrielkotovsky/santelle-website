@@ -21,6 +21,7 @@ export default function NavBar() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [animatedBackground, setAnimatedBackground] = useState(false);
 
   // Smooth scroll handler for nav
   function handleSmoothNavScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
@@ -118,11 +119,28 @@ export default function NavBar() {
           </Link>
         ))}
       </div>
-      {/* Right-aligned My Account - desktop only */}
+      {/* Right-aligned buttons - desktop only */}
       <div className="items-center h-full hidden md:flex">
-        {/* Dark mode toggle removed */}
+        {/* Background Toggle Button */}
         <button
-          className="bg-white/20 backdrop-blur-md text-black font-bold text-xl px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition ml-4 flex items-center justify-center"
+          className="bg-white/20 backdrop-blur-md text-black font-bold text-sm px-4 h-10 rounded-xl hover:bg-white/40 hover:text-black transition mr-3 flex items-center justify-center"
+          style={{ WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.12)' }}
+          onClick={() => {
+            setAnimatedBackground(!animatedBackground);
+            // Dispatch event to communicate with parent component
+            window.dispatchEvent(new CustomEvent('toggleBackground', { 
+              detail: { animated: !animatedBackground } 
+            }));
+          }}
+          type="button"
+          title={animatedBackground ? "Switch to static background" : "Switch to animated background"}
+        >
+          {animatedBackground ? "🎬" : "🖼️"}
+        </button>
+        
+        {/* Get Early Access Button */}
+        <button
+          className="bg-white/20 backdrop-blur-md text-black font-bold text-xl px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition flex items-center justify-center"
           style={{ WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.12)' }}
           onClick={() => {
             if (pathname !== '/') {
