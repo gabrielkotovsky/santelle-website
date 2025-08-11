@@ -65,7 +65,7 @@ export default function Home() {
   }, []);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
-  const [animatedBackground, setAnimatedBackground] = useState(false);
+
 
   const [showEmailForm, setShowEmailForm] = useState(false);
   const waitlistRef = useRef<HTMLDivElement>(null);
@@ -211,13 +211,7 @@ export default function Home() {
     return () => window.removeEventListener('openWaitlist', openWaitlistListener);
   }, []);
 
-  useEffect(() => {
-    function toggleBackgroundListener(event: CustomEvent) {
-      setAnimatedBackground(event.detail.animated);
-    }
-    window.addEventListener('toggleBackground', toggleBackgroundListener as EventListener);
-    return () => window.removeEventListener('toggleBackground', toggleBackgroundListener as EventListener);
-  }, []);
+
 
 
 
@@ -679,72 +673,44 @@ export default function Home() {
           paddingRight: 'env(safe-area-inset-right)'
         }}
       >
-        {/* Background with toggle between static and animated */}
+        {/* Background - Always Video */}
         <div className="absolute inset-0 -z-10 flex items-center justify-center" style={{
           top: 0,
           bottom: 'env(safe-area-inset-bottom)',
           left: 'env(safe-area-inset-left)',
           right: 'env(safe-area-inset-right)'
         }}>
-          {/* Static Backgrounds (Default) */}
-          <Image
-            src="/background_desktop_static.webp"
-            alt="Background"
-            fill
-            className="absolute inset-0 object-cover hidden md:block"
+          {/* Desktop Video Background */}
+          <video
+            src="/background_desktop.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover hidden md:block"
             style={{ 
-              objectPosition: 'center'
+              objectFit: 'cover', 
+              objectPosition: 'center',
+              width: '100vw',
+              height: '100dvh'
             }}
-            priority
           />
           
-          <Image
-            src="/background_mobile_static.webp"
-            alt="Background"
-            fill
-            className="absolute inset-0 object-cover block md:hidden"
+          {/* Mobile Video Background */}
+          <video
+            src="/background_mobile.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover block md:hidden"
             style={{ 
-              objectPosition: 'center'
+              objectFit: 'cover', 
+              objectPosition: 'center',
+              width: '100vw',
+              height: '100dvh'
             }}
-            priority
           />
-          
-          {/* Animated Backgrounds (Conditional) */}
-          {animatedBackground && (
-            <>
-              {/* Desktop Video Background */}
-              <video
-                src="/background_desktop.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover hidden md:block"
-                style={{ 
-                  objectFit: 'cover', 
-                  objectPosition: 'center',
-                  width: '100vw',
-                  height: '100dvh'
-                }}
-              />
-              
-              {/* Mobile Video Background */}
-              <video
-                src="/background_mobile.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover block md:hidden"
-                style={{ 
-                  objectFit: 'cover', 
-                  objectPosition: 'center',
-                  width: '100vw',
-                  height: '100dvh'
-                }}
-              />
-            </>
-          )}
           
           {/* Overlay - Blur only, no color */}
           <div className="absolute inset-0 backdrop-blur-lg" />
@@ -1513,75 +1479,116 @@ export default function Home() {
           </div>
                       <div className="w-full px-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                {/* Left: Leonor Landeau */}
-                                <div 
-                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full max-w-sm"
+                                {/* Left: Leonor Landeau */}
+                <a 
+                  href="https://www.linkedin.com/in/léonor-landeau-412197121/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full max-w-sm"
                 >
-                  <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
+                  <div 
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                  >
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
                     backgroundImage: 'url(/profile_background.webp)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
+                    <Image
+                      src="/LL.png"
+                      alt="Leonor Landeau"
+                      width={400}
+                      height={400}
+                      className="absolute top-[65%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-150 h-150 object-cover"
+                      priority
+                    />
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Leonor Landeau</h3>
-                    <p className="text-lg font-semibold text-[#ff4fa3] mb-3">Collaborator & Advisor</p>
-                    <p className="text-sm text-[#721422]/80 leading-relaxed">
-                      Product Manager<br/>
-                      Health tech<br/>
-                      Expertise in startups, scale-ups, wearables<br/>
-                      Marketing Data Science
-                    </p>
+                    <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Collaborator & Advisor</p>
+                    <div className="flex items-center gap-3">
+                      <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={60} height={60} className="w-27 h-auto object-contain" />
+                      <Image src="/LSE_Logo.svg" alt="London School of Economics" width={60} height={60} className="w-20 h-auto object-contain" />
+                      <Image src="/INSEAD.webp" alt="INSEAD" width={60} height={60} className="w-50 h-auto object-contain" />
+                    </div>
                   </div>
                 </div>
+                  </a>
 
                 {/* Center: Roxanne Sabbag */}
-                <div 
-                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full max-w-sm"
-
+                <a 
+                  href="https://www.linkedin.com/in/roxanne-sabbag-642a3014b/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full max-w-sm"
                 >
-                  <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
+                  <div 
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                  >
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
                     backgroundImage: 'url(/profile_background.webp)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
+                    <Image
+                      src="/RS.png"
+                      alt="Roxanne Sabbag"
+                      width={500}
+                      height={500}
+                      className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-130 h-130 object-cover"
+                      priority
+                    />
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-[#721422] mb-2">Roxanne Sabbag</h3>
-                    <p className="text-lg font-semibold text-[#ff4fa3] mb-3">Founder & CEO</p>
-                    <p className="text-sm text-[#721422]/80 leading-relaxed">
-                      Biomedical Engineer, Imperial College London<br/>
-                      Life Sciences Strategy Consultant, McKinsey & Co.<br/>
-                      Contributor to McKinsey Women&apos;s Health Initiative<br/>
-                      Experienced in Equity Storytelling & Fundraising
-                    </p>
+                    <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Founder & CEO</p>
+                    <div className="flex items-center gap-3">
+                      <Image src="/McK.webp" alt="McKinsey & Co." width={60} height={60} className="w-50 h-auto object-contain" />
+                      <Image src="/ICL.webp" alt="Imperial College London" width={60} height={60} className="w-50 h-auto object-contain" />
+                      <Image src="/INSEAD.webp" alt="INSEAD" width={80} height={80} className="w-50 h-auto object-contain" />
+                    </div>
                   </div>
                 </div>
+                  </a>
 
                 {/* Right: Tomasso Busolo */}
-                <div 
-                  className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full max-w-sm"
-
+                <a 
+                  href="https://www.linkedin.com/in/tommaso-busolo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full max-w-sm"
                 >
-                  <div className="w-full h-96 flex items-center justify-center overflow-hidden" style={{
+                  <div 
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                  >
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
                     backgroundImage: 'url(/profile_background.webp)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                   }}>
+                    <Image
+                      src="/TB.png"
+                      alt="Tomasso Busolo"
+                      width={400}
+                      height={400}
+                      className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-130 h-130 object-cover"
+                      priority
+                    />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-bold text-[#721422] mb-2">Tomasso Busolo</h3>
-                    <p className="text-lg font-semibold text-[#ff4fa3] mb-3">Collaborator & Advisor</p>
-                    <p className="text-sm text-[#721422]/80 leading-relaxed">
-                      PhD in Materials Science<br/>
-                      Founder of Smart Underwear start-up ALMA<br/>
-                      Product Innovation
-                    </p>
+                    <h3 className="text-2xl font-bold text-[#721422] mb-2">Dr. Tomasso Busolo</h3>
+                    <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Collaborator & Advisor</p>
+                    <div className="flex items-center gap-3">
+                      <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={60} height={60} className="w-20 h-auto object-contain" />
+                      <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={60} height={60} className="w-20 h-auto object-contain" />
+                      <Image src="/cambridge.svg" alt="University of Cambridge" width={60} height={60} className="w-30 h-auto object-contain" />
+                    </div>
                   </div>
                 </div>
+                  </a>
               </div>
           </div>
         </section>
@@ -1799,47 +1806,98 @@ export default function Home() {
 
               <div className="space-y-4">
                 {/* Team Member Cards */}
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                    </div>
-                    <div>
+                <a 
+                  href="https://www.linkedin.com/in/roxanne-sabbag-642a3014b/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer h-[120px]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                        <Image
+                          src="/RS.webp"
+                          alt="Roxanne Sabbag"
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-contain"
+                          priority
+                        />
+                      </div>
+                                          <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
-                      <p className="text-xl font-semibold text-[#ff4fa3]">Founder & CEO</p>
+                      <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Founder & CEO</p>
+                      <div className="flex items-center gap-2">
+                        <Image src="/McK.webp" alt="McKinsey & Co." width={40} height={40} className="w-10 h-auto object-contain" />
+                        <Image src="/ICL.webp" alt="Imperial College London" width={40} height={40} className="w-10 h-auto object-contain" />
+                        <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain" />
+                      </div>
+                    </div>
                     </div>
                   </div>
-                  <p className="text-base text-[#721422]/80 leading-relaxed">
-                    Biomedical Engineer, Imperial College London, Life Sciences Strategy Consultant, McKinsey & Co., Contributor to McKinsey Women&apos;s Health Initiative, Experienced in Equity Storytelling & Fundraising.
-                  </p>
-                </div>
+                </a>
 
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
-                      <p className="text-xl font-semibold text-[#ff4fa3]">Collaborator & Advisor</p>
+                <a 
+                  href="https://www.linkedin.com/in/léonor-landeau-412197121/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                        <Image
+                          src="/LL.png"
+                          alt="Leonor Landeau"
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-contain"
+                          priority
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
+                        <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
+                        <div className="flex items-center gap-2">
+                          <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={40} height={40} className="w-10 h-auto object-contain" />
+                          <Image src="/LSE_Logo.svg" alt="London School of Economics" width={40} height={40} className="w-10 h-auto object-contain" />
+                          <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-base text-[#721422]/80 leading-relaxed">
-                    Product Manager, Health tech, Expertise in startups, scale-ups, wearables, Marketing Data Science.
-                  </p>
-                </div>
+                </a>
 
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                    </div>
-                    <div>
+                <a 
+                  href="https://www.linkedin.com/in/tommaso-busolo/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer h-[120px]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                        <Image
+                          src="/TB.png"
+                          alt="Tomasso Busolo"
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-contain"
+                          priority
+                        />
+                      </div>
+                                          <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>
-                      <p className="text-xl font-semibold text-[#ff4fa3]">Collaborator & Advisor</p>
+                      <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
+                      <div className="flex items-center gap-2">
+                        <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={40} height={40} className="w-10 h-auto object-contain" />
+                        <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={40} height={40} className="w-10 h-auto object-contain" />
+                        <Image src="/cambridge.svg" alt="University of Cambridge" width={40} height={40} className="w-10 h-auto object-contain" />
+                      </div>
+                    </div>
                     </div>
                   </div>
-                  <p className="text-base text-[#721422]/80 leading-relaxed">
-                    PhD in Materials Science, Founder of Smart Underwear start-up ALMA, Product Innovation.
-                  </p>
-                </div>
+                </a>
               </div>
             </div>
 

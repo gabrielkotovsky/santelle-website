@@ -14,7 +14,7 @@ const menuItems = [
 export default function MobileNavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [animatedBackground, setAnimatedBackground] = useState(false);
+
 
   useEffect(() => {
     const onScroll = () => {
@@ -164,20 +164,7 @@ export default function MobileNavBar() {
             </ul>
           </nav>
 
-          {/* Background Toggle Button */}
-          <button
-            onClick={() => {
-              setAnimatedBackground(!animatedBackground);
-              // Dispatch event to communicate with parent component
-              window.dispatchEvent(new CustomEvent('toggleBackground', { 
-                detail: { animated: !animatedBackground } 
-              }));
-            }}
-            className="w-full bg-white/20 backdrop-blur-sm text-white font-bold text-base py-3 px-6 rounded-full hover:bg-white/30 transition-colors duration-200 touch-target mb-4"
-            aria-label={animatedBackground ? "Switch to static background" : "Switch to animated background"}
-          >
-            {animatedBackground ? "🖼️ Switch to Static" : "🎬 Switch to Animated"}
-          </button>
+
 
           {/* Get Early Access Button */}
           <button
