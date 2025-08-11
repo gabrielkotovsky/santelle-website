@@ -1029,10 +1029,13 @@ export default function Home() {
               <Image
                 src="/kit.webp"
                 alt="Santelle Kit"
-                width={600}
-                height={600}
+                width={900}
+                height={900}
                 className="w-full max-w-[28.8rem] md:w-[900px] md:max-w-[54rem] h-auto object-contain drop-shadow-lg"
+                sizes="(max-width: 768px) 288px, 900px"
+                quality={85}
                 loading="lazy"
+                priority={false}
               />
             ) : (
               <div 
@@ -1131,8 +1134,9 @@ export default function Home() {
                               width={224}
                               height={224}
                               className="h-48 md:h-56 w-auto object-contain mx-auto"
+                              sizes="224px"
+                              quality={85}
                               loading="lazy"
-                              unoptimized
                             />
                           ) : (
                             <div 
@@ -1202,8 +1206,9 @@ export default function Home() {
                             width={224}
                             height={224}
                             className="h-48 md:h-56 w-auto object-contain mx-auto"
+                            sizes="224px"
+                            quality={85}
                             loading="lazy"
-                            unoptimized
                           />
                         ) : (
                           <div 
@@ -1599,6 +1604,8 @@ export default function Home() {
                     width={300}
                     height={300}
                     className="w-full max-w-[300px] h-auto object-contain drop-shadow-lg"
+                    sizes="300px"
+                    quality={85}
                     priority
                   />
                 </div>
@@ -1667,7 +1674,8 @@ export default function Home() {
                           loading="lazy" 
                           alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
                           className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
-                          unoptimized
+                          sizes="(max-width: 768px) 240px, 240px"
+                          quality={85}
                         />
                       </div>
                       
