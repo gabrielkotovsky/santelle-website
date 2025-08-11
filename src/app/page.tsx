@@ -301,6 +301,7 @@ export default function Home() {
     '/Demo_Step1.png',
     '/Demo_pH.png',
     '/Demo_Biomarkers.png',
+    '/Demo_AI.png',
     '/Demo_History.png'
   ];
 
@@ -316,6 +317,10 @@ export default function Home() {
     {
       title: "Get step-by-step guidance to perform your test",
       description: "Follow our clear, easy-to-understand instructions with visual guides. Each step is designed to make testing simple, accurate, and stress-free from the comfort of your home. Test for pH and 5 other key biomarkers to get comprehensive insights into your vaginal health."
+    },
+    {
+      title: "Let Santelle AI interpret your test results",
+      description: "Our advanced AI analyzes your biomarker data to provide personalized insights and recommendations. Get clear, actionable guidance based on your unique health patterns and test results."
     },
     {
       title: "Access your vaginal health history",
@@ -684,7 +689,6 @@ export default function Home() {
           <video
             src="/background_desktop.mp4"
             autoPlay
-            loop
             muted
             playsInline
             className="absolute inset-0 w-full h-full object-cover hidden md:block"
@@ -700,7 +704,6 @@ export default function Home() {
           <video
             src="/background_mobile.mp4"
             autoPlay
-            loop
             muted
             playsInline
             className="absolute inset-0 w-full h-full object-cover block md:hidden"
@@ -1398,7 +1401,7 @@ export default function Home() {
                       onClick={() => {
                         setSelectedFeature(index);
                         // Link to corresponding demo image
-                        const demoIndex = index === 3 ? 5 : index; // 4th title links to last image (index 5)
+                        const demoIndex = index === 4 ? 6 : index === 3 ? 5 : index; // 5th title links to last image (index 6), 6th title links to last image (index 7)
                         setCurrentDemoIdx(demoIndex);
                       }}
                       className={`text-2xl md:text-3xl font-bold text-left w-full transition-all duration-300 cursor-pointer hover:scale-105 ${
@@ -1445,12 +1448,7 @@ export default function Home() {
                   </div>
                 ))}
                 
-                {/* Additional Title */}
-                <div className="w-full">
-                  <div className="text-2xl md:text-3xl font-bold text-left w-full text-[#FD9EAA]">
-                    Benefit from AI-powered analytics based on multiple biomarkers (coming soon!)
-                  </div>
-                </div>
+
               </div>
               </div>
             </div>
