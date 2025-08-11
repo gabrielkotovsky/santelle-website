@@ -846,9 +846,9 @@ export default function Home() {
               </span>
             
                         {/* Mobile Get Early Access Button and Email Form Container */}
-            <div className="relative w-full">
+            <div className="relative">
               {/* Mobile Get Early Access Button */}
-              <div className={`transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
+              <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
                 <button
                   className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
                   onClick={focusHeroEmailInput}
