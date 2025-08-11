@@ -1479,44 +1479,7 @@ export default function Home() {
           </div>
                       <div className="w-full px-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                                {/* Left: Leonor Landeau */}
-                <a 
-                  href="https://www.linkedin.com/in/léonor-landeau-412197121/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full max-w-sm"
-                >
-                  <div 
-                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
-                  >
-                  <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
-                    backgroundImage: 'url(/profile_background.webp)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
-                  }}>
-                    <Image
-                      src="/LL.png"
-                      alt="Leonor Landeau"
-                      width={400}
-                      height={400}
-                      className="absolute top-[65%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-150 h-150 object-cover"
-                      priority
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-bold text-[#721422] mb-2">Leonor Landeau</h3>
-                    <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Collaborator & Advisor</p>
-                    <div className="flex items-center gap-3">
-                      <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={60} height={60} className="w-27 h-auto object-contain" />
-                      <Image src="/LSE_Logo.svg" alt="London School of Economics" width={60} height={60} className="w-20 h-auto object-contain" />
-                      <Image src="/INSEAD.webp" alt="INSEAD" width={60} height={60} className="w-50 h-auto object-contain" />
-                    </div>
-                  </div>
-                </div>
-                  </a>
-
-                {/* Center: Roxanne Sabbag */}
+                                {/* Left: Roxanne Sabbag */}
                 <a 
                   href="https://www.linkedin.com/in/roxanne-sabbag-642a3014b/"
                   target="_blank"
@@ -1548,6 +1511,43 @@ export default function Home() {
                       <Image src="/McK.webp" alt="McKinsey & Co." width={60} height={60} className="w-50 h-auto object-contain" />
                       <Image src="/ICL.webp" alt="Imperial College London" width={60} height={60} className="w-50 h-auto object-contain" />
                       <Image src="/INSEAD.webp" alt="INSEAD" width={80} height={80} className="w-50 h-auto object-contain" />
+                    </div>
+                  </div>
+                </div>
+                  </a>
+
+                {/* Center: Leonor Landeau */}
+                <a 
+                  href="https://www.linkedin.com/in/léonor-landeau-412197121/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full max-w-sm"
+                >
+                  <div 
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                  >
+                  <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
+                    backgroundImage: 'url(/profile_background.webp)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                  }}>
+                    <Image
+                      src="/LL.png"
+                      alt="Leonor Landeau"
+                      width={400}
+                      height={400}
+                      className="absolute top-[65%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-150 h-150 object-cover"
+                      priority
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold text-[#721422] mb-2">Leonor Landeau</h3>
+                    <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Collaborator & Advisor</p>
+                    <div className="flex items-center gap-3">
+                      <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={60} height={60} className="w-27 h-auto object-contain" />
+                      <Image src="/LSE_Logo.svg" alt="London School of Economics" width={60} height={60} className="w-20 h-auto object-contain" />
+                      <Image src="/INSEAD.webp" alt="INSEAD" width={60} height={60} className="w-50 h-auto object-contain" />
                     </div>
                   </div>
                 </div>
