@@ -95,6 +95,16 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="msapplication-navbutton-color" content="#FD9EAA" />
         
+        {/* Preload Critical CSS to Eliminate Render-Blocking */}
+        <link rel="preload" href="/globals.css" as="style" />
+        <link rel="preload" href="/styles/typography.css" as="style" />
+        <link rel="preload" href="/styles/mobile.css" as="style" />
+        
+        {/* Preload Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style" />
+        
         {/* Structured Data */}
         <Script
           id="organization-schema"
