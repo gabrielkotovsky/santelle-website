@@ -219,6 +219,8 @@ export default function Home() {
     return () => window.removeEventListener('toggleBackground', toggleBackgroundListener as EventListener);
   }, []);
 
+
+
   useEffect(() => {
     // Intersection Observer to trigger animation when stats card is in view
     const statsEl = statsRef.current;
@@ -372,6 +374,16 @@ export default function Home() {
     blocked: false,
     cooldownEnd: 0
   });
+  const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup validation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (validationTimeout) {
+        clearTimeout(validationTimeout);
+      }
+    };
+  }, [validationTimeout]);
 
   // Confetti effect function
   const triggerConfetti = () => {
@@ -403,7 +415,17 @@ export default function Home() {
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (e.target.name === 'email') {
-      validateEmail(e.target.value);
+      // Clear any existing timeout
+      if (validationTimeout) {
+        clearTimeout(validationTimeout);
+      }
+      
+      // Set a new timeout for debounced validation
+      const timeout = setTimeout(() => {
+        validateEmail(e.target.value);
+      }, 500); // 500ms delay after user stops typing
+      
+      setValidationTimeout(timeout);
     }
   };
 
