@@ -11,7 +11,7 @@ const menuItems = [
 ];
 
 const navLinkBase =
-  'font-bold text-lg transition duration-500 flex items-center h-full';
+  'font-bold transition duration-500 flex items-center h-full';
 const navLinkNormal = 'text-black hover:text-black/80';
 const navLinkDimmed = 'text-black/50';
 const navLinkActive = 'text-black font-bold';
@@ -67,11 +67,31 @@ export default function NavBar() {
     >
       {/* Logo - desktop only */}
       <Link href="/" className="hidden md:flex items-center h-full">
-        <Image src="/logo-dark.svg" alt="Santelle Logo" width={113} height={38} priority />
+        <Image 
+          src="/logo-dark.svg" 
+          alt="Santelle Logo" 
+          width={113} 
+          height={38} 
+          priority 
+          style={{
+            width: 'clamp(80px, 8vw, 113px)',
+            height: 'auto'
+          }}
+        />
       </Link>
       {/* Logo - mobile only */}
       <Link href="/" className="flex md:hidden items-center h-full mx-auto">
-        <Image src="/logo-dark.svg" alt="Santelle Logo" width={90} height={30} priority />
+        <Image 
+          src="/logo-dark.svg" 
+          alt="Santelle Logo" 
+          width={90} 
+          height={30} 
+          priority 
+          style={{
+            width: 'clamp(60px, 6vw, 90px)',
+            height: 'auto'
+          }}
+        />
       </Link>
       {/* Hamburger Icon - mobile only */}
       <button
@@ -99,6 +119,9 @@ export default function NavBar() {
                 ? navLinkActive
                 : navLinkDimmed)
             }
+            style={{
+              fontSize: 'clamp(0.875rem, 1.2vw, 1.125rem)'
+            }}
             onMouseEnter={() => setHoveredIdx(idx)}
             onMouseLeave={() => setHoveredIdx(null)}
             onClick={
@@ -125,8 +148,15 @@ export default function NavBar() {
         
         {/* Get Early Access Button */}
         <button
-          className="bg-white/20 backdrop-blur-md text-black font-bold text-xl px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition flex items-center justify-center"
-          style={{ WebkitBackdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.12)' }}
+          className="bg-white/20 backdrop-blur-md text-black font-bold px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition flex items-center justify-center"
+          style={{ 
+            WebkitBackdropFilter: 'blur(12px)', 
+            background: 'rgba(255,255,255,0.12)',
+            fontSize: 'clamp(0.75rem, 1vw, 1.25rem)',
+            paddingLeft: 'clamp(1rem, 1.5vw, 1.5rem)',
+            paddingRight: 'clamp(1rem, 1.5vw, 1.5rem)',
+            height: 'clamp(2.5rem, 4vw, 3rem)'
+          }}
           onClick={() => {
             if (pathname !== '/') {
               window.location.href = '/';
