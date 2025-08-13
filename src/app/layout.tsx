@@ -90,10 +90,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Santelle" />
         
         {/* Mobile Status Bar Color */}
-        <meta name="theme-color" content="#FD9EAA" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="msapplication-navbutton-color" content="#FD9EAA" />
+        <meta name="theme-color" content="#ffffff" />
         
         {/* Preload Critical CSS to Eliminate Render-Blocking */}
         <link rel="preload" href="/globals.css" as="style" />

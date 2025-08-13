@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
-import { motion, AnimatePresence } from 'framer-motion';
+
 
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
@@ -272,25 +272,9 @@ export default function Home() {
     },
   ];
 
-  // Add state to control biomarker card
-  const [showBiomarkerCard, setShowBiomarkerCard] = useState(false);
 
-  // Add state for cycling stats
-  const [currentStatIdx, setCurrentStatIdx] = useState(0);
-  const extraStats = [
-    [
-      '500 million women experience vaginal infections annually',
-      '',
-    ],
-    [
-      '84% of women are unaware that they have Bacterial Vaginosis',
-      '',
-    ],
-    [
-      '15% of untreated BV cases may lead to pelvic inflammatory disease.',
-      '',
-    ],
-  ];
+
+
 
   // Add state for demo screens
   const [currentDemoIdx, setCurrentDemoIdx] = useState(0);
@@ -307,51 +291,37 @@ export default function Home() {
 
   const featureData = [
     {
-      title: "Get personalised recommendations and articles",
+      title: "Get personalised insights",
       description: "Receive tailored insights and educational content based on your test results and health patterns. Our AI-powered recommendations help you understand your vaginal health and provide actionable advice."
     },
     {
-      title: "Scan your Santelle self-test to activate your kit",
+      title: "Scan your self-test kit to activate it",
       description: "Simply scan the QR code on your test kit to connect it to your account. This activates your personalized testing experience and ensures accurate result tracking."
     },
     {
-      title: "Get step-by-step guidance to perform your test",
+      title: "Get step-by-step guidance",
       description: "Follow our clear, easy-to-understand instructions with visual guides. Each step is designed to make testing simple, accurate, and stress-free from the comfort of your home. Test for pH and 5 other key biomarkers to get comprehensive insights into your vaginal health."
     },
     {
-      title: "Let Santelle AI interpret your test results",
+      title: "Let Santelle AI interpret your results",
       description: "Our advanced AI analyzes your biomarker data to provide personalized insights and recommendations. Get clear, actionable guidance based on your unique health patterns and test results."
     },
     {
       title: "Access your vaginal health history",
       description: "View your complete testing history, track patterns over time, and monitor your health journey. All your data is securely stored and easily accessible whenever you need it."
+    },
+    {
+      title: "Benefit from AI-powered analytics (coming soon !)",
+      description: "Our advanced AI analytics will provide deeper insights into your health patterns, predictive recommendations, and personalized wellness strategies. Stay tuned for this powerful new feature."
     }
   ];
 
 
-  // Typewriter effect state
-  const [typedText, setTypedText] = useState('');
-  const [typing, setTyping] = useState(false);
 
 
 
-  useEffect(() => {
-    if (currentStatIdx === 0) return;
-    setTypedText('');
-    setTyping(true);
-    const stat = extraStats[currentStatIdx-1][0];
-    let i = 0;
-    const interval = setInterval(() => {
-      setTypedText(stat.slice(0, i + 1));
-      i++;
-      if (i === stat.length) {
-        clearInterval(interval);
-        setTyping(false);
-      }
-    }, 18);
-    return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStatIdx]);
+
+
 
   // Calculate card offsets after hydration to prevent hydration mismatch
   useEffect(() => {
@@ -421,7 +391,7 @@ export default function Home() {
       
       // Set a new timeout for debounced validation
       const timeout = setTimeout(() => {
-        validateEmail(e.target.value);
+      validateEmail(e.target.value);
       }, 500); // 500ms delay after user stops typing
       
       setValidationTimeout(timeout);
@@ -707,7 +677,7 @@ export default function Home() {
             muted
             playsInline
             className="absolute inset-0 w-full h-full object-cover block md:hidden"
-            style={{ 
+            style={{
               objectFit: 'cover', 
               objectPosition: 'center',
               width: '100vw',
@@ -720,37 +690,92 @@ export default function Home() {
         </div>
         {/* Desktop Hero Content */}
         <div className="hidden md:flex flex-col items-center justify-center w-full h-full absolute top-0 left-0 z-10" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
-          <div className="flex flex-col items-end w-[680px] max-w-full mx-auto">
+          <div className="flex flex-col items-center w-[680px] max-w-full mx-auto">
             <Image
               src="/logo-dark.svg"
               alt="Santelle Logo"
               width={1020}
               height={360}
               priority
+              style={{
+                width: 'clamp(300px, 50vw, 680px)',
+                height: 'auto'
+              }}
             />
-            <h2 className="mt-2 mb-2 text-black text-2xl md:text-4xl text-right w-full">To Her Health</h2>
+            <h2 
+              className="mt-2 mb-2 text-black text-right"
+              style={{
+                fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+                width: 'clamp(300px, 50vw, 680px)'
+              }}
+            >
+              To Her Health
+            </h2>
             </div>
             
           {/* Desktop Get Early Access Button and Email Form Container */}
             <div className="relative">
               {/* Desktop Get Early Access Button */}
               <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
+                <div className="flex gap-4 mt-5 w-full max-w-[680px] justify-center">
                 <button
-                  className="bg-[#721422] text-white font-bold text-xl md:text-2xl px-8 py-3 md:px-12 md:py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse mt-5"
+                    className="bg-[#721422] text-white font-bold rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse"
+                    style={{
+                      fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
+                      paddingLeft: 'clamp(1rem, 2vw, 2rem)',
+                      paddingRight: 'clamp(1rem, 2vw, 2rem)',
+                      paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
+                      paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)',
+                      width: 'clamp(180px, 20vw, 280px)',
+                      whiteSpace: 'nowrap'
+                    }}
                   onClick={focusHeroEmailInput}
                 >
                   Get Early Access
                 </button>
+                  <button
+                    className="bg-white text-[#721422] font-bold rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white"
+                    style={{
+                      fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
+                      paddingLeft: 'clamp(1rem, 2vw, 2rem)',
+                      paddingRight: 'clamp(1rem, 2vw, 2rem)',
+                      paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
+                      paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)',
+                      width: 'clamp(200px, 22vw, 320px)',
+                      whiteSpace: 'nowrap'
+                    }}
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById('stats');
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    }}
+                  >
+                    Explore Santelle Now
+                </button>
+                </div>
               </div>
               
               {/* Desktop Email Form */}
               <div className={`transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}>
                 <form
                   ref={emailFormRef}
-                  className="flex flex-col items-center w-full max-w-2xl mt-0 px-4 md:px-0"
+                  className="flex flex-col items-center mt-0 px-4 md:px-0"
+                  style={{
+                    width: 'clamp(400px, 50vw, 600px)'
+                  }}
                   onSubmit={handleFormSubmit}
                 >
-                <label htmlFor="waitlist-email" className="self-start mb-1 text-[#721422] font-medium text-base pl-2">Your email*</label>
+                <label 
+                  htmlFor="waitlist-email" 
+                  className="self-start mb-1 text-[#721422] font-medium pl-2"
+                  style={{
+                    fontSize: 'clamp(0.875rem, 1.2vw, 1rem)'
+                  }}
+                >
+                  Your email*
+                </label>
                 <div className="relative w-full">
                   <div className="get-access-pulse flex w-full">
                       <input
@@ -760,24 +785,38 @@ export default function Home() {
                       value={formData.email}
                       onChange={handleFormChange}
                       placeholder="your@email.com"
-                      className={`flex-1 px-4 py-3 md:px-8 md:py-4 rounded-l-full border ${
+                      className={`flex-1 rounded-l-full border ${
                         emailValidation.error ? 'border-red-500' : 
                         emailValidation.isValid ? 'border-green-500' : 
                         'border-[#ececec]'
-                      } bg-white text-[#721422] text-base md:text-xl outline-none focus:ring-2 focus:ring-[#721422]/20 transition caret-[#ff4fa3]`}
+                      } bg-white text-[#721422] outline-none focus:ring-2 focus:ring-[#721422]/20 transition caret-[#ff4fa3]`}
+                      style={{
+                        fontSize: 'clamp(0.875rem, 1.2vw, 1.125rem)',
+                        paddingLeft: 'clamp(1rem, 1.5vw, 2rem)',
+                        paddingRight: 'clamp(1rem, 1.5vw, 2rem)',
+                        paddingTop: 'clamp(0.75rem, 1.2vw, 1rem)',
+                        paddingBottom: 'clamp(0.75rem, 1.2vw, 1rem)'
+                      }}
                       required
                       disabled={isSubmitting}
                     />
                     <button
                       type="submit"
                       disabled={isSubmitting || (!!formData.email && !emailValidation.isValid) || rateLimit.blocked}
-                      className={`px-6 py-3 md:px-10 md:py-4 font-semibold rounded-r-full text-sm md:text-base border transition focus:outline-none focus:ring-2 focus:ring-[#721422]/30 flex items-center justify-center
+                      className={`font-semibold rounded-r-full border transition focus:outline-none focus:ring-2 focus:ring-[#721422]/30 flex items-center justify-center
                         ${isSubmitting ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                           : (!formData.email ? 'bg-[#721422] text-white border-[#721422]/40 hover:bg-[#8a1a2a] hover:text-white'
                             : (!emailValidation.isValid ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                               : 'bg-[#721422] text-white border-[#721422]/40 hover:bg-[#8a1a2a] hover:text-white'))}
                       `}
-                      style={{ WebkitBackdropFilter: 'blur(12px)' }}
+                      style={{ 
+                        WebkitBackdropFilter: 'blur(12px)',
+                        fontSize: 'clamp(0.75rem, 1vw, 1rem)',
+                        paddingLeft: 'clamp(1rem, 1.5vw, 2.5rem)',
+                        paddingRight: 'clamp(1rem, 1.5vw, 2.5rem)',
+                        paddingTop: 'clamp(0.75rem, 1.2vw, 1rem)',
+                        paddingBottom: 'clamp(0.75rem, 1.2vw, 1rem)'
+                      }}
                     >
                       {isSubmitting ? 'Joining...' : rateLimit.blocked ? 'Rate limited' : (
                         <Image
@@ -786,6 +825,10 @@ export default function Home() {
                           width={40}
                           height={40}
                           className="w-10 h-10 brightness-0 invert"
+                          style={{
+                            width: 'clamp(24px, 2.5vw, 40px)',
+                            height: 'clamp(24px, 2.5vw, 40px)'
+                          }}
                         />
                       )}
                     </button>
@@ -793,28 +836,64 @@ export default function Home() {
                   {/* Validation feedback - absolutely positioned */}
                   <div className="absolute top-full left-0 right-0 mt-2">
                     {emailValidation.isChecking && (
-                      <div className="text-blue-600 text-sm text-center">Checking email domain...</div>
+                      <div 
+                        className="text-blue-600 text-center"
+                        style={{
+                          fontSize: 'clamp(0.75rem, 1vw, 0.875rem)'
+                        }}
+                      >
+                        Checking email domain...
+                      </div>
                     )}
                     {emailValidation.error && (
-                      <div className="text-red-600 text-sm text-center">{emailValidation.error}</div>
+                      <div 
+                        className="text-red-600 text-center"
+                        style={{
+                          fontSize: 'clamp(0.75rem, 1vw, 0.875rem)'
+                        }}
+                      >
+                        {emailValidation.error}
+                      </div>
                     )}
                     {emailValidation.isValid && !emailValidation.isChecking && (
-                      <div className="text-green-600 text-sm text-center">✓ Valid email address</div>
+                      <div 
+                        className="text-green-600 text-center"
+                        style={{
+                          fontSize: 'clamp(0.75rem, 1vw, 0.875rem)'
+                        }}
+                      >
+                        ✓ Valid email address
+                      </div>
                     )}
                     {/* Rate limiting feedback */}
                     {rateLimit.blocked && (
-                      <div className="text-red-600 text-sm text-center">
+                      <div 
+                        className="text-red-600 text-center"
+                        style={{
+                          fontSize: 'clamp(0.75rem, 1vw, 0.875rem)'
+                        }}
+                      >
                         Too many attempts. Please wait {Math.ceil((rateLimit.cooldownEnd - Date.now()) / 1000)} seconds before trying again.
                       </div>
                     )}
                     {/* Submit status */}
                     {submitStatus === 'success' && (
-                      <div className="text-green-600 text-lg font-semibold text-center mt-2">
+                      <div 
+                        className="text-green-600 font-semibold text-center mt-2"
+                        style={{
+                          fontSize: 'clamp(1rem, 1.5vw, 1.125rem)'
+                        }}
+                      >
                     ✓ You&apos;ve been added to the waitlist!
                       </div>
                     )}
                     {submitStatus === 'error' && (
-                      <div className="text-red-600 text-lg font-semibold text-center mt-2">
+                      <div 
+                        className="text-red-600 font-semibold text-center mt-2"
+                        style={{
+                          fontSize: 'clamp(1rem, 1.5vw, 1.125rem)'
+                        }}
+                      >
                         {rateLimit.blocked ? 'Too many submission attempts. Please wait before trying again.' : 'Something went wrong. Please try again.'}
                       </div>
                     )}
@@ -840,12 +919,26 @@ export default function Home() {
             <div className="relative">
               {/* Mobile Get Early Access Button */}
               <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
-                <button
-                  className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
-                  onClick={focusHeroEmailInput}
-                >
-                  Get Early Access
-                </button>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
+                    onClick={focusHeroEmailInput}
+                  >
+                    Get Early Access
+                  </button>
+                  <button
+                    className="bg-white text-[#721422] font-bold text-sm px-6 py-4 rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white touch-target"
+                    onClick={() => {
+                      const unifiedCard = document.getElementById('mobile-unified-card');
+                      const statsSection = unifiedCard?.querySelector('[data-section="stats"]');
+                      if (statsSection) {
+                        statsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                  >
+                    Explore Santelle
+                  </button>
+                </div>
               </div>
               
               {/* Mobile Email Form */}
@@ -924,23 +1017,22 @@ export default function Home() {
         </div>
 
         {/* Desktop Bottom Section */}
-        <div className="hidden md:flex absolute left-0 w-full flex-col items-center justify-center gap-4 z-20 bottom-0 md:bottom-20 lg:bottom-20" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
-          <span className="italic text-[#721422] text-xl md:text-3xl text-center">Discover Santelle, your vaginal health companion</span>
-                <button
-            className="mt-2 bg-white text-[#511828] font-bold text-lg md:text-xl px-8 py-3 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
-            type="button"
-            onClick={() => {
-              const el = document.getElementById('stats');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }
+        <div className="hidden md:flex absolute left-0 w-full flex-col items-center justify-center gap-0 z-20 bottom-0 md:bottom-12 lg:bottom-15" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
+          <span 
+            className="italic text-[#721422] text-center"
+            style={{
+              fontSize: 'clamp(1rem, 2.5vw, 1.5rem)'
             }}
           >
-            Explore Santelle Now
-                </button>
+            Discover Santelle, your vaginal health companion
+          </span>
           <span className="flex justify-center mt-2">
               <span
               className="cursor-pointer hover:scale-110 transition-transform duration-200"
+              style={{
+                width: 'clamp(40px, 4vw, 50px)',
+                height: 'clamp(40px, 4vw, 50px)'
+              }}
               onClick={() => {
                 const el = document.getElementById('stats');
                 if (el) {
@@ -948,7 +1040,7 @@ export default function Home() {
                 }
               }}
             >
-              <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M8 10l4 4 4-4" stroke="#721422" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
                 </span>
@@ -962,68 +1054,94 @@ export default function Home() {
       {/* Main content sections with higher z-index to cover hero */}
       <div className="relative z-20 w-full">
           {/* Desktop Stats Section */}
-          <section id="stats" ref={statsRef} className="hidden md:flex w-screen min-h-screen flex-col justify-center items-center gap-2 p-0 m-0 -mt-8 md:-mt-26">
+          <section id="stats" ref={statsRef} className="hidden md:flex w-full min-h-screen flex-col justify-center items-center gap-2 p-0 m-0 -mt-8 md:-mt-26">
             <div className="px-4 md:px-8 py-8 md:py-12 w-full flex justify-center items-center">
-              <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
+              <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)'}}>
                 <div
-                  className="block md:inline-flex md:flex-row items-center md:items-start text-4xl md:text-6xl font-bold mb-2 text-center relative cursor-pointer chunko-bold"
-                  onClick={() => {
-                    setCurrentStatIdx(idx => (idx + 1) % (extraStats.length + 1));
+                  className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative chunko-bold"
+                  style={{
+                    fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',
+                    color: '#721422'
                   }}
                 >
-                  {currentStatIdx === 0 ? (
-                    <>
                       <span 
-                        className={`transition-opacity duration-[1200ms] text-4xl md:text-5xl ${showStatsLine1 ? 'opacity-100' : 'opacity-0'} cursor-pointer hover:scale-105 transition-transform duration-200 select-none`} 
-                        style={{color: '#721422'}}
-                        onClick={() => {
-                          setCurrentStatIdx(idx => (idx + 1) % (extraStats.length + 1));
-                        }}
-                        title="Click to see more stats"
-                      >
-                        Vaginal infections affect 3 in 4 women. 50% are recurrent.
-                        <span className="inline-block ml-2 text-sm opacity-60">(click for more)</span>
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="opacity-100 text-4xl md:text-5xl" style={{color: '#721422', minHeight: 0}}>
-                        {typedText}
-                        <span className="inline-block w-2 animate-pulse align-baseline" style={{opacity: typing ? 1 : 0}}>|</span>
-                      </span>
-                      {extraStats[currentStatIdx-1][1] && (
-                        <span className="opacity-100 md:ml-2 mt-2 md:mt-0" style={{color: '#ff4fa3', display: 'block'}}>{extraStats[currentStatIdx-1][1]}</span>
-                      )}
-                    </>
-                  )}
+                    className={`transition-opacity duration-[1200ms] ${showStatsLine1 ? 'opacity-100' : 'opacity-0'}`} 
+                  >
+                    Vaginal infections affect 3 in 4 women.
+                  </span>
               </div>
-                <div className={`text-3xl md:text-3xl text-[#721422] mb-3 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}>Left untreated, this can lead to <span className="text-[#721422] font-bold">infertility</span>, <span className="text-[#721422] font-bold">pregnancy complications</span>, and <span className="text-[#721422] font-bold">long-term discomfort</span>.</div>
-                <div className={`text-4xl md:text-4xl font-bold text-[#FD9EAA] mt-10 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}>It&apos;s time to take charge of your vaginal health — with insights, not guesswork.</div>
+              <div
+                className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative chunko-bold"
+                style={{
+                  fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',
+                  color: '#721422'
+                }}
+              >
+                <span 
+                  className={`transition-opacity duration-[1200ms] ${showStatsLine1 ? 'opacity-100' : 'opacity-0'}`} 
+                >
+                  50% are recurrent.
+                      </span>
+              </div>
+                <div 
+                  className={`text-[#721422] mb-12 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}
+                  style={{
+                    fontSize: 'clamp(0.75rem, 1.75vw, 1.75rem)'
+                  }}
+                >
+                  Left untreated, this can lead to <span className="font-bold">infertility</span>, <span className="font-bold">pregnancy complications</span>, and <span className="font-bold">long-term discomfort</span>.
+                </div>
+                <div 
+                  className={`font-bold text-[#FD9EAA] mb-12 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}
+                  style={{
+                    fontSize: 'clamp(0.75rem, 1.75vw, 1.75rem)'
+                  }}
+                >
+                  It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
+                </div>
               <button
                 onClick={e => handleSmoothScroll(e, 'kit')}
-                className="mx-auto mt-10 flex items-center justify-center bg-white text-[#000000] font-bold text-lg md:text-xl px-8 py-4 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#511828] hover:text-white"
+                className="mx-auto mt-10 flex items-center justify-center bg-white text-[#721422] font-bold rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white"
+                style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
+                  paddingLeft: 'clamp(1rem, 2vw, 2rem)',
+                  paddingRight: 'clamp(1rem, 2vw, 2rem)',
+                  paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
+                  paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)',
+                  width: 'clamp(250px, 30vw, 400px)',
+                  whiteSpace: 'nowrap'
+                }}
                 aria-label="Scroll to kit section"
               >
-                Discover how Santelle supports you
+                Discover how you can prevent this
               </button>
               </div>
             </div>
           </section>
 
-
+        {/* Desktop Horizontal Divider */}
+        <div className="hidden md:block w-full py-48">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-1 bg-[#721422] rounded-full"></div>
+          </div>
+        </div>
 
         {/* Desktop Kit Image Section */}
-          <section ref={kitSectionRef} id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center mb-20 md:mb-20">
-            <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-0 md:p-0 flex flex-col md:flex-row items-center justify-center gap-2 md:gap-12 w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
+          <section ref={kitSectionRef} id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center">
+            <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-center gap-2 md:gap-0" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)', padding: '120px'}}>
           <div className="md:w-1/2 flex justify-center md:justify-end items-center p-0 py-2 md:py-0">
             {kitSectionLoaded ? (
               <Image
-                src="/kit.webp"
-                alt="Santelle Kit"
+                src="/SantelleKit+App.png"
+                alt="Santelle Kit and App"
                 width={900}
                 height={900}
-                className="w-full max-w-[28.8rem] md:w-[900px] md:max-w-[54rem] h-auto object-contain drop-shadow-lg"
-                sizes="(max-width: 768px) 288px, 900px"
+                className="h-auto object-contain drop-shadow-lg"
+                style={{
+                  width: 'clamp(300px, 70vh, 900px)',
+                  maxWidth: '100%'
+                }}
+                sizes="(max-width: 768px) 300px, (max-width: 1024px) 600px, 900px"
                 quality={85}
                 loading="lazy"
                 priority={false}
@@ -1037,36 +1155,77 @@ export default function Home() {
               />
             )}
           </div>
-          <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center">
-                <h1 className="font-bold text-5xl md:text-7xl md:text-7xl text-[#721422] mb-0 text-left">
-                  <span className="chunko-bold">Meet Santelle</span><br className="hidden md:block" />
-                  <span className="block md:inline font-normal text-2xl md:text-2xl md:text-5xl mt-0">Your Vaginal Health Companion</span>
+                    <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center" style={{gap: '5vh'}}>
+                {/* First Group: Title and Subtitle */}
+                <div style={{gap: '0.5rem'}}>
+                  <h1 
+                    className="font-bold text-[#721422] mb-0 text-left"
+                    style={{
+                      fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',
+                      lineHeight: '1.0'
+                    }}
+                  >
+                    <span className="chunko-bold">Meet Santelle</span>
                 </h1>
-            <p className="text-xl md:text-4xl text-[#721422] mb-2 text-center md:text-left">Easy, discreet, and empowering.</p>
-                                  <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-4 ">
-                 The Santelle Starter Kit is more than a test.<br/>
-                 It&apos;s your monthly vaginal wellness ritual.<br/>
-                 Our at-home kit gives you lab-quality insights.<br/>
-                 No clinic visit, no waiting rooms, no shame.
-               </p>
-                <p className="text-base md:text-2xl text-[#721422] text-center md:text-left mb-6 ">
-              With Santelle, you take quiet control of your intimate health, proactively.
-            </p>
-                <ul className="list-disc pl-6 text-[#721422] mb-6 space-y-2 text-left text-sm md:text-lg ">
+                  <h2 
+                    className="font-bold text-[#721422] mb-0 text-left"
+                    style={{
+                      fontSize: 'clamp(0.5rem, 1.25vw, 1.25rem)',
+                      lineHeight: '0.8',
+                      marginTop: '0.5rem'
+                    }}
+                  >
+                    Your discreet, at-home vaginal health companion
+                  </h2>
+                </div>
+
+                {/* Second Group: Description and Bullet Points */}
+                <div style={{gap: '1rem'}}>
+                  <p 
+                    className="text-[#721422] text-center md:text-left"
+                    style={{
+                      fontSize: 'clamp(0.25rem, 1.25vw, 1.25rem)'
+                    }}
+                  >
+                  Santelle makes it simple to check in on your intimate health each month — with instant
+                  results, personalised insights, and no awkward clinic visits.
+                   </p>
+                  <ul 
+                    className="list-disc pl-8 text-[#721422] space-y-2 text-left"
+                    style={{
+                      fontSize: 'clamp(0.25rem, 1.25vw, 1.25rem)',
+                      marginTop: '0.5rem'
+                    }}
+                  >
               <li>Instant results from home</li>
-              <li>Multi-biomarker analysis, not just pH</li>
-              <li>Connected app for tracking & personalized insights</li>
+                <li>Multi-biomarker analysis — beyond pH</li>
+                <li>Connected app with personalised insights & tips</li>
             </ul>
+                </div>
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center md:justify-start">
               <a
                 href="#how-it-works"
-                className="how-it-works-btn inline-block bg-white text-[#511828] font-bold text-2xl px-12 py-2 md:py-5 rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full max-w-xs mx-auto md:mx-0 md:w-auto text-center hover:bg-[#511828] hover:text-white"
+                className="how-it-works-btn inline-block bg-white text-[#511828] font-bold rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full max-w-xs mx-auto md:mx-0 md:w-auto text-center hover:bg-[#511828] hover:text-white"
+                style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
+                  paddingLeft: 'clamp(1rem, 2vw, 2rem)',
+                  paddingRight: 'clamp(1rem, 2vw, 2rem)',
+                  paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
+                  paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)'
+                }}
                 onClick={e => handleSmoothScroll(e, 'how-it-works')}
               >
                 How It Works
               </a>
               <button
-                className="bg-[#721422] text-white font-bold text-2xl px-12 py-2 md:py-5 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse w-full max-w-xs mx-auto md:mx-0 md:w-auto"
+                className="bg-[#721422] text-white font-bold rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse w-full max-w-xs mx-auto md:mx-0 md:w-auto"
+                style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
+                  paddingLeft: 'clamp(1rem, 2vw, 2rem)',
+                  paddingRight: 'clamp(1rem, 2vw, 2rem)',
+                  paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
+                  paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)'
+                }}
                 onClick={focusHeroEmailInput}
                 type="button"
               >
@@ -1078,179 +1237,101 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-12">
+        <div className="hidden md:block w-full py-48">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
         </div>
 
         {/* Desktop Product Intro Section */}
-          <section ref={howItWorksRef} id="how-it-works" className="hidden md:flex w-full py-20 mt-0 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
-            <h2 className="hidden md:block font-bold text-5xl md:text-7xl md:text-8xl text-[#721422] mb-0 md:mb-10 text-center">
+          <section ref={howItWorksRef} id="how-it-works" className="hidden md:flex w-full py-0 mt-0 flex-col items-center gap-12 min-h-screen">
+            <h2 className="hidden md:block font-bold text-[#721422] mb-0 md:mb-10 text-center"
+                style={{
+                  fontSize: 'clamp(2rem, 5vw, 4rem)'
+                }}>
               <span className="chunko-bold">How you&apos;ll use it</span>
             </h2>
-            <div ref={howItWorksRef} className="hidden md:block w-full max-w-7xl mx-auto space-y-8">
-               {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
-                 const isBiomarkerCard = showBiomarkerCard && stepIdx === 1;
-                 
-                 // Only apply motion animation to step 2 (biomarker card)
-                 if (stepIdx === 1) {
-                   return (
-                     <AnimatePresence mode="wait" key="step2">
-                       <motion.div
-                         key={isBiomarkerCard ? 'biomarker' : step.number}
-                         className={`w-full flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-8 md:px-8 md:py-16 ${isBiomarkerCard ? 'gap-0 md:gap-0' : 'gap-4 md:gap-8'}`}
-                         initial={{ opacity: 0, y: 20 }}
-                         animate={{ opacity: 1, y: 0 }}
-                         exit={{ opacity: 0, y: -20 }}
-                         transition={{ duration: 0.6, ease: "easeInOut" }}
-                       >
-                        {/* Top: Step number and heading */}
-                        {!isBiomarkerCard && (
-                          <div className="flex flex-row items-center gap-4 md:gap-8 w-full md:w-auto mb-2 md:mb-0">
-                            <span className="text-4xl md:text-7xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 md:w-20 md:h-20 aspect-square flex items-center justify-center">
-                              {step.number}
-                            </span>
-                            <div className="text-2xl md:text-4xl font-bold">
-                              {step.title}
-                            </div>
-                          </div>
-                        )}
-                        {/* Middle: Image */}
-                        <div className={`flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 ${isBiomarkerCard ? 'my-1 md:my-0' : 'my-2 md:my-0'}`}>
-                          {howItWorksLoaded ? (
-                            <Image 
-                              src={isBiomarkerCard ? '/step2.webp' : step.img} 
-                              alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
-                              width={224}
-                              height={224}
-                              className="h-48 md:h-56 w-auto object-contain mx-auto"
-                              sizes="224px"
-                              quality={85}
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div 
-                              className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
+            <div ref={howItWorksRef} className="hidden md:block w-full mx-auto flex flex-col" style={{maxWidth: 'clamp(70vw, 70vw, 70vw)'}}>
+               {howItWorksSteps.slice(0, 4).map((step) => (
+                 <div
+                   key={step.number}
+                   className={`w-full flex flex-col items-center justify-center bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl mb-16`}
                               style={{
-                                background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
-                                minWidth: '200px'
-                              }}
-                            />
-                          )}
-                        </div>
-                        {/* Bottom: Description */}
-                        <div className={`text-xl md:text-3xl w-full ${isBiomarkerCard ? 'text-center' : 'text-center md:text-left'}`}>
-                          {!isBiomarkerCard && (
-                            <>
-                              Use a small sample of discharge to test for <span className="biomarker-highlight" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(true); }}>6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
-                            </>
-                          )}
-                          {isBiomarkerCard && (
-                            <>
-                              <div className="text-left max-w-4xl mx-auto">
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                  <ul className="list-disc pl-6 space-y-3 text-lg">
-                                    <li><span className="font-bold">pH:</span> A higher-than-normal vaginal pH (&gt;4.5) may indicate bacterial vaginosis or other infections due to disrupted microbial balance.</li>
-                                    <li><span className="font-bold">H₂O₂ (Hydrogen Peroxide):</span> Hydrogen peroxide is produced by healthy Lactobacillus species and helps maintain vaginal acidity and protect against infections.</li>
-                                    <li><span className="font-bold">LE (Leukocyte Esterase):</span> The presence of leukocyte esterase signals inflammation or infection, often due to an immune response.</li>
-                                  </ul>
-                                  <ul className="list-disc pl-6 space-y-3 text-lg">
-                                    <li><span className="font-bold">SNA (Sialidase Activity):</span> Elevated sialidase activity is a biomarker for bacterial vaginosis, produced by anaerobic bacteria like Gardnerella vaginalis.</li>
-                                    <li><span className="font-bold">β-G (Beta-Glucuronidase):</span> This enzyme, when elevated, suggests bacterial overgrowth or imbalance in the vaginal microbiome.</li>
-                                    <li><span className="font-bold">B-G (Beta-Glucosidase):</span> Increased beta-glucosidase activity can be a sign of microbial dysbiosis and is linked to conditions like bacterial vaginosis.</li>
-                                  </ul>
-                                </div>
-                                <div className="text-center mt-8">
-                                  <button className="px-8 py-3 bg-[#721422] text-white rounded-full font-bold text-xl hover:bg-[#8a1a2a] transition" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(false); }}>Back</button>
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
-                 } else {
-                   // Regular cards without animation
-                   return (
-                     <div
-                       key={step.number}
-                       className={`w-full flex flex-col md:flex-row items-center justify-between bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-8 md:px-8 md:py-16 gap-4 md:gap-8`}
+                     padding: 'clamp(2rem, 2vw, 2rem)',
+                     gap: '0'
+                   }}
                      >
-                      {/* Top: Step number and heading */}
-                      <div className="flex flex-row items-center gap-4 md:gap-8 w-full md:w-auto mb-2 md:mb-0">
-                        <span className="text-4xl md:text-7xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 md:w-20 md:h-20 aspect-square flex items-center justify-center">
-                          {step.number}
-                        </span>
-                        <div className="text-2xl md:text-4xl font-bold">
-                          {step.title}
-                        </div>
-                      </div>
-                      {/* Middle: Image */}
-                      <div className="flex-shrink-0 flex-grow-0 flex items-center justify-center w-full md:w-auto h-48 md:h-56 my-2 md:my-0">
+                                        {/* Top: Step number and heading */}
+                  <div className="flex flex-row items-center w-full justify-center p-4" 
+                       style={{
+                         gap: 'clamp(1rem, 2vw, 2rem)',
+                         height: 'clamp(80px, 10vh, 120px)'
+                       }}>
+                    <span className="font-bold text-white bg-[#721422] rounded-full aspect-square flex items-center justify-center"
+                          style={{
+                            fontSize: 'clamp(1.25rem, 2.5vw, 2.5rem)',
+                            width: 'clamp(2.5rem, 5vw, 4rem)',
+                            height: 'clamp(2.5rem, 5vw, 4rem)'
+                          }}>
+                      {step.number}
+                    </span>
+                    <div className="font-bold text-[#721422]" style={{fontSize: 'clamp(1rem, 2vw, 2rem)'}}>
+                      {step.title}
+                    </div>
+                  </div>
+                  {/* Middle: Image */}
+                  <div className="flex items-center justify-center w-full p-4"
+                       style={{
+                         height: 'clamp(200px, 25vh, 400px)'
+                       }}>
                         {howItWorksLoaded ? (
-                          <Image 
-                            src={step.img} 
-                            alt={step.title} 
-                            width={224}
-                            height={224}
-                            className="h-48 md:h-56 w-auto object-contain mx-auto"
-                            sizes="224px"
-                            quality={85}
-                            loading="lazy"
-                          />
+                                                  <Image 
+                          src={step.img} 
+                          alt={step.title} 
+                          width={500}
+                          height={500}
+                          className="w-full h-full object-contain mx-auto"
+                          style={{
+                            height: 'clamp(200px, 25vh, 400px)',
+                            width: 'clamp(200px, 60vw, 500px)',
+                            maxWidth: '100%'
+                          }}
+                          sizes="(max-width: 768px) 200px, (max-width: 1024px) 300px, 500px"
+                          quality={85}
+                          loading="lazy"
+                        />
                         ) : (
-                          <div 
-                            className="h-48 md:h-56 w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
-                            style={{
-                              background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
-                              minWidth: '200px'
-                            }}
-                          />
+                                                <div 
+                        className="w-auto bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-lg animate-pulse"
+                        style={{
+                          background: 'linear-gradient(135deg, #FBD5DB 0%, #F48CA3 50%, #721422 100%)',
+                          minWidth: 'clamp(200px, 60vw, 500px)',
+                          height: 'clamp(200px, 25vh, 400px)'
+                        }}
+                      />
                         )}
                       </div>
                                               {/* Bottom: Description */}
-                        <div className="text-xl md:text-3xl w-full text-center md:text-left">
-                          {stepIdx === 2 ? (
-                            <>
-                              Match your strip to the color guide and enter your results in the{' '}
-                              <span 
-                                className="text-[#ff4fa3] font-bold cursor-pointer hover:text-[#ff4fa3]/80 transition-colors duration-200"
-                                onClick={() => {
-                                  const demoSection = document.getElementById('demo-section');
-                                  if (demoSection) {
-                                    demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                  }
-                                }}
-                              >
-                                Santelle app
-                              </span>
-                              . Get instant, clear personalized insights to understand what&apos;s going on.
-                            </>
-                          ) : (
-                            step.desc
-                          )}
-                        </div>
+                                    <div className="w-full text-center flex items-center p-4 text-[#721422]"
+                       style={{
+                         fontSize: 'clamp(0.875rem, 1.5vw, 1.5rem)',
+                         minHeight: 'clamp(80px, 10vh, 120px)'
+                       }}>
+                    {step.desc}
+                  </div>
                     </div>
-                  );
-                 }
-               })}
+               ))}
 
             </div>
 
             {/* Mobile: Single card with dividers */}
             <div className="block md:hidden w-full max-w-7xl mx-auto">
               <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
-                {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
-                  const isBiomarkerCard = showBiomarkerCard && stepIdx === 1;
-                  return (
-                    <div key={isBiomarkerCard ? 'biomarker' : step.number}>
+                {howItWorksSteps.slice(0, 4).map((step) => (
+                  <div key={step.number}>
                       {/* Step content */}
                       <div className="flex flex-col items-center text-center py-6">
                         {/* Step number and title */}
-                        {!isBiomarkerCard && (
                           <div className="flex flex-col items-center gap-4 mb-4">
                             <span className="text-3xl font-bold text-white bg-[#721422] rounded-full w-16 h-16 aspect-square flex items-center justify-center">
                               {step.number}
@@ -1259,13 +1340,12 @@ export default function Home() {
                               {step.title}
                             </div>
                           </div>
-                        )}
                         
                         {/* Image */}
                         <div className="flex items-center justify-center w-full h-32 mb-4">
                           <Image 
-                            src={isBiomarkerCard ? '/step2.webp' : step.img} 
-                            alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
+                          src={step.img} 
+                          alt={step.title} 
                             width={128}
                             height={128}
                             className="h-32 w-auto object-contain"
@@ -1276,55 +1356,18 @@ export default function Home() {
                         
                         {/* Description */}
                         <div className="text-base text-[#721422] leading-relaxed">
-                          {stepIdx === 0 && (
-                            <>
-                              A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
-                            </>
-                          )}
-                          {stepIdx === 1 && !isBiomarkerCard && (
-                            <>
-                              Use a small sample of discharge to test for <span className="biomarker-highlight" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(true); }}>6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
-                            </>
-                          )}
-                          {stepIdx === 1 && isBiomarkerCard && (
-                            <>
-                              <div className="text-left">
-                                <div className="space-y-3 text-sm">
-                                  <div><span className="font-bold">pH:</span> A higher-than-normal vaginal pH (&gt;4.5) may indicate bacterial vaginosis or other infections due to disrupted microbial balance.</div>
-                                  <div><span className="font-bold">H₂O₂ (Hydrogen Peroxide):</span> Hydrogen peroxide is produced by healthy Lactobacillus species and helps maintain vaginal acidity and protect against infections.</div>
-                                  <div><span className="font-bold">LE (Leukocyte Esterase):</span> The presence of leukocyte esterase signals inflammation or infection, often due to an immune response.</div>
-                                  <div><span className="font-bold">SNA (Sialidase Activity):</span> Elevated sialidase activity is a biomarker for bacterial vaginosis, produced by anaerobic bacteria like Gardnerella vaginalis.</div>
-                                  <div><span className="font-bold">β-G (Beta-Glucuronidase):</span> This enzyme, when elevated, suggests bacterial overgrowth or imbalance in the vaginal microbiome.</div>
-                                  <div><span className="font-bold">B-G (Beta-Glucosidase):</span> Increased beta-glucosidase activity can be a sign of microbial dysbiosis and is linked to conditions like bacterial vaginosis.</div>
-                                </div>
-                                <div className="text-center mt-6">
-                                  <button className="px-6 py-2 bg-[#721422] text-white rounded-full font-bold text-sm hover:bg-[#8a1a2a] transition" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(false); }}>Back</button>
-                                </div>
-                              </div>
-                            </>
-                          )}
-                          {stepIdx === 2 && (
-                            <>
-                              Match your strip to the color guide and enter your results in the <span className="biomarker-highlight">Santelle app</span>. Get <span className="font-bold">instant, clear personalized insights</span> to understand what&apos;s going on.
-                            </>
-                          )}
-                          {stepIdx === 3 && (
-                            <>
-                              See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you&apos;re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
-                            </>
-                          )}
+                          {step.desc}
                         </div>
                       </div>
                       
                       {/* Divider - don&apos;t show after last step */}
-                      {stepIdx < 3 && (
+                      {step.number < 4 && (
                         <div className="flex justify-center py-4">
                           <div className="w-16 h-0.5 bg-[#721422]/30 rounded-full"></div>
                         </div>
                       )}
                     </div>
-                  );
-                })}
+                ))}
               </div>
             </div>
             {/* CTA */}
@@ -1343,7 +1386,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-12">
+        <div className="hidden md:block w-full py-32">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1351,7 +1394,7 @@ export default function Home() {
 
         {/* Desktop New Section Between How It Works and Team */}
         <section id="demo-section" className="hidden md:flex w-screen min-h-screen flex-col justify-center items-center gap-2 p-0 m-0">
-          <div className="px-4 md:px-8 py-8 md:py-12 w-full flex justify-center items-center">
+          <div className="px-4 md:px-8 py-0 w-full flex justify-center items-center">
             <div className="px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center gap-8 md:gap-16 w-screen" style={{minHeight: '100vh', minWidth: '100vw', width: '100vw'}}>
               {/* Section Title */}
               <div className="w-full text-center mb-8">
@@ -1394,7 +1437,7 @@ export default function Home() {
               </div>
               
               {/* Right: Content */}
-              <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center text-center md:text-left gap-6">
+              <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center text-center md:text-left gap-6 pr-8 md:pr-50">
                 {featureData.map((feature, index) => (
                   <div key={index} className="w-full">
                     <button
@@ -1456,17 +1499,23 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-12">
+        <div className="hidden md:block w-full py-32">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
         </div>
 
         {/* Desktop Team/Leadership Section */}
-        <section ref={teamSectionRef} id="team" className="hidden md:flex w-full py-5 px-8 lg:px-32 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
-          <h2 className="font-bold text-5xl md:text-8xl text-[#721422] mb-10 text-center">
+        <section ref={teamSectionRef} id="team" className="hidden md:flex w-full py-0 px-8 lg:px-32 flex-col items-center gap-12 min-h-screen" style={{minWidth: '100vw', width: '100vw'}}>
+          <h2 className="font-bold text-[#721422] mb-10 text-center"
+              style={{
+                fontSize: 'clamp(2rem, 5vw, 4rem)'
+              }}>
             <span className="chunko-bold">Our Team</span>
           </h2>
+          <p className="text-center text-[#721422] mb-8 font-bold" style={{fontSize: 'clamp(0.875rem, 1.25vw, 1.25rem)'}}>
+            Santelle is built by a passionate team with backgrounds in health, tech, and women&apos;s wellness.
+          </p>
           {/* Logos Row */}
           <div className="flex flex-row justify-center items-center gap-8 md:gap-12 mb-8 w-full">
                                 <Image src="/ICL.webp" alt="Imperial College London" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
@@ -1509,8 +1558,8 @@ export default function Home() {
                       <Image src="/McK.webp" alt="McKinsey & Co." width={60} height={60} className="w-50 h-auto object-contain" />
                       <Image src="/ICL.webp" alt="Imperial College London" width={60} height={60} className="w-50 h-auto object-contain" />
                       <Image src="/INSEAD.webp" alt="INSEAD" width={80} height={80} className="w-50 h-auto object-contain" />
-                    </div>
                   </div>
+                </div>
                 </div>
                   </a>
 
@@ -1546,8 +1595,8 @@ export default function Home() {
                       <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={60} height={60} className="w-27 h-auto object-contain" />
                       <Image src="/LSE_Logo.svg" alt="London School of Economics" width={60} height={60} className="w-20 h-auto object-contain" />
                       <Image src="/INSEAD.webp" alt="INSEAD" width={60} height={60} className="w-50 h-auto object-contain" />
-                    </div>
                   </div>
+                </div>
                 </div>
                   </a>
 
@@ -1583,20 +1632,27 @@ export default function Home() {
                       <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={60} height={60} className="w-20 h-auto object-contain" />
                       <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={60} height={60} className="w-20 h-auto object-contain" />
                       <Image src="/cambridge.svg" alt="University of Cambridge" width={60} height={60} className="w-30 h-auto object-contain" />
-                    </div>
                   </div>
+                </div>
                 </div>
                   </a>
               </div>
           </div>
         </section>
 
+        {/* Desktop Horizontal Divider */}
+        <div className="hidden md:block w-full py-48">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-1 bg-[#721422] rounded-full"></div>
+          </div>
+        </div>
+
         {/* Mobile Unified Card - All Sections */}
         <section id="mobile-unified-card" className="block md:hidden w-full py-8">
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
             
             {/* Stats Section */}
-            <div data-section="stats" className="py-20">
+                                <div data-section="stats" className="py-40">
               <div className="text-center">
                 <div className="chunko-bold text-3xl font-bold text-[#721422] mb-20">
                   Vaginal infections affect 3 in 4 women. 50% are recurrent.
@@ -1607,14 +1663,14 @@ export default function Home() {
                   <span className="font-bold">long-term discomfort</span><br/>
                   <span className="font-bold">infertility</span>
                 </div>
-                <div className="text-xl font-bold text-[#EF7D88] mb-4">
+                <div className="text-2xl font-bold text-[#EF7D88] mb-4">
                   It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
                 </div>
               </div>
             </div>
 
             {/* Meet Section Title */}
-            <div data-section="meet" className="py-20">
+                                <div data-section="meet" className="py-40">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
                 <h2 className="font-bold text-4xl text-[#721422] text-center">
@@ -1626,8 +1682,8 @@ export default function Home() {
                 
                 <div className="mb-4 self-center">
                   <Image
-                    src="/kit.webp"
-                    alt="Santelle Kit"
+                    src="/SantelleKit+App.png"
+                    alt="Santelle Kit and App"
                     width={300}
                     height={300}
                     className="w-full max-w-[300px] h-auto object-contain drop-shadow-lg"
@@ -1637,19 +1693,16 @@ export default function Home() {
                   />
                 </div>
                 <div className="font-bold text-xl text-[#721422] text-left mb-4">
-                  Your vaginal health companion
+                  Your discreet, at-home vaginal health companion
                 </div>
-                <p className="font-bold text-lg text-[#721422] mb-0">Easy, Discreet, Empowering</p>
                 <p className="text-lg text-[#721422] mb-4 leading-relaxed">
-                  The Santelle Starter Kit is more than a test, it&apos;s your monthly vaginal wellness ritual. Our at-home kit gives you lab-quality insights. No clinic visit, no waiting rooms, no shame.
-                </p>
-                <p className="text-lg text-[#721422] mb-4 leading-relaxed">
-                  With Santelle, you take quiet control of your intimate health.
+                  Santelle makes it simple to check in on your intimate health each month — with instant
+                  results, personalised insights, and no awkward clinic visits.
                 </p>
                 <ul className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left">
-                  <li>Instant lab-grade results from home</li>
-                  <li>Multi-biomarker analysis, not just pH</li>
-                  <li>Connected app for tracking & personalized insights</li>
+                  <li>Instant results from home</li>
+                  <li>Multi-biomarker analysis — beyond pH</li>
+                  <li>Connected app with personalised insights & tips</li>
                 </ul>
                 <div className="flex flex-col gap-3 w-full">
                 <div className="flex justify-center mt-0 mb-6">
@@ -1666,7 +1719,7 @@ export default function Home() {
             </div>
 
             {/* How It Works Section */}
-            <div data-section="how-it-works" className="py-20">
+                                <div data-section="how-it-works" className="py-40">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
                 <h2 className="font-bold text-4xl text-[#721422] text-center">
@@ -1674,14 +1727,11 @@ export default function Home() {
                 </h2>
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
               </div>
-              {howItWorksSteps.slice(0, 4).map((step, stepIdx) => {
-                const isBiomarkerCard = showBiomarkerCard && stepIdx === 1;
-                return (
-                  <div key={isBiomarkerCard ? 'biomarker' : step.number} className="mb-6">
+              {howItWorksSteps.slice(0, 4).map((step, stepIdx) => (
+                <div key={step.number} className="mb-6">
                     {/* Step content */}
                     <div className="flex flex-col items-start text-left">
                       {/* Step number and title */}
-                      {!isBiomarkerCard && (
                         <div className="flex flex-col items-center gap-3 mb-3 w-full">
                           <span className="text-3xl font-bold text-white bg-[#721422] rounded-full w-12 h-12 aspect-square flex items-center justify-center">
                             {step.number}
@@ -1690,19 +1740,18 @@ export default function Home() {
                             {step.title}
                           </div>
                         </div>
-                      )}
                       
                       {/* Image */}
                       <div className="flex items-center justify-center w-full mb-3">
                         <Image 
-                          src={isBiomarkerCard ? '/step2.webp' : step.img}
+                        src={step.img}
                           width={240}
                           height={240}
                           loading="lazy" 
-                          alt={isBiomarkerCard ? 'Biomarkers' : step.title} 
+                        alt={step.title} 
                           className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
-                          sizes="(max-width: 768px) 240px, 240px"
-                          quality={85}
+                        sizes="(max-width: 768px) 240px, 240px"
+                        quality={85}
                         />
                       </div>
                       
@@ -1713,26 +1762,9 @@ export default function Home() {
                             A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
                           </>
                         )}
-                        {stepIdx === 1 && !isBiomarkerCard && (
-                          <>
-                            Use a small sample of discharge to test for <span className="biomarker-highlight" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(true); }}>6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
-                          </>
-                        )}
-                        {stepIdx === 1 && isBiomarkerCard && (
-                          <>
-                            <div className="text-left">
-                              <div className="space-y-2 text-xs">
-                                <div><span className="font-bold">pH:</span> A higher-than-normal vaginal pH (&gt;4.5) may indicate bacterial vaginosis or other infections due to disrupted microbial balance.</div>
-                                <div><span className="font-bold">H₂O₂ (Hydrogen Peroxide):</span> Hydrogen peroxide is produced by healthy Lactobacillus species and helps maintain vaginal acidity and protect against infections.</div>
-                                <div><span className="font-bold">LE (Leukocyte Esterase):</span> The presence of leukocyte esterase signals inflammation or infection, often due to an immune response.</div>
-                                <div><span className="font-bold">SNA (Sialidase Activity):</span> Elevated sialidase activity is a biomarker for bacterial vaginosis, produced by anaerobic bacteria like Gardnerella vaginalis.</div>
-                                <div><span className="font-bold">β-G (Beta-Glucuronidase):</span> This enzyme, when elevated, suggests bacterial overgrowth or imbalance in the vaginal microbiome.</div>
-                                <div><span className="font-bold">B-G (Beta-Glucosidase):</span> Increased beta-glucosidase activity can be a sign of microbial dysbiosis and is linked to conditions like bacterial vaginosis.</div>
-              </div>
-                              <div className="text-center mt-4">
-                                <button className="px-4 py-2 bg-[#721422] text-white rounded-full font-bold text-xs hover:bg-[#8a1a2a] transition" onClick={e => { e.stopPropagation(); setShowBiomarkerCard(false); }}>Back</button>
-                    </div>
-                            </div>
+                      {stepIdx === 1 && (
+                        <>
+                          Use a small sample of discharge to test for <span className="font-bold">6 key biomarkers</span> linked to <span className="font-bold">infection</span>, <span className="font-bold">inflammation</span>, and <span className="font-bold">imbalance</span>.
                           </>
                         )}
                         {stepIdx === 2 && (
@@ -1755,8 +1787,7 @@ export default function Home() {
                     </div>
                   )}
                 </div>
-                );
-              })}
+              ))}
               
               {/* Get Early Access Button */}
               <div className="flex justify-center mt-0 mb-6">
@@ -1771,7 +1802,7 @@ export default function Home() {
             </div>
 
             {/* Team Section */}
-            <div data-section="team" className="py-6">
+                                <div data-section="team" className="py-40">
               <div className="flex items-center gap-4 mb-6">
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
                 <h2 className="font-bold text-4xl text-[#721422] text-center">
@@ -1812,7 +1843,7 @@ export default function Home() {
                 >
                   <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer h-[120px]">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
                         <Image
                           src="/RS.webp"
                           alt="Roxanne Sabbag"
@@ -1821,17 +1852,17 @@ export default function Home() {
                           className="w-full h-full object-contain"
                           priority
                         />
-                      </div>
-                                          <div>
+                    </div>
+                    <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
                       <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Founder & CEO</p>
                       <div className="flex items-center gap-2">
                         <Image src="/McK.webp" alt="McKinsey & Co." width={40} height={40} className="w-10 h-auto object-contain" />
                         <Image src="/ICL.webp" alt="Imperial College London" width={40} height={40} className="w-10 h-auto object-contain" />
                         <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain" />
-                      </div>
                     </div>
-                    </div>
+                  </div>
+                </div>
                   </div>
                 </a>
 
@@ -1843,7 +1874,7 @@ export default function Home() {
                 >
                   <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
                         <Image
                           src="/LL.png"
                           alt="Leonor Landeau"
@@ -1852,17 +1883,17 @@ export default function Home() {
                           className="w-full h-full object-contain"
                           priority
                         />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
                         <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
                         <div className="flex items-center gap-2">
                           <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={40} height={40} className="w-10 h-auto object-contain" />
                           <Image src="/LSE_Logo.svg" alt="London School of Economics" width={40} height={40} className="w-10 h-auto object-contain" />
                           <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain" />
-                        </div>
-                      </div>
                     </div>
+                  </div>
+                </div>
                   </div>
                 </a>
 
@@ -1874,7 +1905,7 @@ export default function Home() {
                 >
                   <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer h-[120px]">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
                         <Image
                           src="/TB.png"
                           alt="Tomasso Busolo"
@@ -1883,17 +1914,17 @@ export default function Home() {
                           className="w-full h-full object-contain"
                           priority
                         />
-                      </div>
-                                          <div>
+                    </div>
+                    <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>
                       <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
                       <div className="flex items-center gap-2">
                         <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={40} height={40} className="w-10 h-auto object-contain" />
                         <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={40} height={40} className="w-10 h-auto object-contain" />
                         <Image src="/cambridge.svg" alt="University of Cambridge" width={40} height={40} className="w-10 h-auto object-contain" />
-                      </div>
                     </div>
-                    </div>
+                  </div>
+                </div>
                   </div>
                 </a>
               </div>
