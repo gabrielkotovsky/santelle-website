@@ -55,7 +55,7 @@ export default function PrivacyPolicy() {
         <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
         <div className="text-sm text-[#721422]/60 mb-6">Last updated: August 2025</div>
         
-        <p className="mb-4">At Santelle ("we," "our," or "us"), we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our services, or interact with us.</p>
+        <p className="mb-4">At Santelle (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our services, or interact with us.</p>
         
         <h2 className="text-xl font-semibold mt-6 mb-2">1. Information We Collect</h2>
         <h3 className="text-lg font-semibold mt-4 mb-2">1.1 Personal Information</h3>
@@ -139,11 +139,11 @@ export default function PrivacyPolicy() {
         <h2 className="text-xl font-semibold mt-6 mb-2">8. International Data Transfers</h2>
         <p className="mb-4">Your information may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws and implement appropriate safeguards to protect your information.</p>
         
-        <h2 className="text-xl font-semibold mt-6 mb-2">9. Children's Privacy</h2>
+        <h2 className="text-xl font-semibold mt-6 mb-2">9. Children&apos;s Privacy</h2>
         <p className="mb-4">Our services are not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.</p>
         
         <h2 className="text-xl font-semibold mt-6 mb-2">10. Changes to This Privacy Policy</h2>
-        <p className="mb-4">We may update this Privacy Policy from time to time to reflect changes in our practices or applicable laws. We will notify you of any material changes by posting the updated policy on our website and updating the "Last updated" date.</p>
+        <p className="mb-4">We may update this Privacy Policy from time to time to reflect changes in our practices or applicable laws. We will notify you of any material changes by posting the updated policy on our website and updating the &quot;Last updated&quot; date.</p>
         
         <h2 className="text-xl font-semibold mt-6 mb-2">11. Contact Us</h2>
         <p className="mb-4">If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us through our <Link href="/contact-us" className="underline hover:text-[#511828]">contact form</Link>.</p>
