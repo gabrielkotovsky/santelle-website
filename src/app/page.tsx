@@ -87,9 +87,6 @@ export default function Home() {
   const [showStatsLine2] = useState(true);
   const [showStatsLine3] = useState(true);
 
-
-
-  // Handle lazy loading triggers
   useEffect(() => {
     if (kitSectionIntersecting && !kitSectionLoaded) {
       setKitSectionLoaded(true);
@@ -108,9 +105,6 @@ export default function Home() {
     }
   }, [teamSectionIntersecting, teamSectionLoaded]);
 
-
-
-  // Smooth scroll handler
   function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, sectionId: string) {
     e.preventDefault();
     if (sectionId === 'how-it-works' && howItWorksRef.current) {
@@ -124,9 +118,6 @@ export default function Home() {
     }
   }
 
-
-
-  // Sync showSecureLabel with waitlistOpen, but delay label change on close
   useEffect(() => {
     // The label will now change directly based on waitlistOpen
   }, [waitlistOpen]);
@@ -201,8 +192,6 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [waitlistOpen]);
 
-
-
   useEffect(() => {
     function openWaitlistListener() {
       setShowEmailForm(true);
@@ -210,10 +199,6 @@ export default function Home() {
     window.addEventListener('openWaitlist', openWaitlistListener);
     return () => window.removeEventListener('openWaitlist', openWaitlistListener);
   }, []);
-
-
-
-
 
   useEffect(() => {
     // Intersection Observer to trigger animation when stats card is in view
@@ -231,13 +216,11 @@ export default function Home() {
     };
   }, []);
 
-  // Animation effect - disabled for immediate display
   useEffect(() => {
     // All lines are now shown immediately, no animation needed
     return;
   }, []);
 
-  // How It Works stacked card state
   const [cardOrder] = useState([0, 1, 2, 3]);
   const howItWorksSteps = [
     {
@@ -272,20 +255,6 @@ export default function Home() {
     },
   ];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Calculate card offsets after hydration to prevent hydration mismatch
   useEffect(() => {
     // Card offsets calculation removed
   }, [cardOrder]);
@@ -307,7 +276,6 @@ export default function Home() {
   });
   const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // Cleanup validation timeout on unmount
   useEffect(() => {
     return () => {
       if (validationTimeout) {
@@ -316,7 +284,6 @@ export default function Home() {
     };
   }, [validationTimeout]);
 
-  // Confetti effect function
   const triggerConfetti = () => {
     // Create a burst of confetti from the center
     confetti({
@@ -360,7 +327,6 @@ export default function Home() {
     }
   };
 
-  // Email validation functions
   const validateEmailFormat = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -518,9 +484,6 @@ export default function Home() {
     }
   };
 
-
-
-  // Function to focus the hero section's email input
   const focusHeroEmailInput = () => {
     setShowEmailForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -530,9 +493,6 @@ export default function Home() {
     }
   };
 
-
-
-  // Update cooldown timer display
   useEffect(() => {
     if (!rateLimit.blocked) return;
     
@@ -550,7 +510,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [rateLimit.blocked, rateLimit.cooldownEnd]);
 
-  // Section navigation with arrow keys
   useEffect(() => {
     const sectionOrder = ['hero', 'stats', 'kit', 'how-it-works', 'team', 'footer'];
     
@@ -782,7 +741,7 @@ export default function Home() {
                     >
                       {isSubmitting ? 'Joining...' : rateLimit.blocked ? 'Rate limited' : (
                         <Image
-                          src="/S_logo.svg"
+                          src="/SantelleSBlack.svg"
                           alt="Santelle Logo"
                           width={40}
                           height={40}
@@ -1018,11 +977,11 @@ export default function Home() {
           {/* Desktop Stats Section */}
           <section id="stats" ref={statsRef} className="hidden md:flex w-full min-h-screen flex-col justify-center items-center gap-2 p-0 m-0 -mt-8 md:-mt-26">
             <div className="px-4 md:px-8 py-8 md:py-12 w-full flex justify-center items-center">
-              <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)'}}>
+              <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-none px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center border border-white/50" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)'}}>
                 <div
                   className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative chunko-bold"
                   style={{
-                    fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',
+                    fontSize: 'clamp(1rem, 2vw, 2rem)',
                     color: '#721422'
                   }}
                 >
@@ -1035,7 +994,7 @@ export default function Home() {
               <div
                 className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative chunko-bold"
                 style={{
-                  fontSize: 'clamp(1rem, 2.5vw, 2.5rem)',
+                  fontSize: 'clamp(1rem, 2vw, 2rem)',
                   color: '#721422'
                 }}
               >
@@ -1048,15 +1007,15 @@ export default function Home() {
                 <div 
                   className={`text-[#721422] mb-12 transition-opacity duration-[1200ms] ${showStatsLine2 ? 'opacity-100' : 'opacity-0'}`}
                   style={{
-                    fontSize: 'clamp(0.75rem, 1.75vw, 1.75rem)'
+                    fontSize: 'clamp(0.5rem, 1.5vw, 1.5rem)'
                   }}
                 >
                   Left untreated, this can lead to <span className="font-bold">infertility</span>, <span className="font-bold">pregnancy complications</span>, and <span className="font-bold">long-term discomfort</span>.
                 </div>
                 <div 
-                  className={`font-bold text-[#FD9EAA] mb-12 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}
+                  className={`font-bold text-[#EF7D88] mb-12 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}
                   style={{
-                    fontSize: 'clamp(0.75rem, 1.75vw, 1.75rem)'
+                    fontSize: 'clamp(0.5rem, 1.5vw, 1.5rem)'
                   }}
                 >
                   It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
@@ -1082,7 +1041,7 @@ export default function Home() {
           </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-48">
+        <div className="hidden md:block w-full py-35">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1090,7 +1049,7 @@ export default function Home() {
 
         {/* Desktop Kit Image Section */}
           <section ref={kitSectionRef} id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center">
-            <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-center gap-2 md:gap-0" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)', padding: '120px'}}>
+            <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-none flex flex-col md:flex-row items-center justify-center gap-2 md:gap-0 border border-white/50" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)', padding: '120px'}}>
           <div className="md:w-1/2 flex justify-center md:justify-end items-center p-0 py-2 md:py-0">
             {kitSectionLoaded ? (
               <Image
@@ -1149,8 +1108,9 @@ export default function Home() {
                       fontSize: 'clamp(0.25rem, 1.25vw, 1.25rem)'
                     }}
                   >
-                  Santelle makes it simple to check in on your intimate health each month — with instant
-                  results, personalised insights, and no awkward clinic visits.
+                  Santelle makes it simple to check in on your intimate health
+                  each month — with instant results, personalised insights, and support
+                  along your intimate health journey.
                    </p>
                   <ul 
                     className="list-disc pl-8 text-[#721422] space-y-2 text-left"
@@ -1199,7 +1159,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-48">
+        <div className="hidden md:block w-full py-35">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1217,7 +1177,7 @@ export default function Home() {
                {howItWorksSteps.slice(0, 4).map((step) => (
                  <div
                    key={step.number}
-                   className={`w-full flex flex-col items-center justify-center bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl mb-16`}
+                   className={`w-full flex flex-col items-center justify-center bg-white/30 backdrop-blur-lg rounded-3xl shadow-none mb-16 border border-white/50`}
                               style={{
                      padding: 'clamp(2rem, 2vw, 2rem)',
                      gap: '0'
@@ -1288,7 +1248,7 @@ export default function Home() {
 
             {/* Mobile: Single card with dividers */}
             <div className="block md:hidden w-full max-w-7xl mx-auto">
-              <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
+              <div className="bg-white/30 backdrop-blur-lg rounded-3xl p-6 border border-white/50">
                 {howItWorksSteps.slice(0, 4).map((step) => (
                   <div key={step.number}>
                       {/* Step content */}
@@ -1383,7 +1343,7 @@ export default function Home() {
                   className="block w-full max-w-sm"
                 >
                   <div 
-                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl overflow-hidden hover:bg-white/40 cursor-pointer relative w-full h-[600px] border border-white/50"
                   >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
                     backgroundImage: 'url(/profile_background.webp)',
@@ -1420,7 +1380,7 @@ export default function Home() {
                   className="block w-full max-w-sm"
                 >
                   <div 
-                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl overflow-hidden hover:bg-white/40 cursor-pointer relative w-full h-[600px] border border-white/50"
                   >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
                     backgroundImage: 'url(/profile_background.webp)',
@@ -1457,7 +1417,7 @@ export default function Home() {
                   className="block w-full max-w-sm"
                 >
                   <div 
-                    className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:bg-white/40 cursor-pointer relative w-full h-[600px]"
+                    className="bg-white/30 backdrop-blur-lg rounded-3xl overflow-hidden hover:bg-white/40 cursor-pointer relative w-full h-[600px] border border-white/50"
                   >
                   <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
                     backgroundImage: 'url(/profile_background.webp)',
@@ -1490,7 +1450,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-48">
+        <div className="hidden md:block w-full py-35">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1498,7 +1458,7 @@ export default function Home() {
 
         {/* Mobile Unified Card - All Sections */}
         <section id="mobile-unified-card" className="block md:hidden w-full py-8">
-          <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl p-6">
+          <div className="bg-white/30 backdrop-blur-lg rounded-3xl p-6 border border-white/50">
             
             {/* Stats Section */}
                                 <div data-section="stats" className="py-40">
@@ -1783,13 +1743,13 @@ export default function Home() {
         </section>
 
         {/* Bottom Glassmorphic Card */}
-        <section className="w-full pt-4 pb-8 px-4 md:px-8 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
-          <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 w-full">
+        <section className="w-full pt-4 pb-0 px-0 md:px-0 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
+          <div className="bg-white/30 backdrop-blur-lg border border-white/50 w-full">
             <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
               {/* Logo */}
               <div className="w-full flex justify-center mb-2">
                 <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} loading="lazy" />
-                </div>
+              </div>
 
               {/* Get Early Access Button */}
               <button

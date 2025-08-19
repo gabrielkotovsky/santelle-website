@@ -10,6 +10,7 @@ const subjects = [
   'Partnership',
   'Press/Media',
   'Support',
+  'Account Deletion',
   'Other',
 ];
 
@@ -131,99 +132,163 @@ export default function ContactUs() {
 
   return (
     <div className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Gradient */}
-      <div 
-        className="fixed top-0 left-0 w-screen h-screen z-0"
-        style={{
-          background: 'linear-gradient(135deg, #FD9EAA 0%, #FFEBCE 100%)',
-        }}
+      {/* Background - Always Video */}
+      <div className="fixed inset-0 -z-10 flex items-center justify-center" style={{
+        top: 0,
+        bottom: 'env(safe-area-inset-bottom)',
+        left: 'env(safe-area-inset-left)',
+        right: 'env(safe-area-inset-right)'
+      }}>
+        {/* Desktop Video Background */}
+        <video
+          src="/background_desktop.mp4"
+          autoPlay
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover hidden md:block"
+          style={{ 
+            objectFit: 'cover', 
+            objectPosition: 'center',
+            width: '100vw',
+            height: '100dvh'
+          }}
+        />
         
-      />
-      {/* Blur Overlay */}
-      <div className="fixed top-0 left-0 w-screen h-screen z-10 backdrop-blur-sm pointer-events-none" />
+        {/* Mobile Video Background */}
+        <video
+          src="/background_mobile.mp4"
+          autoPlay
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover block md:hidden"
+          style={{
+            objectFit: 'cover', 
+            objectPosition: 'center',
+            width: '100vw',
+            height: '100dvh'
+          }}
+        />
+        
+        {/* Overlay - Blur only, no color */}
+        <div className="absolute inset-0 backdrop-blur-lg" />
+      </div>
+      
       {/* Contact Form Content */}
-      <form
-        className="relative z-20 w-full max-w-xl bg-white/30 backdrop-blur-2xl border border-white/30 rounded-lg shadow-xl p-8 flex flex-col gap-6 mt-24 mb-16"
-        onSubmit={handleSubmit}
-      >
-        <h1 className="text-3xl font-bold mb-2 text-black">Contact Us</h1>
-        <p className="text-lg mb-4 text-black">Hi there! Got a question? We&apos;d love to hear from you.</p>
-        <input
-          type="text"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Name"
-          className="px-4 py-3 rounded-lg border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 text-lg bg-white text-[#511828] placeholder-[#c9a6b7]"
-        />
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="Email*"
-          required
-          className="px-4 py-3 rounded-lg border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 text-lg bg-white text-[#511828] placeholder-[#c9a6b7]"
-        />
-        {/* Email validation feedback */}
-        <div className="min-h-[24px] -mt-4 mb-2">
-          {emailValidation.isChecking && (
-            <div className="text-pink-600 text-sm text-center">Checking email domain...</div>
-          )}
-          {emailValidation.error && (
-            <div className="text-red-600 text-sm text-center">{emailValidation.error}</div>
-          )}
-          {emailValidation.isValid && !emailValidation.isChecking && (
-            <div className="text-green-600 text-sm text-center">✓ Valid email address</div>
-          )}
-        </div>
-        <select
-          name="subject"
-          value={form.subject}
-          onChange={handleChange}
-          className="px-4 py-3 rounded-lg border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 text-lg bg-white text-[#511828] placeholder-[#c9a6b7]"
+      <div className="relative z-20 w-full max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12 mt-32 md:mt-20">
+        <form
+          className="bg-white/30 backdrop-blur-2xl border border-white/50 rounded-3xl p-6 md:p-8 lg:p-12 flex flex-col gap-6 md:gap-8 transition-all duration-300"
+          style={{
+            minHeight: 'clamp(600px, 70vh, 800px)',
+            maxHeight: 'clamp(800px, 90vh, 1200px)'
+          }}
+          onSubmit={handleSubmit}
         >
-          <option value="">Subject</option>
-          {subjects.slice(1).map((subj) => (
-            <option key={subj} value={subj}>{subj}</option>
-          ))}
-        </select>
-        <textarea
-          name="message"
-          value={form.message}
-          onChange={handleChange}
-          placeholder="Message*"
-          required
-          rows={5}
-          className="px-4 py-3 rounded-lg border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 text-lg bg-white text-[#511828] placeholder-[#c9a6b7] resize-none"
-        />
-        <label className="flex items-center gap-2 text-black text-base">
-          <input
-            type="checkbox"
-            name="updates"
-            checked={form.updates}
+          <div className="text-center mb-4">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-[#721422] chunko-bold">Contact Us</h1>
+            <p className="text-lg md:text-xl text-[#721422] font-semibold">Hi there! Got a question? We&apos;d love to hear from you.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Name"
+              className="px-4 md:px-6 py-3 md:py-4 rounded-2xl border-2 border-white/30 focus:outline-none focus:ring-4 focus:ring-[#721422]/20 focus:border-[#721422] text-base md:text-lg bg-white/50 backdrop-blur-sm text-[#721422] placeholder-[#721422]/60 font-medium transition-all duration-300"
+            />
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email*"
+              required
+              className="px-4 md:px-6 py-3 md:py-4 rounded-2xl border-2 border-white/30 focus:outline-none focus:ring-4 focus:ring-[#721422]/20 focus:border-[#721422] text-base md:text-lg bg-white/50 backdrop-blur-sm text-[#721422] placeholder-[#721422]/60 font-medium transition-all duration-300"
+            />
+          </div>
+          
+          {/* Email validation feedback */}
+          <div className="min-h-[20px] md:min-h-[24px] -mt-2">
+            {emailValidation.isChecking && (
+              <div className="text-[#ff4fa3] text-sm text-center font-medium">Checking email domain...</div>
+            )}
+            {emailValidation.error && (
+              <div className="text-red-500 text-sm text-center font-medium">{emailValidation.error}</div>
+            )}
+            {emailValidation.isValid && !emailValidation.isChecking && (
+              <div className="text-green-600 text-sm text-center font-medium">✓ Valid email address</div>
+            )}
+          </div>
+          
+          <select
+            name="subject"
+            value={form.subject}
             onChange={handleChange}
-            className="accent-pink-400 w-5 h-5 rounded"
+            className="px-4 md:px-6 py-3 md:py-4 rounded-2xl border-2 border-white/30 focus:outline-none focus:ring-4 focus:ring-[#721422]/20 focus:border-[#721422] text-base md:text-lg bg-white/50 backdrop-blur-sm text-[#721422] font-medium transition-all duration-300 appearance-none"
+            style={{
+              backgroundImage: 'none'
+            }}
+          >
+            <option value="">Subject</option>
+            {subjects.slice(1).map((subj) => (
+              <option key={subj} value={subj}>{subj}</option>
+            ))}
+          </select>
+          
+          <textarea
+            name="message"
+            value={form.message}
+            onChange={handleChange}
+            placeholder="Message*"
+            required
+            rows={4}
+            className="px-4 md:px-6 py-3 md:py-4 rounded-2xl border-2 border-white/30 focus:outline-none focus:ring-4 focus:ring-[#721422]/20 focus:border-[#721422] text-base md:text-lg bg-white/50 backdrop-blur-sm text-[#721422] placeholder-[#721422]/60 font-medium resize-none transition-all duration-300 flex-1"
+            style={{
+              minHeight: 'clamp(120px, 20vh, 200px)',
+              maxHeight: 'clamp(200px, 30vh, 300px)'
+            }}
           />
-          I want to receive updates from Santelle.
-        </label>
-        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-        {status === 'success' && <div className="text-green-600 text-center font-semibold">Message sent! We&apos;ll be in touch soon.</div>}
-        <button
-          type="submit"
-          className="bg-[#721422] text-white font-bold text-lg px-8 py-3 rounded-full hover:bg-[#8a1a2a] transition-all duration-200 mt-2"
-        >
-          Send Message
-        </button>
-        <div className="text-xs text-[#721422]/60 mt-2 text-center">
-          *We&apos;ll use your details only to respond to you. See our{' '}
-          <Link href="/privacy-policy" className="underline hover:text-[#511828]">Privacy Policy</Link>.
-        </div>
-      </form>
+          
+          <label className="flex items-center gap-3 text-[#721422] text-base md:text-lg font-medium cursor-pointer">
+            <input
+              type="checkbox"
+              name="updates"
+              checked={form.updates}
+              onChange={handleChange}
+              className="w-4 md:w-5 h-4 md:h-5 rounded border-2 border-[#721422] text-[#721422] focus:ring-2 focus:ring-[#721422]/20 cursor-pointer"
+            />
+            I want to receive updates from Santelle.
+          </label>
+          
+          {error && (
+            <div className="text-red-500 text-center font-semibold text-base md:text-lg bg-red-50/50 rounded-2xl p-3 md:p-4 border border-red-200/50">
+              {error}
+            </div>
+          )}
+          {status === 'success' && (
+            <div className="text-green-600 text-center font-semibold text-base md:text-lg bg-green-50/50 rounded-2xl p-3 md:p-4 border border-green-200/50">
+              Message sent! We&apos;ll be in touch soon.
+            </div>
+          )}
+          
+          <button
+            type="submit"
+            className="bg-[#721422] text-white font-bold text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-[#8a1a2a] transition-all duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#721422]/20 transform hover:scale-105 active:scale-95 mt-auto"
+          >
+            Send Message
+          </button>
+          
+          <div className="text-xs md:text-sm text-[#721422]/60 text-center font-medium">
+            *We&apos;ll use your details only to respond to you. See our{' '}
+            <Link href="/privacy-policy" className="underline hover:text-[#721422] transition-colors duration-200">Privacy Policy</Link>.
+          </div>
+        </form>
+      </div>
       
       {/* Bottom Glassmorphic Card */}
-      <section className="w-full pt-4 pb-8 px-4 md:px-8 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
-        <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 w-full">
+      <section className="w-full pt-0 pb-0 px-0 md:px-0 relative z-20" style={{minWidth: '100vw', width: '100vw'}}>
+        <div className="bg-white/30 backdrop-blur-lg rounded-3xl border border-white/50 w-full">
           <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
             {/* Logo */}
             <div className="w-full flex justify-center mb-2">
