@@ -31,16 +31,14 @@ export default function PrivacyPolicy() {
           }}
         />
         
-        {/* Mobile Video Background */}
-        <video
-          src="/background_mobile.mp4"
-          autoPlay
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover block md:hidden"
+        {/* Mobile Background Image */}
+        <div 
+          className="absolute inset-0 w-full h-full block md:hidden"
           style={{
-            objectFit: 'cover', 
-            objectPosition: 'center',
+            backgroundImage: 'url(/background-mobile.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
             width: '100vw',
             height: '100dvh'
           }}
