@@ -22,7 +22,6 @@ export default function NavBar() {
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-
   // Smooth scroll handler for nav
   function handleSmoothNavScroll(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
     if (href.startsWith('#')) {
@@ -53,11 +52,9 @@ export default function NavBar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [lastScrollY]);
 
-
-
   return (
     <nav
-      className={`w-[95%] max-w-7xl mx-auto flex items-center justify-between px-2 md:pl-8 md:pr-1 py-2 fixed left-1/2 -translate-x-1/2 z-30 h-12 md:h-14 transition-transform duration-500 bg-white/10 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-xl
+      className={`w-[95%] max-w-7xl mx-auto flex items-center justify-between px-2 md:pl-8 md:pr-1 py-2 fixed left-1/2 -translate-x-1/2 z-30 h-12 md:h-14 transition-transform duration-500 bg-white/10 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-none
         ${hidden ? '-translate-y-[200%] pointer-events-none' : 'translate-y-0'}
       `}
       style={{

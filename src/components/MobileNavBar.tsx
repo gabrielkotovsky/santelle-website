@@ -169,7 +169,7 @@ export default function MobileNavBar() {
           {/* Get Early Access Button */}
           <button
             onClick={handleGetAccess}
-            className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target shadow-lg"
+            className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
             aria-label="Get early access to Santelle"
           >
             Get Early Access
