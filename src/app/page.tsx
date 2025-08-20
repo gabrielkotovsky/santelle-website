@@ -1039,7 +1039,7 @@ export default function Home() {
           </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-35">
+        <div className="hidden md:block w-full py-20">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1157,7 +1157,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-35">
+        <div className="hidden md:block w-full py-20">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1306,7 +1306,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-32">
+        <div className="hidden md:block w-full py-20">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
@@ -1448,7 +1448,7 @@ export default function Home() {
         </section>
 
         {/* Desktop Horizontal Divider */}
-        <div className="hidden md:block w-full py-35">
+        <div className="hidden md:block w-full py-20">
           <div className="max-w-4xl mx-auto">
             <div className="h-1 bg-[#721422] rounded-full"></div>
           </div>
