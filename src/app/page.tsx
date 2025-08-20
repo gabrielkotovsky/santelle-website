@@ -3,14 +3,69 @@
 import Image from 'next/image';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
-
-
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
+import Lottie from 'lottie-react';
 
 const HERO_HEIGHT = '100vh';
 
+// Loading Screen Component
+function LoadingScreen({ isLoading }: { isLoading: boolean }) {
+  const [animationData, setAnimationData] = useState(null);
+  const [isFading, setIsFading] = useState(false);
 
+  useEffect(() => {
+    // Load the Lottie animation data
+    fetch('/Loading.json')
+      .then(response => response.json())
+      .then(data => setAnimationData(data))
+      .catch(error => console.error('Error loading animation:', error));
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !isFading) {
+      setIsFading(true);
+      // Remove the loading screen after fade animation completes
+      const timer = setTimeout(() => {
+        setIsFading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, isFading]);
+
+  if (!isLoading && !isFading) return null;
+
+  return (
+    <div 
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 ${
+        isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+      style={{
+        backgroundImage: 'url(/background_desktop_static.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+      
+      {/* Loading Animation Container */}
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        {animationData && (
+          <div className="w-32 h-32 md:w-48 md:h-48">
+            <Lottie 
+              animationData={animationData}
+              loop={true}
+              autoplay={true}
+              style={{ width: '100%', height: '100%' }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // Custom hook for intersection observer
 function useIntersectionObserver(options = {}) {
@@ -49,7 +104,72 @@ function useIntersectionObserver(options = {}) {
   return [elementRef, isIntersecting, hasIntersected] as const;
 }
 
+// Custom smooth scroll function with easing options
+function smoothScrollTo(element: HTMLElement, options: {
+  duration?: number;
+  easing?: 'linear' | 'easeInQuad' | 'easeOutQuad' | 'easeInOutQuad' | 'easeInCubic' | 'easeOutCubic' | 'easeInOutCubic';
+  offset?: number;
+  block?: 'start' | 'center' | 'end';
+} = {}) {
+  const { duration = 1000, easing = 'easeInOutCubic', offset = 0, block = 'start' } = options;
+  
+  const startPosition = window.pageYOffset;
+  const elementRect = element.getBoundingClientRect();
+  const elementTop = elementRect.top + window.pageYOffset;
+  
+  // Calculate target position based on block alignment
+  let targetPosition: number;
+  if (block === 'center') {
+    targetPosition = elementTop - (window.innerHeight / 2) + (elementRect.height / 2) - offset;
+  } else if (block === 'end') {
+    targetPosition = elementTop - window.innerHeight + elementRect.height - offset;
+  } else {
+    // 'start' - align to top
+    targetPosition = elementTop - offset;
+  }
+  
+  const distance = targetPosition - startPosition;
+  let startTime: number | null = null;
+
+  // Easing functions
+  const easingFunctions = {
+    linear: (t: number) => t,
+    easeInQuad: (t: number) => t * t,
+    easeOutQuad: (t: number) => t * (2 - t),
+    easeInOutQuad: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    easeInCubic: (t: number) => t * t * t,
+    easeOutCubic: (t: number) => (--t) * t * t + 1,
+    easeInOutCubic: (t: number) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+  };
+
+  function animation(currentTime: number) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+    
+    const easedProgress = easingFunctions[easing](progress);
+    const newPosition = startPosition + distance * easedProgress;
+    
+    window.scrollTo(0, newPosition);
+    
+    if (progress < 1) {
+      requestAnimationFrame(animation);
+    }
+  }
+
+  requestAnimationFrame(animation);
+}
+
 export default function Home() {
+  // Loading state
+  const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  // Mark as hydrated after first render
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+  
   // Add preconnect hints for better performance
   useEffect(() => {
     // Preconnect to CDN if you're using one
@@ -62,7 +182,67 @@ export default function Home() {
     link2.rel = 'preconnect';
     link2.href = 'https://fonts.gstatic.com';
     document.head.appendChild(link2);
+    
+    // Preload the loading screen background image
+    const preloadImage = new window.Image();
+    preloadImage.src = '/background_desktop_static.webp';
   }, []);
+  
+  // Handle loading completion
+  useEffect(() => {
+    const startTime = Date.now();
+    const minLoadingTime = 1500; // Minimum 1.5 seconds
+
+    // Function to handle loading completion
+    const handleLoadingComplete = () => {
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+      
+      // Add remaining time to ensure minimum loading duration
+      setTimeout(() => {
+        setIsLoading(false);
+      }, remainingTime);
+    };
+
+    // Check if page is already loaded
+    if (document.readyState === 'complete') {
+      handleLoadingComplete();
+      return;
+    }
+
+    // Listen for DOM content loaded (faster than window.load)
+    const handleDOMContentLoaded = () => {
+      // Wait a bit more for React hydration
+      setTimeout(handleLoadingComplete, 200);
+    };
+
+    // Listen for window load as fallback
+    const handleWindowLoad = () => {
+      handleLoadingComplete();
+    };
+
+    // Add event listeners
+    document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
+    window.addEventListener('load', handleWindowLoad);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded);
+      window.removeEventListener('load', handleWindowLoad);
+    };
+  }, []);
+
+  // Additional effect to handle React hydration
+  useEffect(() => {
+    if (isHydrated && document.readyState === 'complete') {
+      // If already hydrated and page is loaded, start fade out
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isHydrated]);
+  
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
 
@@ -108,13 +288,24 @@ export default function Home() {
   function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, sectionId: string) {
     e.preventDefault();
     if (sectionId === 'how-it-works' && howItWorksRef.current) {
-      howItWorksRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      smoothScrollTo(howItWorksRef.current, { 
+        duration: 800, 
+        easing: 'easeInOutQuad',
+        block: 'start',
+        offset: 100 
+      });
       return;
     }
     const el = document.getElementById(sectionId);
     if (el) {
       const block = sectionId === 'stats' ? 'center' : (window.innerWidth < 768 ? 'start' : 'center');
-      el.scrollIntoView({ behavior: 'smooth', block });
+      const offset = window.innerWidth < 768 ? 64 : 0;
+      smoothScrollTo(el, { 
+        duration: 800, 
+        easing: 'easeInOutQuad',
+        block,
+        offset 
+      });
     }
   }
 
@@ -534,7 +725,12 @@ export default function Home() {
         if (sectionOrder[nextIdx] === 'hero') {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (nextSection) {
-          nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          smoothScrollTo(nextSection, { 
+            duration: 800, 
+            easing: 'easeInOutQuad',
+            block: 'start',
+            offset: 100 
+          });
         }
       }
     }
@@ -547,6 +743,7 @@ export default function Home() {
       <Head>
         <title>Santelle | To Her Health</title>
       </Head>
+              <LoadingScreen isLoading={isLoading} />
       <main className="flex flex-col items-center w-full bg-brand-blue overflow-x-hidden overflow-hidden" style={{
         minHeight: '100dvh',
         paddingTop: 'env(safe-area-inset-top)',
@@ -664,12 +861,16 @@ export default function Home() {
                       whiteSpace: 'nowrap'
                     }}
                     type="button"
-                    onClick={() => {
-                      const el = document.getElementById('stats');
-                      if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }
-                    }}
+                                  onClick={() => {
+                const el = document.getElementById('stats');
+                if (el) {
+                  smoothScrollTo(el, { 
+                    duration: 800, 
+                    easing: 'easeInOutQuad',
+                    block: 'center'
+                  });
+                }
+              }}
                   >
                     Explore Santelle Now
                 </button>
@@ -851,7 +1052,12 @@ export default function Home() {
                       const unifiedCard = document.getElementById('mobile-unified-card');
                       const statsSection = unifiedCard?.querySelector('[data-section="stats"]');
                       if (statsSection) {
-                        statsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        smoothScrollTo(statsSection as HTMLElement, { 
+                          duration: 800, 
+                          easing: 'easeInOutQuad',
+                          block: 'start',
+                          offset: 64 
+                        });
                       }
                     }}
                   >
@@ -955,7 +1161,11 @@ export default function Home() {
               onClick={() => {
                 const el = document.getElementById('stats');
                 if (el) {
-                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  smoothScrollTo(el, { 
+                    duration: 800, 
+                    easing: 'easeInOutQuad',
+                    offset: window.innerHeight / 2 
+                  });
                 }
               }}
             >

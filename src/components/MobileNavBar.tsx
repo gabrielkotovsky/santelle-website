@@ -11,6 +11,62 @@ const menuItems = [
   { href: '#mobile-team', label: 'Our Team', section: 'team' },
 ];
 
+// Custom smooth scroll function with easing options
+function smoothScrollTo(element: HTMLElement, options: {
+  duration?: number;
+  easing?: 'linear' | 'easeInQuad' | 'easeOutQuad' | 'easeInOutQuad' | 'easeInCubic' | 'easeOutCubic' | 'easeInOutCubic';
+  offset?: number;
+  block?: 'start' | 'center' | 'end';
+} = {}) {
+  const { duration = 1000, easing = 'easeInOutCubic', offset = 0, block = 'start' } = options;
+  
+  const startPosition = window.pageYOffset;
+  const elementRect = element.getBoundingClientRect();
+  const elementTop = elementRect.top + window.pageYOffset;
+  
+  // Calculate target position based on block alignment
+  let targetPosition: number;
+  if (block === 'center') {
+    targetPosition = elementTop - (window.innerHeight / 2) + (elementRect.height / 2) - offset;
+  } else if (block === 'end') {
+    targetPosition = elementTop - window.innerHeight + elementRect.height - offset;
+  } else {
+    // 'start' - align to top
+    targetPosition = elementTop - offset;
+  }
+  
+  const distance = targetPosition - startPosition;
+  let startTime: number | null = null;
+
+  // Easing functions
+  const easingFunctions = {
+    linear: (t: number) => t,
+    easeInQuad: (t: number) => t * t,
+    easeOutQuad: (t: number) => t * (2 - t),
+    easeInOutQuad: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    easeInCubic: (t: number) => t * t * t,
+    easeOutCubic: (t: number) => (--t) * t * t + 1,
+    easeInOutCubic: (t: number) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+  };
+
+  function animation(currentTime: number) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+    
+    const easedProgress = easingFunctions[easing](progress);
+    const newPosition = startPosition + distance * easedProgress;
+    
+    window.scrollTo(0, newPosition);
+    
+    if (progress < 1) {
+      requestAnimationFrame(animation);
+    }
+  }
+
+  requestAnimationFrame(animation);
+}
+
 export default function MobileNavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -43,22 +99,23 @@ export default function MobileNavBar() {
           el.getAttribute('data-section') === section
         );
         
-        if (targetSection) {
-          const elementTop = targetSection.getBoundingClientRect().top + window.scrollY - headerHeight;
-          
-          // Smooth scroll to element
-          window.scrollTo({
-            top: elementTop,
-            behavior: 'smooth'
-          });
-        } else {
-          // Fallback: scroll to unified card
-          const elementTop = unifiedCard.offsetTop - headerHeight;
-          window.scrollTo({
-            top: elementTop,
-            behavior: 'smooth'
-          });
-        }
+                  if (targetSection) {
+            // Use custom smooth scroll for target section
+            smoothScrollTo(targetSection as HTMLElement, { 
+              duration: 1200, 
+              easing: 'easeInOutCubic',
+              block: 'start',
+              offset: headerHeight 
+            });
+          } else {
+            // Fallback: scroll to unified card
+            smoothScrollTo(unifiedCard, { 
+              duration: 1200, 
+              easing: 'easeInOutCubic',
+              block: 'start',
+              offset: headerHeight 
+            });
+          }
       } else {
         // Fallback: scroll to top if element not found
         window.scrollTo({
@@ -87,7 +144,7 @@ export default function MobileNavBar() {
         } else if (desktopEmailInput) {
           desktopEmailInput.focus();
         }
-      }, 600); // Wait for scroll to complete
+      }, 800); // Wait for scroll to complete (increased for custom animation)
     }, 300);
   };
 
