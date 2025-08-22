@@ -5,81 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
-import Lottie from 'lottie-react';
-import { useLoading } from '../lib/loadingContext';
-
 const HERO_HEIGHT = '100vh';
-
-// Loading Screen Component
-function LoadingScreen() {
-  const { isLoading } = useLoading();
-  const [animationData, setAnimationData] = useState(null);
-  const [isFading, setIsFading] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // Load the Lottie animation data
-    fetch('/Loading.json')
-      .then(response => response.json())
-      .then(data => {
-        setAnimationData(data);
-        setIsReady(true);
-      })
-      .catch(error => {
-        console.error('Error loading animation:', error);
-        setIsReady(true); // Still mark as ready even if animation fails
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading && !isFading) {
-      setIsFading(true);
-      // Remove the loading screen after fade animation completes
-      const timer = setTimeout(() => {
-        setIsFading(false);
-      }, 1200); // Slightly longer for smoother fade
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, isFading]);
-
-  // Always show loading screen if isLoading is true, regardless of other states
-  if (!isLoading && !isFading) return null;
-
-  return (
-    <div 
-      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-1200 ease-in-out ${
-        isLoading ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-      }`}
-      style={{
-        backgroundImage: 'url(/background_desktop_static.webp)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* Overlay for better contrast */}
-      <div className={`absolute inset-0 transition-all duration-1200 ease-in-out ${
-        isLoading ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0 backdrop-blur-none'
-      }`} />
-      
-      {/* Loading Animation Container */}
-      <div className={`relative z-10 flex flex-col items-center justify-center transition-all duration-1000 ease-out ${
-        isLoading ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-      }`}>
-        {animationData && (
-          <div className="w-32 h-32 md:w-48 md:h-48">
-            <Lottie 
-              animationData={animationData}
-              loop={true}
-              autoplay={true}
-              style={{ width: '100%', height: '100%' }}
-            />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // Custom hook for intersection observer
 function useIntersectionObserver(options = {}) {
@@ -175,26 +101,6 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function Home() {
-  // Use global loading context
-  const { isLoading, setIsLoading } = useLoading();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  // Mark as hydrated after first render
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-  
-  // Ensure loading screen appears immediately and stays until everything is ready
-  useEffect(() => {
-    // Force loading to stay true for at least 100ms to ensure it renders first
-    const initialTimer = setTimeout(() => {
-      setIsInitialized(true);
-    }, 100);
-    
-    return () => clearTimeout(initialTimer);
-  }, []);
-  
   // Add preconnect hints for better performance
   useEffect(() => {
     // Preconnect to CDN if you're using one
@@ -207,69 +113,7 @@ export default function Home() {
     link2.rel = 'preconnect';
     link2.href = 'https://fonts.gstatic.com';
     document.head.appendChild(link2);
-    
-    // Preload the loading screen background image
-    const preloadImage = new window.Image();
-    preloadImage.src = '/background_desktop_static.webp';
   }, []);
-  
-  // Handle loading completion
-  useEffect(() => {
-    // Only start the loading completion process after initialization
-    if (!isInitialized) return;
-    
-    const startTime = Date.now();
-    const minLoadingTime = 1500; // Minimum 1.5 seconds
-
-    // Function to handle loading completion
-    const handleLoadingComplete = () => {
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
-      
-      // Add remaining time to ensure minimum loading duration
-      setTimeout(() => {
-        setIsLoading(false);
-      }, remainingTime);
-    };
-
-    // Check if page is already loaded
-    if (document.readyState === 'complete') {
-      handleLoadingComplete();
-      return;
-    }
-
-    // Listen for DOM content loaded (faster than window.load)
-    const handleDOMContentLoaded = () => {
-      // Wait a bit more for React hydration
-      setTimeout(handleLoadingComplete, 200);
-    };
-
-    // Listen for window load as fallback
-    const handleWindowLoad = () => {
-      handleLoadingComplete();
-    };
-
-    // Add event listeners
-    document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
-    window.addEventListener('load', handleWindowLoad);
-
-    // Cleanup
-    return () => {
-      document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded);
-      window.removeEventListener('load', handleWindowLoad);
-    };
-  }, [isInitialized]);
-
-  // Additional effect to handle React hydration
-  useEffect(() => {
-    if (isHydrated && document.readyState === 'complete' && isInitialized) {
-      // If already hydrated and page is loaded, start fade out
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isHydrated, isInitialized]);
   
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
@@ -771,15 +615,13 @@ export default function Home() {
       <Head>
         <title>Santelle | To Her Health</title>
       </Head>
-      <LoadingScreen />
-      {!isLoading && (
-        <main className="flex flex-col items-center w-full bg-brand-blue overflow-x-hidden overflow-hidden" style={{
-          minHeight: '100dvh',
-          paddingTop: 'env(safe-area-inset-top)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          paddingLeft: 'env(safe-area-inset-left)',
-          paddingRight: 'env(safe-area-inset-right)'
-        }}>
+      <main className="flex flex-col items-center w-full bg-brand-blue overflow-x-hidden overflow-hidden" style={{
+        minHeight: '100dvh',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)'
+      }}>
 
       {/* Mobile Top Bar: Logo left, Hamburger + Shop right */}
       {/* Remove or hide this block for mobile since NavBar already provides the logo */}
@@ -1993,7 +1835,6 @@ export default function Home() {
       </div>
       <script dangerouslySetInnerHTML={{__html:`window.statsCard = document.getElementById('stats');`}} />
     </main>
-      )}
     </>
   );
 }
