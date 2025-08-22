@@ -3,9 +3,9 @@ import { Poppins } from 'next/font/google';
 import "./globals.css";
 import '../styles/typography.css';
 import '../styles/mobile.css';
-import NavBar from '../components/NavBar';
-import MobileNavBar from '../components/MobileNavBar';
+import ConditionalNavigation from '../components/ConditionalNavigation';
 import PageTransitionWrapper from '../components/PageTransitionWrapper';
+import { LoadingProvider } from '../lib/loadingContext';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -198,17 +198,10 @@ export default function RootLayout({
         />
       </head>
       <body className={`antialiased`}>
-        {/* Desktop Navigation */}
-        <div className="hidden md:block">
-          <NavBar />
-        </div>
-        
-        {/* Mobile Navigation */}
-        <div className="block md:hidden">
-          <MobileNavBar />
-        </div>
-        
-        <PageTransitionWrapper>{children}</PageTransitionWrapper>
+        <LoadingProvider>
+          <ConditionalNavigation />
+          <PageTransitionWrapper>{children}</PageTransitionWrapper>
+        </LoadingProvider>
       </body>
     </html>
   );

@@ -6,20 +6,29 @@ import Head from 'next/head';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
 import Lottie from 'lottie-react';
+import { useLoading } from '../lib/loadingContext';
 
 const HERO_HEIGHT = '100vh';
 
 // Loading Screen Component
-function LoadingScreen({ isLoading }: { isLoading: boolean }) {
+function LoadingScreen() {
+  const { isLoading } = useLoading();
   const [animationData, setAnimationData] = useState(null);
   const [isFading, setIsFading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     // Load the Lottie animation data
     fetch('/Loading.json')
       .then(response => response.json())
-      .then(data => setAnimationData(data))
-      .catch(error => console.error('Error loading animation:', error));
+      .then(data => {
+        setAnimationData(data);
+        setIsReady(true);
+      })
+      .catch(error => {
+        console.error('Error loading animation:', error);
+        setIsReady(true); // Still mark as ready even if animation fails
+      });
   }, []);
 
   useEffect(() => {
@@ -28,17 +37,18 @@ function LoadingScreen({ isLoading }: { isLoading: boolean }) {
       // Remove the loading screen after fade animation completes
       const timer = setTimeout(() => {
         setIsFading(false);
-      }, 1000);
+      }, 1200); // Slightly longer for smoother fade
       return () => clearTimeout(timer);
     }
   }, [isLoading, isFading]);
 
+  // Always show loading screen if isLoading is true, regardless of other states
   if (!isLoading && !isFading) return null;
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-1000 ${
-        isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-all duration-1200 ease-in-out ${
+        isLoading ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
       }`}
       style={{
         backgroundImage: 'url(/background_desktop_static.webp)',
@@ -48,10 +58,14 @@ function LoadingScreen({ isLoading }: { isLoading: boolean }) {
       }}
     >
       {/* Overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+      <div className={`absolute inset-0 transition-all duration-1200 ease-in-out ${
+        isLoading ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0 backdrop-blur-none'
+      }`} />
       
       {/* Loading Animation Container */}
-      <div className="relative z-10 flex flex-col items-center justify-center">
+      <div className={`relative z-10 flex flex-col items-center justify-center transition-all duration-1000 ease-out ${
+        isLoading ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+      }`}>
         {animationData && (
           <div className="w-32 h-32 md:w-48 md:h-48">
             <Lottie 
@@ -161,13 +175,24 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function Home() {
-  // Loading state
-  const [isLoading, setIsLoading] = useState(true);
+  // Use global loading context
+  const { isLoading, setIsLoading } = useLoading();
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Mark as hydrated after first render
   useEffect(() => {
     setIsHydrated(true);
+  }, []);
+  
+  // Ensure loading screen appears immediately and stays until everything is ready
+  useEffect(() => {
+    // Force loading to stay true for at least 100ms to ensure it renders first
+    const initialTimer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 100);
+    
+    return () => clearTimeout(initialTimer);
   }, []);
   
   // Add preconnect hints for better performance
@@ -190,6 +215,9 @@ export default function Home() {
   
   // Handle loading completion
   useEffect(() => {
+    // Only start the loading completion process after initialization
+    if (!isInitialized) return;
+    
     const startTime = Date.now();
     const minLoadingTime = 1500; // Minimum 1.5 seconds
 
@@ -230,18 +258,18 @@ export default function Home() {
       document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded);
       window.removeEventListener('load', handleWindowLoad);
     };
-  }, []);
+  }, [isInitialized]);
 
   // Additional effect to handle React hydration
   useEffect(() => {
-    if (isHydrated && document.readyState === 'complete') {
+    if (isHydrated && document.readyState === 'complete' && isInitialized) {
       // If already hydrated and page is loaded, start fade out
       const timer = setTimeout(() => {
         setIsLoading(false);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isHydrated]);
+  }, [isHydrated, isInitialized]);
   
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
@@ -743,14 +771,15 @@ export default function Home() {
       <Head>
         <title>Santelle | To Her Health</title>
       </Head>
-              <LoadingScreen isLoading={isLoading} />
-      <main className="flex flex-col items-center w-full bg-brand-blue overflow-x-hidden overflow-hidden" style={{
-        minHeight: '100dvh',
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingLeft: 'env(safe-area-inset-left)',
-        paddingRight: 'env(safe-area-inset-right)'
-      }}>
+      <LoadingScreen />
+      {!isLoading && (
+        <main className="flex flex-col items-center w-full bg-brand-blue overflow-x-hidden overflow-hidden" style={{
+          minHeight: '100dvh',
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingLeft: 'env(safe-area-inset-left)',
+          paddingRight: 'env(safe-area-inset-right)'
+        }}>
 
       {/* Mobile Top Bar: Logo left, Hamburger + Shop right */}
       {/* Remove or hide this block for mobile since NavBar already provides the logo */}
@@ -1029,7 +1058,7 @@ export default function Home() {
                       {/* Mobile "Discover Santelle" text and button - centered vertically */}
             <div className="flex flex-col items-start justify-center flex-1 w-full">
                           <span 
-                className="italic text-[#000000] text-4xl font-medium text-left leading-relaxed mb-6 chunko-bold"
+                className="italic text-[#721422] text-4xl font-medium text-left leading-relaxed mb-6 chunko-bold"
               >
                 Discover Santelle,<br />
                 Your vaginal health companion
@@ -1664,7 +1693,7 @@ export default function Home() {
             {/* Stats Section */}
                                 <div data-section="stats" className="py-40">
               <div className="text-center">
-                <div className="chunko-bold text-3xl font-bold text-[#721422] mb-20">
+                <div className="poppins-bold text-3xl font-bold text-[#721422] mb-20">
                   Vaginal infections affect 3 in 4 women. 50% are recurrent.
                 </div>
                 <div className="text-2xl text-[#721422] mb-20">
@@ -1673,7 +1702,7 @@ export default function Home() {
                   <span className="font-bold">long-term discomfort</span><br/>
                   <span className="font-bold">infertility</span>
                 </div>
-                <div className="text-2xl font-bold text-gray-600 mb-4">
+                <div className="text-2xl font-bold text-[#721422] mb-4">
                   It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
                 </div>
               </div>
@@ -1820,28 +1849,6 @@ export default function Home() {
                 </h2>
                 <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
               </div>
-              
-              {/* Logos Carousel */}
-              <div className="relative overflow-hidden mb-6">
-                <div className="flex animate-scroll-left">
-                  {/* First set of logos */}
-                  <div className="flex items-center gap-6 flex-shrink-0 px-4">
-                    <Image src="/ICL.webp" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/INSEAD.webp" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/McK.webp" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/Nabta.webp" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/P&G.webp" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                  </div>
-                  {/* Duplicate set for seamless loop */}
-                  <div className="flex items-center gap-6 flex-shrink-0 px-4">
-                    <Image src="/ICL.webp" alt="Imperial College London" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/INSEAD.webp" alt="INSEAD" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/McK.webp" alt="McKinsey & Co." width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/Nabta.webp" alt="Nabta" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/P&G.webp" alt="P&G" width={100} height={38} style={{width: 100, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                  </div>
-                </div>
-              </div>
 
               <div className="space-y-4">
                 {/* Team Member Cards */}
@@ -1851,7 +1858,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer h-[120px]">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
                         <Image
@@ -1913,7 +1920,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer h-[120px]">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
                         <Image
@@ -1986,6 +1993,7 @@ export default function Home() {
       </div>
       <script dangerouslySetInnerHTML={{__html:`window.statsCard = document.getElementById('stats');`}} />
     </main>
+      )}
     </>
   );
 }
