@@ -802,7 +802,7 @@ export default function Home() {
           />
           
           {/* Overlay - Blur only, no color */}
-          <div className="absolute inset-0 backdrop-blur-lg" />
+          <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
         </div>
         {/* Desktop Hero Content */}
         <div className="hidden md:flex flex-col items-center justify-center w-full h-full absolute top-0 left-0 z-10" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
@@ -1185,9 +1185,9 @@ export default function Home() {
           {/* Desktop Stats Section */}
           <section id="stats" ref={statsRef} className="hidden md:flex w-full min-h-screen flex-col justify-center items-center gap-2 p-0 m-0 -mt-8 md:-mt-26">
             <div className="px-4 md:px-8 py-8 md:py-12 w-full flex justify-center items-center">
-              <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-none px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center border border-white/50" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)'}}>
+              <div className="bg-white/20 backdrop-blur-lg rounded-3xl shadow-none px-4 py-6 md:px-8 md:py-12 flex flex-col justify-center items-center text-center border border-white/50" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)'}}>
                 <div
-                  className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative chunko-bold"
+                  className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative poppins-bold"
                   style={{
                     fontSize: 'clamp(1rem, 2vw, 2rem)',
                     color: '#721422'
@@ -1200,7 +1200,7 @@ export default function Home() {
                   </span>
               </div>
               <div
-                className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative chunko-bold"
+                className="block md:inline-flex md:flex-row items-center md:items-start font-bold mb-12 text-center relative poppins-bold"
                 style={{
                   fontSize: 'clamp(1rem, 2vw, 2rem)',
                   color: '#721422'
@@ -1221,7 +1221,7 @@ export default function Home() {
                   Left untreated, this can lead to <span className="font-bold">infertility</span>, <span className="font-bold">pregnancy complications</span>, and <span className="font-bold">long-term discomfort</span>.
                 </div>
                 <div 
-                  className={`font-bold text-[#EF7D88] mb-12 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}
+                  className={`font-bold text-[#721422] mb-12 transition-opacity duration-[1200ms] ${showStatsLine3 ? 'opacity-100' : 'opacity-0'}`}
                   style={{
                     fontSize: 'clamp(0.5rem, 1.5vw, 1.5rem)'
                   }}
@@ -1534,13 +1534,6 @@ export default function Home() {
             Santelle is built by a passionate team with backgrounds in health, tech, and women&apos;s wellness.
           </p>
           {/* Logos Row */}
-          <div className="flex flex-row justify-center items-center gap-8 md:gap-12 mb-8 w-full">
-                                <Image src="/ICL.webp" alt="Imperial College London" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/INSEAD.webp" alt="INSEAD" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/McK.webp" alt="McKinsey & Co." width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/Nabta.webp" alt="Nabta" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-                    <Image src="/P&G.webp" alt="P&G" width={240} height={90} style={{width: 240, height: 'auto', objectFit: 'contain'}} loading="lazy" />
-          </div>
                       <div className="w-full px-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                                 {/* Left: Roxanne Sabbag */}
@@ -1680,7 +1673,7 @@ export default function Home() {
                   <span className="font-bold">long-term discomfort</span><br/>
                   <span className="font-bold">infertility</span>
                 </div>
-                <div className="text-2xl font-bold text-[#EF7D88] mb-4">
+                <div className="text-2xl font-bold text-gray-600 mb-4">
                   It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
                 </div>
               </div>
