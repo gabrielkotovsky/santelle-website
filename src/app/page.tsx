@@ -1862,22 +1862,22 @@ export default function Home() {
                     <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
                         <Image
-                          src="/RS.webp"
+                          src="/RS.png"
                           alt="Roxanne Sabbag"
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-contain"
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain scale-170"
                           priority
                         />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
                       <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Founder & CEO</p>
-                      <div className="flex items-center gap-2">
-                        <Image src="/McK.webp" alt="McKinsey & Co." width={40} height={40} className="w-10 h-auto object-contain" />
-                        <Image src="/ICL.webp" alt="Imperial College London" width={40} height={40} className="w-10 h-auto object-contain" />
-                        <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain" />
-                    </div>
+                                                                                           <div className="flex items-center gap-9 justify-start">
+                          <Image src="/McK.webp" alt="McKinsey & Co." width={40} height={40} className="w-10 h-auto ml-3 object-contain scale-150" />
+                          <Image src="/ICL.webp" alt="Imperial College London" width={40} height={40} className="w-10 h-auto object-contain scale-150" />
+                          <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain scale-170" />
+                         </div>
                   </div>
                 </div>
                   </div>
@@ -1895,20 +1895,20 @@ export default function Home() {
                         <Image
                           src="/LL.png"
                           alt="Leonor Landeau"
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-contain"
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain scale-200"
                           priority
                         />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
                         <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
-                        <div className="flex items-center gap-2">
-                          <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={40} height={40} className="w-10 h-auto object-contain" />
-                          <Image src="/LSE_Logo.svg" alt="London School of Economics" width={40} height={40} className="w-10 h-auto object-contain" />
-                          <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain" />
-                    </div>
+                                                                                                 <div className="flex items-center gap-2 justify-start">
+                           <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={40} height={40} className="w-10 h-auto object-contain scale-100" />
+                           <Image src="/LSE_Logo.svg" alt="London School of Economics" width={40} height={40} className="w-10 h-auto object-contain scale-100" />
+                           <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain scale-170" />
+                          </div>
                   </div>
                 </div>
                   </div>
@@ -1926,20 +1926,20 @@ export default function Home() {
                         <Image
                           src="/TB.png"
                           alt="Tomasso Busolo"
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-contain"
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain scale-170"
                           priority
                         />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>
                       <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
-                      <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 justify-start">
                         <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={40} height={40} className="w-10 h-auto object-contain" />
                         <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={40} height={40} className="w-10 h-auto object-contain" />
-                        <Image src="/cambridge.svg" alt="University of Cambridge" width={40} height={40} className="w-10 h-auto object-contain" />
-                    </div>
+                        <Image src="/cambridge.svg" alt="University of Cambridge" width={40} height={40} className="w-10 h-auto ml-4 object-contain scale-200" />
+                      </div>
                   </div>
                 </div>
                   </div>

@@ -70,15 +70,27 @@ function smoothScrollTo(element: HTMLElement, options: {
 export default function MobileNavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+  const [hidden, setHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 1);
+      const currentScrollY = window.scrollY;
+      
+      // Hide navbar when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setHidden(true); // Hide when scrolling down and not at top
+      } else {
+        setHidden(false); // Show when scrolling up or at top
+      }
+      
+      setScrolled(currentScrollY > 1);
+      setLastScrollY(currentScrollY);
     };
+    
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string, section?: string) => {
     e.preventDefault();
@@ -152,9 +164,11 @@ export default function MobileNavBar() {
     <>
       {/* Mobile Navigation Bar */}
       <nav 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isOpen ? 'bg-black' : scrolled ? 'bg-white/20 backdrop-blur-lg' : 'bg-transparent'
-        } safe-top border-none`}
+        } safe-top border-none ${
+          hidden ? '-translate-y-full' : 'translate-y-0'
+        }`}
       >
         <div className="flex items-center justify-between px-4 py-3">
           {/* Logo */}
