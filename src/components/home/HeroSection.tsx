@@ -27,7 +27,7 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
           const statsCardTop = statsCard.offsetTop;
           const statsCardHeight = statsCard.offsetHeight;
           const fadeStart = 0; // Start fading from the top of the page
-          const fadeEnd = statsCardTop + statsCardHeight; // End fading when stats card is fully in viewport
+          const fadeEnd = statsCardTop+statsCardHeight/2; // End fading when stats card is fully in viewport
           
           if (scrollY <= fadeStart) {
             setHeroFadeOpacity(1);
@@ -108,6 +108,8 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
           playsInline
           className="absolute inset-0 w-full h-full object-cover hidden md:block"
           style={{ 
+            objectFit: 'cover', 
+            objectPosition: 'center',
             width: '100vw',
             height: '100dvh'
           }}

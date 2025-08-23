@@ -6,38 +6,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "analyze": "ANALYZE=true npm run build",
-    "analyze:server": "ANALYZE=true npm run build && npm run start",
-    "build:analyze": "ANALYZE=true next build",
-    "bundle-report": "npm run build:analyze && open .next/analyze/client.html",
-    "bundle-report:server": "npm run build:analyze && open .next/analyze/server.html"
+    "lint": "next lint"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.52.0",
     "@types/dompurify": "^3.0.5",
-    "canvas-confetti": "^1.9.2",
+    "canvas-confetti": "^1.9.3",
     "dompurify": "^3.2.6",
     "framer-motion": "^12.23.12",
     "jsdom": "^26.1.0",
     "lottie-react": "^2.4.1",
     "next": "15.4.1",
-    "react": "^19",
-    "react-dom": "^19",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "resend": "^4.7.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@next/bundle-analyzer": "^15.4.1",
+    "@next/bundle-analyzer": "^15.5.0",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^8",
+    "eslint": "^9",
     "eslint-config-next": "15.4.1",
-    "tailwindcss": "^3.3.0",
+    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

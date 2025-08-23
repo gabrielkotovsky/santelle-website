@@ -1,27 +1,19 @@
 'use client';
 
-import { useEffect, useState, Suspense, lazy } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { analytics } from '../lib/analytics';
 
-// Dynamic imports with React.lazy() for code splitting
-const HeroSection = lazy(() => import('@/components/home/HeroSection'));
-const StatsSection = lazy(() => import('@/components/home/StatsSection'));
-const KitSection = lazy(() => import('@/components/home/KitSection'));
-const HowItWorksSection = lazy(() => import('@/components/home/HowItWorksSection'));
-const TeamSection = lazy(() => import('@/components/home/TeamSection'));
-const MobileUnifiedCard = lazy(() => import('@/components/home/MobileUnifiedCard'));
-const FooterSection = lazy(() => import('@/components/home/FooterSection'));
-
-// Loading fallback component
-const ComponentLoader = ({ componentName }: { componentName: string }) => (
-  <div className="w-full min-h-screen flex items-center justify-center bg-white/20 backdrop-blur-lg rounded-3xl border border-white/50">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#721422] mx-auto mb-4"></div>
-      <p className="text-[#721422] text-lg">Loading {componentName}...</p>
-    </div>
-  </div>
-);
+// Import split components
+import {
+  HeroSection,
+  StatsSection,
+  KitSection,
+  HowItWorksSection,
+  TeamSection,
+  MobileUnifiedCard,
+  FooterSection
+} from '@/components/home';
 
 const HERO_HEIGHT = '100vh';
 
@@ -42,7 +34,7 @@ export default function Home() {
     link2.href = 'https://fonts.gstatic.com';
     document.head.appendChild(link2);
   }, []);
-  
+
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   useEffect(() => {
@@ -84,11 +76,11 @@ export default function Home() {
         } else if (nextSection) {
           // Import smoothScrollTo function
           import('@/components/shared/SmoothScroll').then(({ smoothScrollTo }) => {
-            smoothScrollTo(nextSection, { 
-              duration: 800, 
-              easing: 'easeInOutQuad',
-              block: 'start',
-              offset: 100 
+          smoothScrollTo(nextSection, { 
+            duration: 800, 
+            easing: 'easeInOutQuad',
+            block: 'start',
+            offset: 100 
             });
           });
         }
@@ -111,50 +103,36 @@ export default function Home() {
         paddingRight: 'env(safe-area-inset-right)'
       }}>
 
-        {/* Hero Section - fixed and full screen */}
-        <Suspense fallback={<ComponentLoader componentName="Hero Section" />}>
-          <HeroSection 
-            onEmailFormToggle={setShowEmailForm}
-            showEmailForm={showEmailForm}
-          />
-        </Suspense>
+      {/* Hero Section - fixed and full screen */}
+        <HeroSection 
+          onEmailFormToggle={setShowEmailForm}
+          showEmailForm={showEmailForm}
+        />
 
-        {/* Spacer to allow scrolling past the fixed hero */}
-        <div style={{ height: HERO_HEIGHT }} className="w-full" />
+      {/* Spacer to allow scrolling past the fixed hero */}
+      <div style={{ height: HERO_HEIGHT }} className="w-full" />
 
-        {/* Main content sections with higher z-index to cover hero */}
-        <div className="relative z-20 w-full">
+      {/* Main content sections with higher z-index to cover hero */}
+      <div className="relative z-20 w-full">
           {/* Desktop Stats Section */}
-          <Suspense fallback={<ComponentLoader componentName="Stats Section" />}>
-            <StatsSection />
-          </Suspense>
+          <StatsSection />
 
-          {/* Desktop Kit Image Section - Load with higher priority since stats section links to it */}
-          <Suspense fallback={<ComponentLoader componentName="Kit Section" />}>
-            <KitSection />
-          </Suspense>
+        {/* Desktop Kit Image Section */}
+          <KitSection />
 
-          {/* Desktop Product Intro Section */}
-          <Suspense fallback={<ComponentLoader componentName="How It Works Section" />}>
-            <HowItWorksSection />
-          </Suspense>
+        {/* Desktop Product Intro Section */}
+          <HowItWorksSection />
 
-          {/* Desktop Team/Leadership Section */}
-          <Suspense fallback={<ComponentLoader componentName="Team Section" />}>
-            <TeamSection />
-          </Suspense>
+        {/* Desktop Team/Leadership Section */}
+          <TeamSection />
 
-          {/* Mobile Unified Card - All Sections */}
-          <Suspense fallback={<ComponentLoader componentName="Mobile Content" />}>
-            <MobileUnifiedCard />
-          </Suspense>
+        {/* Mobile Unified Card - All Sections */}
+          <MobileUnifiedCard />
 
-          {/* Bottom Glassmorphic Card */}
-          <Suspense fallback={<ComponentLoader componentName="Footer" />}>
-            <FooterSection />
-          </Suspense>
-        </div>
-      </main>
+        {/* Bottom Glassmorphic Card */}
+          <FooterSection />
+              </div>
+    </main>
       <script dangerouslySetInnerHTML={{__html:`window.statsCard = document.getElementById('stats');`}} />
     </>
   );
