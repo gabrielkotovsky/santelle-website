@@ -36,8 +36,11 @@ export default function TeamSection() {
               <div 
                 className="bg-white/30 backdrop-blur-lg rounded-3xl overflow-hidden hover:bg-white/40 cursor-pointer relative w-full h-[600px] border border-white/50"
               >
-                <div className="w-full h-96 flex items-center justify-center overflow-hidden relative bg-cover bg-center bg-no-repeat" style={{
-                  backgroundImage: 'url(/profile_background.webp)'
+                <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
+                  backgroundImage: 'url(/profile_background.webp)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
                 }}>
                   <Image
                     src="/RS.png"
@@ -52,9 +55,9 @@ export default function TeamSection() {
                   <h3 className="text-2xl font-bold text-[#721422] mb-2">Roxanne Sabbag</h3>
                   <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Founder & CEO</p>
                   <div className="flex items-center gap-3">
-                    <Image src="/McK.webp" alt="McKinsey & Co." width={60} height={60} className="w-25 mr-4 h-auto object-contain" />
-                    <Image src="/ICL.webp" alt="Imperial College London" width={60} height={60} className="w-25 h-auto object-contain" />
-                    <Image src="/INSEAD.webp" alt="INSEAD" width={80} height={80} className="w-30 h-auto object-contain" />
+                    <Image src="/McK.webp" alt="McKinsey & Co." width={60} height={60} className="w-50 h-auto object-contain" />
+                    <Image src="/ICL.webp" alt="Imperial College London" width={60} height={60} className="w-50 h-auto object-contain" />
+                    <Image src="/INSEAD.webp" alt="INSEAD" width={80} height={80} className="w-50 h-auto object-contain" />
                   </div>
                 </div>
               </div>
@@ -70,8 +73,11 @@ export default function TeamSection() {
               <div 
                 className="bg-white/30 backdrop-blur-lg rounded-3xl overflow-hidden hover:bg-white/40 cursor-pointer relative w-full h-[600px] border border-white/50"
               >
-                <div className="w-full h-96 flex items-center justify-center overflow-hidden relative bg-cover bg-center bg-no-repeat" style={{
-                  backgroundImage: 'url(/profile_background.webp)'
+                <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
+                  backgroundImage: 'url(/profile_background.webp)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
                 }}>
                   <Image
                     src="/LL.png"
@@ -86,9 +92,9 @@ export default function TeamSection() {
                   <h3 className="text-2xl font-bold text-[#721422] mb-2">Leonor Landeau</h3>
                   <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Collaborator & Advisor</p>
                   <div className="flex items-center gap-3">
-                    <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={60} height={60} className="w-15 mr-8 h-auto object-contain" />
-                    <Image src="/LSE_Logo.svg" alt="London School of Economics" width={60} height={60} className="w-15 h-auto object-contain" />
-                    <Image src="/INSEAD.webp" alt="INSEAD" width={60} height={60} className="w-30 h-auto object-contain" />
+                    <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={60} height={60} className="w-27 h-auto object-contain" />
+                    <Image src="/LSE_Logo.svg" alt="London School of Economics" width={60} height={60} className="w-20 h-auto object-contain" />
+                    <Image src="/INSEAD.webp" alt="INSEAD" width={60} height={60} className="w-50 h-auto object-contain" />
                   </div>
                 </div>
               </div>
@@ -104,8 +110,11 @@ export default function TeamSection() {
               <div 
                 className="bg-white/30 backdrop-blur-lg rounded-3xl overflow-hidden hover:bg-white/40 cursor-pointer relative w-full h-[600px] border border-white/50"
               >
-                <div className="w-full h-96 flex items-center justify-center overflow-hidden relative bg-cover bg-center bg-no-repeat" style={{
-                  backgroundImage: 'url(/profile_background.webp)'
+                <div className="w-full h-96 flex items-center justify-center overflow-hidden relative" style={{
+                  backgroundImage: 'url(/profile_background.webp)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
                 }}>
                   <Image
                     src="/TB.png"
@@ -120,8 +129,8 @@ export default function TeamSection() {
                   <h3 className="text-2xl font-bold text-[#721422] mb-2">Dr. Tomasso Busolo</h3>
                   <p className="text-lg font-semibold text-[#ff4fa3] mb-4">Collaborator & Advisor</p>
                   <div className="flex items-center gap-3">
-                    <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={60} height={60} className="w-15 mr-4 h-auto object-contain" />
-                    <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={60} height={60} className="w-15 h-auto object-contain" />
+                    <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={60} height={60} className="w-20 h-auto object-contain" />
+                    <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={60} height={60} className="w-20 h-auto object-contain" />
                     <Image src="/cambridge.svg" alt="University of Cambridge" width={60} height={60} className="w-30 h-auto object-contain" />
                   </div>
                 </div>

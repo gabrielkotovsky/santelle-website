@@ -7,7 +7,6 @@ import ConditionalNavigation from '../components/ConditionalNavigation';
 import PageTransitionWrapper from '../components/PageTransitionWrapper';
 import Script from 'next/script';
 
-
 export const metadata: Metadata = {
   title: {
     default: "Santelle | To Her Health",
@@ -93,7 +92,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="theme-color" content="#ffffff" />
         
-
+        {/* Preload Critical CSS to Eliminate Render-Blocking */}
+        <link rel="preload" href="/globals.css" as="style" />
+        <link rel="preload" href="/styles/typography.css" as="style" />
+        <link rel="preload" href="/styles/mobile.css" as="style" />
         
         {/* Google Analytics */}
         {process.env.NEXT_PUBLIC_GA_ID && (
@@ -213,7 +215,6 @@ export default function RootLayout({
         />
       </head>
       <body className={`antialiased`}>
-
         <ConditionalNavigation />
         <PageTransitionWrapper>{children}</PageTransitionWrapper>
       </body>

@@ -148,7 +148,7 @@ export default function MobileUnifiedCard() {
                     height={240}
                     priority
                     alt={step.title} 
-                    className="w-60 h-auto object-contain" 
+                    className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
                     sizes="(max-width: 768px) 240px, 240px"
                     quality={85}
                   />

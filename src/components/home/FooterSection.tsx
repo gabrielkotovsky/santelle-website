@@ -21,7 +21,7 @@ export default function FooterSection() {
         <div className="p-4 md:p-8 flex flex-col items-center gap-6 text-center">
           {/* Logo */}
           <div className="w-full flex justify-center mb-2">
-            <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} className="object-contain" style={{height: 60}} priority />
+            <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} priority />
           </div>
 
           {/* Get Early Access Button */}
