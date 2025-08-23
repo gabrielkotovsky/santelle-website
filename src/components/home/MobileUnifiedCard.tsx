@@ -97,13 +97,14 @@ export default function MobileUnifiedCard() {
               Santelle makes it simple to check in on your intimate health each month — with instant
               results, personalised insights, and no awkward clinic visits.
             </LazyText>
-            <ul className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left">
+            <LazyText className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left">
               <li>Instant results from home</li>
               <li>Multi-biomarker analysis — beyond pH</li>
               <li>Connected app with personalised insights & tips</li>
-            </ul>
+            </LazyText>
             <div className="flex flex-col gap-3 w-full">
               <div className="flex justify-center mt-0 mb-6">
+                <LazyText>
                 <button
                   className="bg-[#721422] text-white font-bold text-xl px-8 py-4 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
                   onClick={focusHeroEmailInput}
@@ -111,6 +112,7 @@ export default function MobileUnifiedCard() {
                 >
                   Get Early Access
                 </button>
+                </LazyText>
               </div>
             </div>
           </div>
@@ -188,6 +190,7 @@ export default function MobileUnifiedCard() {
           
           {/* Get Early Access Button */}
           <div className="flex justify-center mt-0 mb-6">
+            <LazyText>
             <button
               className="bg-[#721422] text-white font-bold text-xl px-8 py-4 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
               onClick={focusHeroEmailInput}
@@ -195,6 +198,7 @@ export default function MobileUnifiedCard() {
             >
               Get Early Access
             </button>
+            </LazyText>
           </div>
         </div>
 
