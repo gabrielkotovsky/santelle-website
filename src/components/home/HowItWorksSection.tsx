@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { LazyImage, LazyText } from '../shared';
 
 export default function HowItWorksSection() {
   const howItWorksSteps = [
@@ -57,14 +57,14 @@ export default function HowItWorksSection() {
 
       {/* Desktop Product Intro Section */}
       <section id="how-it-works" className="hidden md:flex w-full py-0 mt-0 flex-col items-center gap-12 min-h-screen">
-        <h2 className="hidden md:block font-bold text-[#721422] mb-0 md:mb-10 text-center"
+        <LazyText className="hidden md:block font-bold text-[#721422] mb-0 md:mb-10 text-center" delay={200}
             style={{
               fontSize: 'clamp(2rem, 5vw, 4rem)'
             }}>
           <span className="chunko-bold">How you&apos;ll use it</span>
-        </h2>
+        </LazyText>
         <div className="hidden md:block w-full mx-auto flex flex-col" style={{maxWidth: 'clamp(70vw, 70vw, 70vw)'}}>
-          {howItWorksSteps.slice(0, 4).map((step) => (
+          {howItWorksSteps.slice(0, 4).map((step, index) => (
             <div
               key={step.number}
               className={`w-full flex flex-col items-center justify-center bg-white/30 backdrop-blur-lg rounded-3xl shadow-none mb-16 border border-white/50`}
@@ -74,7 +74,7 @@ export default function HowItWorksSection() {
               }}
             >
               {/* Top: Step number and heading */}
-              <div className="flex flex-row items-center w-full justify-center p-4" 
+              <LazyText className="flex flex-row items-center w-full justify-center p-4" delay={300 + index * 200}
                    style={{
                      gap: 'clamp(1rem, 2vw, 2rem)',
                      height: 'clamp(80px, 10vh, 120px)'
@@ -90,13 +90,13 @@ export default function HowItWorksSection() {
                 <div className="font-bold text-[#721422]" style={{fontSize: 'clamp(1rem, 2vw, 2rem)'}}>
                   {step.title}
                 </div>
-              </div>
+              </LazyText>
               {/* Middle: Image */}
-              <div className="flex items-center justify-center w-full p-4"
+              <LazyText className="flex items-center justify-center w-full p-4" delay={400 + index * 200}
                    style={{
                      height: 'clamp(200px, 25vh, 400px)'
                    }}>
-                <Image 
+                <LazyImage 
                   src={step.img} 
                   alt={step.title} 
                   width={500}
@@ -109,17 +109,16 @@ export default function HowItWorksSection() {
                   }}
                   sizes="(max-width: 768px) 200px, (max-width: 1024px) 300px, 500px"
                   quality={85}
-                  priority
                 />
-              </div>
+              </LazyText>
               {/* Bottom: Description */}
-              <div className="w-full text-center flex items-center p-4 text-[#721422]"
+              <LazyText className="w-full text-center flex items-center p-4 text-[#721422]" delay={500 + index * 200}
                    style={{
                      fontSize: 'clamp(0.875rem, 1.5vw, 1.5rem)',
                      minHeight: 'clamp(80px, 10vh, 120px)'
                    }}>
                 {step.desc}
-              </div>
+              </LazyText>
             </div>
           ))}
         </div>
@@ -127,37 +126,36 @@ export default function HowItWorksSection() {
         {/* Mobile: Single card with dividers */}
         <div className="block md:hidden w-full max-w-7xl mx-auto">
           <div className="bg-white/30 backdrop-blur-lg rounded-3xl p-6 border border-white/50">
-            {howItWorksSteps.slice(0, 4).map((step) => (
+            {howItWorksSteps.slice(0, 4).map((step, index) => (
               <div key={step.number}>
                 {/* Step content */}
                 <div className="flex flex-col items-center text-center py-6">
                   {/* Step number and title */}
-                  <div className="flex flex-col items-center gap-4 mb-4">
+                  <LazyText className="flex flex-col items-center gap-4 mb-4" delay={300 + index * 200}>
                     <span className="text-3xl font-bold text-white bg-[#721422] rounded-full w-16 h-16 aspect-square flex items-center justify-center">
                       {step.number}
                     </span>
                     <div className="text-xl font-bold text-[#721422]">
                       {step.title}
                     </div>
-                  </div>
+                  </LazyText>
                   
                   {/* Image */}
-                  <div className="flex items-center justify-center w-full h-32 mb-4">
-                    <Image 
+                  <LazyText className="flex items-center justify-center w-full h-32 mb-4" delay={400 + index * 200}>
+                    <LazyImage 
                       src={step.img} 
                       alt={step.title} 
                       width={128}
                       height={128}
                       className="h-32 w-auto object-contain"
-                      priority
                       unoptimized
                     />
-                  </div>
+                  </LazyText>
                   
                   {/* Description */}
-                  <div className="text-base text-[#721422] leading-relaxed">
+                  <LazyText className="text-base text-[#721422] leading-relaxed" delay={500 + index * 200}>
                     {step.desc}
-                  </div>
+                  </LazyText>
                 </div>
                 
                 {/* Divider - don't show after last step */}
@@ -172,7 +170,7 @@ export default function HowItWorksSection() {
         </div>
         
         {/* CTA */}
-        <div className="flex flex-col items-center mt-32 md:mt-12">
+        <LazyText className="flex flex-col items-center mt-32 md:mt-12" delay={1000}>
           <div className="text-3xl font-semibold mb-6" style={{color: '#721422'}}>
             Ready to take control?
           </div>
@@ -183,7 +181,7 @@ export default function HowItWorksSection() {
           >
             Get Early Access
           </button>
-        </div>
+        </LazyText>
       </section>
     </>
   );

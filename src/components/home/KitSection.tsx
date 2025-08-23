@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { smoothScrollTo } from '../shared/SmoothScroll';
+import { LazyImage, LazyText } from '../shared';
 
 export default function KitSection() {
   function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, sectionId: string) {
@@ -45,7 +45,7 @@ export default function KitSection() {
       <section id="kit" className="hidden md:flex w-full min-h-screen h-screen items-center justify-center">
         <div className="bg-white/30 backdrop-blur-lg rounded-3xl shadow-none flex flex-col md:flex-row items-center justify-center gap-2 md:gap-0 border border-white/50" style={{height: 'clamp(90vh, 95vh, 98vh)', width: 'clamp(90vw, 95vw, 98vw)', padding: '120px'}}>
           <div className="md:w-1/2 flex justify-center md:justify-end items-center p-0 py-2 md:py-0">
-            <Image
+            <LazyImage
               src="/SantelleKit+App.png"
               alt="Santelle Kit and App"
               width={900}
@@ -57,12 +57,11 @@ export default function KitSection() {
               }}
               sizes="(max-width: 768px) 300px, (max-width: 1024px) 600px, 900px"
               quality={85}
-              priority
             />
           </div>
           <div className="md:w-1/2 flex flex-col items-center md:items-start justify-center" style={{gap: '5vh'}}>
             {/* First Group: Title and Subtitle */}
-            <div style={{gap: '0.5rem'}}>
+            <LazyText style={{gap: '0.5rem'}} delay={300}>
               <h1 
                 className="font-bold text-[#721422] mb-0 text-left"
                 style={{
@@ -82,10 +81,10 @@ export default function KitSection() {
               >
                 Your discreet, at-home vaginal health companion
               </h2>
-            </div>
+            </LazyText>
 
             {/* Second Group: Description and Bullet Points */}
-            <div style={{gap: '1rem'}}>
+            <LazyText style={{gap: '1rem'}} delay={600}>
               <p 
                 className="text-[#721422] text-center md:text-left"
                 style={{
@@ -107,8 +106,8 @@ export default function KitSection() {
                 <li>Multi-biomarker analysis — beyond pH</li>
                 <li>Connected app with personalised insights & tips</li>
               </ul>
-            </div>
-            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center md:justify-start">
+            </LazyText>
+            <LazyText className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center md:justify-start" delay={900}>
               <a
                 href="#how-it-works"
                 className="how-it-works-btn inline-block bg-white text-[#511828] font-bold rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full max-w-xs mx-auto md:mx-0 md:w-auto text-center hover:bg-[#511828] hover:text-white"
@@ -137,7 +136,7 @@ export default function KitSection() {
               >
                 Get Early Access
               </button>
-            </div>
+            </LazyText>
           </div>
         </div>
       </section>

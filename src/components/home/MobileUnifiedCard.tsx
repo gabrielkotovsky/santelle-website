@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { LazyImage, LazyText } from '../shared';
 
 export default function MobileUnifiedCard() {
   const howItWorksSteps = [
@@ -52,7 +52,7 @@ export default function MobileUnifiedCard() {
         
         {/* Stats Section */}
         <div data-section="stats" className="py-40">
-          <div className="text-center">
+          <LazyText className="text-center" delay={200}>
             <div className="poppins-bold text-3xl font-bold text-[#721422] mb-20">
               Vaginal infections affect 3 in 4 women. 50% are recurrent.
             </div>
@@ -65,22 +65,22 @@ export default function MobileUnifiedCard() {
             <div className="text-2xl font-bold text-[#721422] mb-4">
               It&apos;s time to take charge of your vaginal health — with insights, not guesswork.
             </div>
-          </div>
+          </LazyText>
         </div>
 
         {/* Meet Section Title */}
         <div data-section="meet" className="py-40">
-          <div className="flex items-center gap-4 mb-6">
+          <LazyText className="flex items-center gap-4 mb-6" delay={400}>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
             <h2 className="font-bold text-4xl text-[#721422] text-center">
               <span className="chunko-bold">Meet Santelle</span>
             </h2>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
-          </div>
+          </LazyText>
           <div className="flex flex-col items-start text-left">
             
-            <div className="mb-4 self-center">
-              <Image
+            <LazyText className="mb-4 self-center" delay={600}>
+              <LazyImage
                 src="/SantelleKit+App.png"
                 alt="Santelle Kit and App"
                 width={300}
@@ -88,16 +88,15 @@ export default function MobileUnifiedCard() {
                 className="w-full max-w-[300px] h-auto object-contain drop-shadow-lg"
                 sizes="300px"
                 quality={85}
-                priority
               />
-            </div>
-            <div className="font-bold text-xl text-[#721422] text-left mb-4">
+            </LazyText>
+            <LazyText className="font-bold text-xl text-[#721422] text-left mb-4" delay={800}>
               Your discreet, at-home vaginal health companion
-            </div>
-            <p className="text-lg text-[#721422] mb-4 leading-relaxed">
+            </LazyText>
+            <LazyText className="text-lg text-[#721422] mb-4 leading-relaxed" delay={1000}>
               Santelle makes it simple to check in on your intimate health each month — with instant
               results, personalised insights, and no awkward clinic visits.
-            </p>
+            </LazyText>
             <ul className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left">
               <li>Instant results from home</li>
               <li>Multi-biomarker analysis — beyond pH</li>
@@ -119,15 +118,15 @@ export default function MobileUnifiedCard() {
 
         {/* How It Works Section */}
         <div data-section="how-it-works" className="py-40">
-          <div className="flex items-center gap-4 mb-6">
+          <LazyText className="flex items-center gap-4 mb-6" delay={1200}>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
             <h2 className="font-bold text-4xl text-[#721422] text-center">
               <span className="chunko-bold">How It Works</span>
             </h2>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
-          </div>
+          </LazyText>
           {howItWorksSteps.slice(0, 4).map((step, stepIdx) => (
-            <div key={step.number} className="mb-6">
+            <LazyText key={step.number} className="mb-6" delay={1400 + stepIdx * 100}>
               {/* Step content */}
               <div className="flex flex-col items-start text-left">
                 {/* Step number and title */}
@@ -141,21 +140,20 @@ export default function MobileUnifiedCard() {
                 </div>
                 
                 {/* Image */}
-                <div className="flex items-center justify-center w-full mb-3">
-                  <Image 
+                <LazyText className="flex items-center justify-center w-full mb-3" delay={1600 + stepIdx * 100}>
+                  <LazyImage 
                     src={step.img}
                     width={240}
                     height={240}
-                    priority
                     alt={step.title} 
                     className={`${stepIdx === 2 ? 'w-4/5 h-auto' : 'h-60 w-auto'} object-contain`} 
                     sizes="(max-width: 768px) 240px, 240px"
                     quality={85}
                   />
-                </div>
+                </LazyText>
                 
                 {/* Description */}
-                <div className="text-lg text-[#721422] leading-relaxed">
+                <LazyText className="text-lg text-[#721422] leading-relaxed" delay={1800 + stepIdx * 100}>
                   {stepIdx === 0 && (
                     <>
                       A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
@@ -176,7 +174,7 @@ export default function MobileUnifiedCard() {
                       See <span className="font-bold">patterns</span>, get <span className="font-bold">monthly tips</span>, and stay ahead of changes — whether you&apos;re managing <span className="font-bold">symptoms</span>, <span className="font-bold">pregnancy</span>, or just staying in tune.
                     </>
                   )}
-                </div>
+                </LazyText>
               </div>
               
               {/* Divider - don't show after last step */}
@@ -185,7 +183,7 @@ export default function MobileUnifiedCard() {
                   <div className="w-20 h-0.5 bg-[#721422]/40 rounded-full"></div>
                 </div>
               )}
-            </div>
+            </LazyText>
           ))}
           
           {/* Get Early Access Button */}
@@ -202,13 +200,13 @@ export default function MobileUnifiedCard() {
 
         {/* Team Section */}
         <div data-section="team" className="py-40">
-          <div className="flex items-center gap-4 mb-6">
+          <LazyText className="flex items-center gap-4 mb-6" delay={2000}>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
             <h2 className="font-bold text-4xl text-[#721422] text-center">
               <span className="chunko-bold">Our Team</span>
             </h2>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
-          </div>
+          </LazyText>
 
           <div className="space-y-4">
             {/* Team Member Cards */}
@@ -218,29 +216,30 @@ export default function MobileUnifiedCard() {
               rel="noopener noreferrer"
               className="block"
             >
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                    <Image
-                      src="/RS.png"
-                      alt="Roxanne Sabbag"
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-contain scale-170"
-                      priority
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
-                    <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Founder & CEO</p>
-                    <div className="flex items-center gap-9 justify-start">
-                      <Image src="/McK.webp" alt="McKinsey & Co." width={40} height={40} className="w-10 h-auto ml-3 object-contain scale-150" />
-                      <Image src="/ICL.webp" alt="Imperial College London" width={40} height={40} className="w-10 h-auto object-contain scale-150" />
-                      <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain scale-170" />
+              <LazyText className="block" delay={2200}>
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                      <LazyImage
+                        src="/RS.png"
+                        alt="Roxanne Sabbag"
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-contain scale-170"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#721422]">Roxanne Sabbag</h3>
+                      <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Founder & CEO</p>
+                      <div className="flex items-center gap-9 justify-start">
+                        <LazyImage src="/McK.webp" alt="McKinsey & Co." width={40} height={40} className="w-10 h-auto ml-3 object-contain scale-150" />
+                        <LazyImage src="/ICL.webp" alt="Imperial College London" width={40} height={40} className="w-10 h-auto object-contain scale-150" />
+                        <LazyImage src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain scale-170" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </LazyText>
             </a>
 
             <a 
@@ -249,29 +248,30 @@ export default function MobileUnifiedCard() {
               rel="noopener noreferrer"
               className="block"
             >
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                    <Image
-                      src="/LL.png"
-                      alt="Leonor Landeau"
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-contain scale-200"
-                      priority
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
-                    <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
-                    <div className="flex items-center gap-2 justify-start">
-                      <Image src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={40} height={40} className="w-10 h-auto object-contain scale-100" />
-                      <Image src="/LSE_Logo.svg" alt="London School of Economics" width={40} height={40} className="w-10 h-auto object-contain scale-100" />
-                      <Image src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain scale-170" />
+              <LazyText className="block" delay={2400}>
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                      <LazyImage
+                        src="/LL.png"
+                        alt="Leonor Landeau"
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-contain scale-200"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#721422]">Leonor Landeau</h3>
+                      <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
+                      <div className="flex items-center gap-2 justify-start">
+                        <LazyImage src="/feelmore_labs_logo.jpeg" alt="Feelmore Labs" width={40} height={40} className="w-10 h-auto object-contain scale-100" />
+                        <LazyImage src="/LSE_Logo.svg" alt="London School of Economics" width={40} height={40} className="w-10 h-auto object-contain scale-100" />
+                        <LazyImage src="/INSEAD.webp" alt="INSEAD" width={50} height={50} className="w-12 h-auto object-contain scale-170" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </LazyText>
             </a>
 
             <a 
@@ -280,29 +280,30 @@ export default function MobileUnifiedCard() {
               rel="noopener noreferrer"
               className="block"
             >
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
-                    <Image
-                      src="/TB.png"
-                      alt="Tomasso Busolo"
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-contain scale-170"
-                      priority
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>
-                    <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
-                    <div className="flex items-center gap-2 justify-start">
-                      <Image src="/almafutura_logo.jpeg" alt="Alma Futura" width={40} height={40} className="w-10 h-auto object-contain" />
-                      <Image src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={40} height={40} className="w-10 h-auto object-contain" />
-                      <Image src="/cambridge.svg" alt="University of Cambridge" width={40} height={40} className="w-10 h-auto ml-4 object-contain scale-200" />
+              <LazyText className="block" delay={2600}>
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
+                      <LazyImage
+                        src="/TB.png"
+                        alt="Tomasso Busolo"
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-contain scale-170"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#721422]">Tomasso Busolo</h3>
+                      <p className="text-xl font-semibold text-[#ff4fa3] mb-2">Collaborator & Advisor</p>
+                      <div className="flex items-center gap-2 justify-start">
+                        <LazyImage src="/almafutura_logo.jpeg" alt="Alma Futura" width={40} height={40} className="w-10 h-auto object-contain" />
+                        <LazyImage src="/daya_ventures_femtech_logo.jpeg" alt="Daya Ventures" width={40} height={40} className="w-10 h-auto object-contain" />
+                        <LazyImage src="/cambridge.svg" alt="University of Cambridge" width={40} height={40} className="w-10 h-auto ml-4 object-contain scale-200" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </LazyText>
             </a>
           </div>
         </div>
