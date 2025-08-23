@@ -15,13 +15,13 @@ export enum ErrorType {
 export class ApiError extends Error {
   public statusCode: number;
   public errorType: ErrorType;
-  public details?: any;
+  public details?: unknown;
 
   constructor(
     message: string,
     statusCode: number = 500,
     errorType: ErrorType = ErrorType.INTERNAL,
-    details?: any
+    details?: unknown
   ) {
     super(message);
     this.name = 'ApiError';
@@ -61,7 +61,7 @@ export function formatErrorResponse(error: ApiError | Error): NextResponse {
 }
 
 // Error handler wrapper for API routes
-export function withErrorHandler(handler: Function) {
+export function withErrorHandler(handler: (request: NextRequest) => Promise<NextResponse>) {
   return async (request: NextRequest) => {
     try {
       return await handler(request);
@@ -73,7 +73,7 @@ export function withErrorHandler(handler: Function) {
 
 // Specific error constructors
 export const Errors = {
-  validation: (message: string, details?: any) => 
+  validation: (message: string, details?: unknown) => 
     new ApiError(message, 400, ErrorType.VALIDATION, details),
   
   authentication: (message: string = 'Authentication required') => 
@@ -91,7 +91,7 @@ export const Errors = {
   rateLimit: (message: string = 'Rate limit exceeded') => 
     new ApiError(message, 429, ErrorType.RATE_LIMIT),
   
-  externalService: (message: string, details?: any) => 
+  externalService: (message: string, details?: unknown) => 
     new ApiError(message, 502, ErrorType.EXTERNAL_SERVICE, details),
   
   internal: (message: string = 'Internal server error') => 

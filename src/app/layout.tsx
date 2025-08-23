@@ -6,7 +6,7 @@ import '../styles/mobile.css';
 import ConditionalNavigation from '../components/ConditionalNavigation';
 import PageTransitionWrapper from '../components/PageTransitionWrapper';
 import Script from 'next/script';
-import PerformanceMonitor from '@/components/shared/PerformanceMonitor';
+
 
 export const metadata: Metadata = {
   title: {
@@ -213,7 +213,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`antialiased`}>
-        <PerformanceMonitor />
+
         <ConditionalNavigation />
         <PageTransitionWrapper>{children}</PageTransitionWrapper>
       </body>

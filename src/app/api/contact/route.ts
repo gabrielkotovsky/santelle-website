@@ -9,7 +9,7 @@ const resend = new Resend(process.env.RESEND_API_KEY!);
 
 // Create a JSDOM instance for server-side DOMPurify
 const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
+const purify = DOMPurify(window as unknown as typeof window);
 
 // Input sanitization function
 function sanitizeInput(input: string): string {

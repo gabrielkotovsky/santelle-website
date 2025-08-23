@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface OptimizedImageProps {
   src: string;
@@ -34,55 +34,11 @@ export default function OptimizedImage({
   style,
   onClick
 }: OptimizedImageProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-
-  // Set loading state after mount to avoid hydration mismatch
-  useEffect(() => {
-    setIsLoading(true);
-  }, []);
-
-  // Generate blur placeholder if not provided
-  const generateBlurPlaceholder = () => {
-    if (blurDataURL) return blurDataURL;
-    
-    // Only generate canvas placeholder on client side
-    if (typeof window !== 'undefined') {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 32;
-        canvas.height = 32;
-        const ctx = canvas.getContext('2d');
-        
-        if (ctx) {
-          const gradient = ctx.createLinearGradient(0, 0, 32, 32);
-          gradient.addColorStop(0, '#FBD5DB');
-          gradient.addColorStop(0.5, '#F48CA3');
-          gradient.addColorStop(1, '#721422');
-          
-          ctx.fillStyle = gradient;
-          ctx.fillRect(0, 0, 32, 32);
-          
-          return canvas.toDataURL();
-        }
-      } catch (e) {
-        // Fallback if canvas fails
-      }
-    }
-    
-    // Static SVG fallback for server-side rendering
-    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjRkJENURCIi8+Cjwvc3ZnPgo=';
-  };
-
-  // Handle image load
-  const handleLoad = () => {
-    setIsLoading(false);
-  };
 
   // Handle image error
   const handleError = () => {
     setHasError(true);
-    setIsLoading(false);
   };
 
   // Error fallback
@@ -110,43 +66,23 @@ export default function OptimizedImage({
   }
 
   return (
-          <div className={`relative ${className || ''}`} style={style}>
-      {/* Loading placeholder */}
-      {isLoading && (
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] animate-pulse"
-          style={{
-            width: fill ? '100%' : width,
-            height: fill ? '100%' : height,
-          }}
-        />
-      )}
-      
+    <div className={`relative ${className || ''}`} style={style}>
       {/* Main image */}
       <Image
         src={src}
         alt={alt}
         width={fill ? undefined : width}
         height={fill ? undefined : height}
-        className={`transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'} object-cover`}
+        className="object-cover"
         priority={priority}
         sizes={sizes}
         quality={quality}
-        placeholder={placeholder}
-        blurDataURL={generateBlurPlaceholder()}
+        placeholder={placeholder && blurDataURL ? placeholder : undefined}
+        blurDataURL={blurDataURL}
         fill={fill}
-        onLoad={handleLoad}
         onError={handleError}
         onClick={onClick}
-        style={{}}
       />
-      
-      {/* Loading indicator */}
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#721422]"></div>
-        </div>
-      )}
     </div>
   );
 }
