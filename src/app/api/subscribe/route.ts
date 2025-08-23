@@ -5,13 +5,13 @@ import { extractTechnicalData, getIPGeolocation } from '@/lib/technicalData';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import { validateRequestBody, subscribeSchema } from '@/middleware/validation';
-import { withErrorHandler, Errors, formatErrorResponse } from '@/middleware/errorHandler';
+import { withErrorHandler, Errors } from '@/middleware/errorHandler';
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 // Create a JSDOM instance for server-side DOMPurify
 const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
+const purify = DOMPurify(window as unknown as typeof window);
 
 // Input sanitization function
 function sanitizeInput(input: string): string {
@@ -33,15 +33,6 @@ async function subscribeHandler(req: NextRequest) {
   // Sanitize email (already validated by middleware)
   const sanitizedEmail = sanitizeInput(email.trim().toLowerCase());
 
-  // Sanitize screen data if provided
-  let sanitizedScreenData = null;
-  if (screenData && typeof screenData === 'object') {
-    sanitizedScreenData = {
-      width: typeof screenData.width === 'number' ? Math.max(0, Math.min(screenData.width, 10000)) : null,
-      height: typeof screenData.height === 'number' ? Math.max(0, Math.min(screenData.height, 10000)) : null
-    };
-  }
-
   // Extract technical data from the request (non-blocking)
   let technicalData;
   let geoData: { country?: string; city?: string; region?: string } = {};
@@ -50,8 +41,13 @@ async function subscribeHandler(req: NextRequest) {
     technicalData = extractTechnicalData(req);
     
     // Merge screen data from client if provided
-    if (screenData) {
-      technicalData.screen = screenData;
+    if (screenData && typeof screenData === 'object') {
+      const width = typeof screenData.width === 'number' ? Math.max(0, Math.min(screenData.width, 10000)) : null;
+      const height = typeof screenData.height === 'number' ? Math.max(0, Math.min(screenData.height, 10000)) : null;
+      
+      if (width !== null || height !== null) {
+        technicalData.screen = { width, height };
+      }
     }
 
     // Get IP geolocation data (non-blocking)

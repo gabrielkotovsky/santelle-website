@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // Validation schemas
 export interface ValidationSchema {
@@ -8,85 +8,13 @@ export interface ValidationSchema {
     maxLength?: number;
     minLength?: number;
     pattern?: RegExp;
-    custom?: (value: any) => boolean;
+    custom?: (value: unknown) => boolean;
   };
 }
 
-// Validation error response
-function validationError(message: string, field?: string) {
-  return NextResponse.json(
-    { 
-      success: false, 
-      error: 'Validation failed', 
-      details: field ? `${field}: ${message}` : message 
-    },
-    { status: 400 }
-  );
-}
 
-// Main validation function
-export function validateRequest(schema: ValidationSchema) {
-  return function(request: NextRequest) {
-    try {
-      const body = request.json ? request.json() : {};
-      
-      for (const [field, rules] of Object.entries(schema)) {
-        const value = body[field];
-        
-        // Check required fields
-        if (rules.required && (value === undefined || value === null || value === '')) {
-          return validationError(`${field} is required`, field);
-        }
-        
-        // Skip validation for optional fields that aren't provided
-        if (!rules.required && (value === undefined || value === null)) {
-          continue;
-        }
-        
-        // Type validation
-        if (rules.type === 'string' && typeof value !== 'string') {
-          return validationError(`${field} must be a string`, field);
-        }
-        
-        if (rules.type === 'number' && typeof value !== 'number') {
-          return validationError(`${field} must be a number`, field);
-        }
-        
-        if (rules.type === 'boolean' && typeof value !== 'boolean') {
-          return validationError(`${field} must be a boolean`, field);
-        }
-        
-        if (rules.type === 'object' && typeof value !== 'object') {
-          return validationError(`${field} must be an object`, field);
-        }
-        
-        // String-specific validations
-        if (rules.type === 'string' && typeof value === 'string') {
-          if (rules.minLength && value.length < rules.minLength) {
-            return validationError(`${field} must be at least ${rules.minLength} characters`, field);
-          }
-          
-          if (rules.maxLength && value.length > rules.maxLength) {
-            return validationError(`${field} must be no more than ${rules.maxLength} characters`, field);
-          }
-          
-          if (rules.pattern && !rules.pattern.test(value)) {
-            return validationError(`${field} format is invalid`, field);
-          }
-        }
-        
-        // Custom validation
-        if (rules.custom && !rules.custom(value)) {
-          return validationError(`${field} validation failed`, field);
-        }
-      }
-      
-      return null; // Validation passed
-    } catch (error) {
-      return validationError('Invalid request body');
-    }
-  };
-}
+
+
 
 // Predefined validation schemas
 export const subscribeSchema: ValidationSchema = {
@@ -95,7 +23,7 @@ export const subscribeSchema: ValidationSchema = {
     required: true,
     maxLength: 254,
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    custom: (value: string) => value.includes('@') && value.includes('.')
+    custom: (value: unknown) => typeof value === 'string' && value.includes('@') && value.includes('.')
   },
   screenData: {
     type: 'object',
@@ -114,7 +42,7 @@ export const contactSchema: ValidationSchema = {
     required: true,
     maxLength: 254,
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    custom: (value: string) => value.includes('@') && value.includes('.')
+    custom: (value: unknown) => typeof value === 'string' && value.includes('@') && value.includes('.')
   },
   subject: {
     type: 'string',
