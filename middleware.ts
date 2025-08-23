@@ -10,14 +10,14 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   
-  // Content Security Policy
+  // Secure Content Security Policy
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com",
+    "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'", // 'unsafe-inline' needed for dynamic styles
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://dns.google https://api.resend.com https://*.supabase.co",
+    "connect-src 'self' https://dns.google https://api.resend.com https://*.supabase.co https://www.google-analytics.com",
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",
@@ -30,6 +30,11 @@ export function middleware(request: NextRequest) {
   // Additional Security Headers
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  
+  // Additional security headers
+  response.headers.set('X-DNS-Prefetch-Control', 'off');
+  response.headers.set('X-Download-Options', 'noopen');
+  response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
   
   return response;
 }
