@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 const menuItems = [
   { href: '#stats', label: 'Why Santelle' },
@@ -73,7 +74,7 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function NavBar() {
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const pathname = usePathname();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);

@@ -78,13 +78,7 @@ body {
   
 
   
-  /* Ensure video background covers full mobile viewport */
-  video {
-    object-fit: cover !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-  }
+
 }
 
 @keyframes slide-in-right {
