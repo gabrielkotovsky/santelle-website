@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { analytics } from '../../lib/analytics';
 
 const subjects = [
   '',
@@ -22,6 +23,11 @@ export default function ContactUs() {
     message: '',
     updates: false,
   });
+
+  // Track page view on component mount
+  useEffect(() => {
+    analytics.trackLegalPageView('contact');
+  }, []);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
   const [emailValidation, setEmailValidation] = useState({

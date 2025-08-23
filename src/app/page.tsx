@@ -5,6 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import confetti from 'canvas-confetti';
 import Link from 'next/link';
+import { analytics } from '../lib/analytics';
 const HERO_HEIGHT = '100vh';
 
 // Custom hook for intersection observer
@@ -101,8 +102,11 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function Home() {
-  // Add preconnect hints for better performance
+  // Add preconnect hints for better performance and track page view
   useEffect(() => {
+    // Track homepage view
+    analytics.trackPageView('homepage');
+    
     // Preconnect to CDN if you're using one
     const link = document.createElement('link');
     link.rel = 'preconnect';
@@ -507,7 +511,11 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: formData.email
+          email: formData.email,
+          screenData: {
+            width: window.screen.width,
+            height: window.screen.height
+          }
         })
       });
 
@@ -517,6 +525,14 @@ export default function Home() {
       }
 
       console.log('Form submitted:', formData.email);
+      
+      // Track waitlist signup with Google Analytics
+      analytics.trackWaitlistSignup(formData.email, {
+        device: { type: 'desktop' }, // You can pass actual technical data here
+        browser: { name: navigator.userAgent },
+        timestamp: new Date().toISOString()
+      });
+      
       setIsSubmitting(false);
       setSubmitStatus('success');
       triggerConfetti(); // Trigger confetti on success
@@ -548,6 +564,9 @@ export default function Home() {
   };
 
   const focusHeroEmailInput = () => {
+    // Track button click
+    analytics.trackButtonClick('get_early_access', 'hero_section');
+    
     setShowEmailForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
