@@ -103,7 +103,6 @@ async function subscribeHandler(req: NextRequest) {
         timezone: technicalData.timezone || 'UTC',
         referrer: technicalData.referrer || null,
         user_agent: technicalData.userAgent || 'Unknown',
-        signup_timestamp: new Date(technicalData.timestamp || Date.now()),
         // Keep full technical data as backup
         technical_data: technicalData
       }
@@ -158,9 +157,22 @@ async function subscribeHandler(req: NextRequest) {
           <div style="background:#fef7fa; border:1px dashed #e6b7c0; padding:18px; border-radius:14px; margin:20px 0;">
             <h3 style="color:#721422; margin:0 0 6px; font-size:18px;">Be one of our 50 beta testers</h3>
             <p style="margin:8px 0 0; font-size:16px; color:#555; line-height:1.6;">
-              We’re selecting <strong>50 people</strong> from this waitlist to try Santelle first, give feedback, and help us polish the experience.
+              We're selecting <strong>50 people</strong> from this waitlist to try Santelle first, give feedback, and help us polish the experience.
               Keep an eye out for an email from us soon!
             </p>
+          </div>
+
+          <!-- Add this section after your existing content -->
+          <div style="background:#721422; color:white; padding:24px; border-radius:14px; margin:24px 0; text-align:center;">
+            <h3 style="color:white; margin:0 0 16px; font-size:20px;">🚀 Boost Your Beta Testing Chances!</h3>
+            <p style="margin:0 0 20px; font-size:16px; line-height:1.6;">
+              Want to be one of our <strong>50 beta testers</strong>? 
+              Complete your profile and get <strong>3x higher priority</strong> in our selection process!
+            </p>
+            <a href="https://santellehealth.com/complete-profile?email=${sanitizedEmail}" 
+               style="background:#ff4fa3; color:white; padding:16px 32px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">
+              Complete Your Profile
+            </a>
           </div>
     
           <hr style="border:none; border-top:1px solid #f0e0e3; margin:24px 0;">
@@ -170,9 +182,12 @@ async function subscribeHandler(req: NextRequest) {
             The Santelle Team
           </p>
     
+          <!-- Update the unsubscribe section -->
           <p style="font-size:12px; color:#aaa; text-align:center; margin-top:12px;">
-            You’re receiving this because you signed up at santellehealth.com. <br>
-            Prefer fewer emails? <a href="{{UNSUBSCRIBE_LINK}}" style="color:#721422; text-decoration:underline;">Unsubscribe</a>.
+            You're receiving this because you signed up at santellehealth.com. <br>
+            <a href="https://santellehealth.com/unsubscribe?email=${sanitizedEmail}" style="color:#721422; text-decoration:underline;">Unsubscribe</a> | 
+            <a href="https://santellehealth.com/complete-profile?email=${sanitizedEmail}" style="color:#721422; text-decoration:underline;">Update Profile</a> | 
+            <a href="https://santellehealth.com/resubscribe?email=${sanitizedEmail}" style="color:#721422; text-decoration:underline;">Resubscribe</a>
           </p>
         </div>
       `
