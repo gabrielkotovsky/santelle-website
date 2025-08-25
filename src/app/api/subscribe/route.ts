@@ -137,7 +137,7 @@ async function subscribeHandler(req: NextRequest) {
           </div>
     
           <h1 style="color:#721422; text-align:center; margin:8px 0 4px; font-size:28px;">
-            Welcome to <span style="font-style:italic;">Santelle</span> 💜
+            Welcome to <span style="font-style:italic;">Santelle</span> 💗
           </h1>
     
           <p style="font-size:18px; line-height:1.6; margin:12px 0;">
@@ -147,27 +147,17 @@ async function subscribeHandler(req: NextRequest) {
     
           <div style="background:#fff5f6; border:1px solid #f3d7db; padding:20px; border-radius:14px; margin:20px 0;">
             <h3 style="color:#721422; margin:0 0 8px; font-size:18px;">What’s next?</h3>
-            <ul style="padding-left:18px; margin:0; font-size:16px; color:#555; line-height:1.7;">
-              <li>Early access alerts as we get closer to launch</li>
-              <li>Exclusive tips on vaginal health, straight to your inbox</li>
-              <li>Invites to community polls so you can help shape the product</li>
-            </ul>
-          </div>
-    
-          <div style="background:#fef7fa; border:1px dashed #e6b7c0; padding:18px; border-radius:14px; margin:20px 0;">
-            <h3 style="color:#721422; margin:0 0 6px; font-size:18px;">Be one of our 50 beta testers</h3>
             <p style="margin:8px 0 0; font-size:16px; color:#555; line-height:1.6;">
               We're selecting <strong>50 people</strong> from this waitlist to try Santelle first, give feedback, and help us polish the experience.
               Keep an eye out for an email from us soon!
             </p>
           </div>
 
-          <!-- Add this section after your existing content -->
           <div style="background:#721422; color:white; padding:24px; border-radius:14px; margin:24px 0; text-align:center;">
-            <h3 style="color:white; margin:0 0 16px; font-size:20px;">🚀 Boost Your Beta Testing Chances!</h3>
+            <h3 style="color:white; margin:0 0 16px; font-size:20px;">🍀 Boost Your Beta Testing Chances!</h3>
             <p style="margin:0 0 20px; font-size:16px; line-height:1.6;">
               Want to be one of our <strong>50 beta testers</strong>? 
-              Complete your profile and get <strong>3x higher priority</strong> in our selection process!
+              Complete your profile and get <strong>higher priority</strong> in our selection process!
             </p>
             <a href="https://santellehealth.com/complete-profile?email=${sanitizedEmail}" 
                style="background:#ff4fa3; color:white; padding:16px 32px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">
