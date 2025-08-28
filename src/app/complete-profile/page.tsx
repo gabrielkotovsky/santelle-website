@@ -11,9 +11,12 @@ function CompleteProfilePageContent() {
   
   const [formData, setFormData] = useState({
     firstName: '',
-    lastName: '',
     source: '',
-    sourceOther: ''
+    sourceOther: '',
+    age_range: '',
+    interest: '',
+    purchasing_intent: '',
+    communication_channel: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -40,8 +43,8 @@ function CompleteProfilePageContent() {
       return;
     }
 
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      setErrorMessage('First name and last name are required');
+    if (!formData.firstName.trim()) {
+      setErrorMessage('First name is required');
       return;
     }
 
@@ -57,8 +60,11 @@ function CompleteProfilePageContent() {
         body: JSON.stringify({
           email,
           firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          source: formData.source === 'Other' && formData.sourceOther.trim() ? formData.sourceOther.trim() : formData.source.trim() || null
+          source: formData.source === 'Other' && formData.sourceOther.trim() ? formData.sourceOther.trim() : formData.source.trim() || null,
+          age_range: formData.age_range || null,
+          interest: formData.interest || null,
+          purchasing_intent: formData.purchasing_intent || null,
+          communication_channel: formData.communication_channel || null
         }),
       });
 
@@ -67,7 +73,15 @@ function CompleteProfilePageContent() {
       if (response.ok) {
         setSubmitStatus('success');
         // Reset form
-        setFormData({ firstName: '', lastName: '', source: '', sourceOther: '' });
+        setFormData({ 
+          firstName: '', 
+          source: '', 
+          sourceOther: '',
+          age_range: '',
+          interest: '',
+          purchasing_intent: '',
+          communication_channel: ''
+        });
       } else {
         setErrorMessage(result.error || 'Failed to update profile. Please try again.');
         setSubmitStatus('error');
@@ -151,7 +165,7 @@ function CompleteProfilePageContent() {
           />
           <h1 className="text-2xl font-bold text-[#721422] mb-2">Complete Your Profile</h1>
           <p className="text-gray-600 text-sm">
-            Help us get to know you better and boost your beta testing chances!
+            Help us get to know you better!
           </p>
         </div>
 
@@ -163,9 +177,6 @@ function CompleteProfilePageContent() {
               </svg>
             </div>
             <h2 className="text-xl font-semibold text-green-800 mb-2">Profile Updated!</h2>
-            <p className="text-green-700 mb-6">
-              You now have <strong>3x higher priority</strong> for beta testing! 🚀
-            </p>
             <Link
               href="/"
               className="inline-block bg-[#721422] text-white px-6 py-3 rounded-full hover:bg-[#8a1a2a] transition-colors"
@@ -192,22 +203,7 @@ function CompleteProfilePageContent() {
               />
             </div>
 
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                Last Name *
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#721422]/20 focus:border-[#721422] transition-colors"
-                placeholder="Enter your last name"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
+
 
             <div>
               <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-2">
@@ -242,8 +238,88 @@ function CompleteProfilePageContent() {
                   />
                 </div>
               )}
-              
-              <p className="text-xs text-gray-500 mt-1">Optional but helpful for us!</p>
+            </div>
+
+            <div>
+              <label htmlFor="age_range" className="block text-sm font-medium text-gray-700 mb-2">
+                Your Age Range
+              </label>
+              <select
+                id="age_range"
+                name="age_range"
+                value={formData.age_range}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#721422]/20 focus:border-[#721422] transition-colors"
+                disabled={isSubmitting}
+              >
+                <option value="">Select your age range</option>
+                <option value="18-24">18–24</option>
+                <option value="25-34">25–34</option>
+                <option value="35-44">35–44</option>
+                <option value="45-54">45–54</option>
+                <option value="55-64">55–64</option>
+                <option value="65+">65+</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="interest" className="block text-sm font-medium text-gray-700 mb-2">
+                What Interests You Most about Santelle?
+              </label>
+              <select
+                id="interest"
+                name="interest"
+                value={formData.interest}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#721422]/20 focus:border-[#721422] transition-colors"
+                disabled={isSubmitting}
+              >
+                <option value="">Choose one</option>
+                <option value="Instant at-home answers">Instant At-Home Answers</option>
+                <option value="Ongoing tracking & trends">Tracking & Prevention</option>
+                <option value="AI Interpretation">AI-Powered Interpretation</option>
+                <option value="Fertility & TTC support">Fertility / TTC support</option>
+                <option value="Community & Education">Community & Education</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="purchasing_intent" className="block text-sm font-medium text-gray-700 mb-2">
+                Interest in Using Santelle
+              </label>
+              <select
+                id="purchasing_intent"
+                name="purchasing_intent"
+                value={formData.purchasing_intent}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#721422]/20 focus:border-[#721422] transition-colors"
+                disabled={isSubmitting}
+              >
+                <option value="">Select your interest level</option>
+                <option value="Monthly subscription">Excited for a monthly subscription</option>
+                <option value="Occasional purchase">Might purchase occasionally</option>
+                <option value="Just exploring">Just exploring for now</option>
+                <option value="Not interested">Not interested in purchasing</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="communication_channel" className="block text-sm font-medium text-gray-700 mb-2">
+                Stay Connected
+              </label>
+              <select
+                id="communication_channel"
+                name="communication_channel"
+                value={formData.communication_channel}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#721422]/20 focus:border-[#721422] transition-colors"
+                disabled={isSubmitting}
+              >
+                <option value="">Select your preferred channel</option>
+                <option value="Email">Email updates</option>
+                <option value="WhatsApp">WhatsApp messages</option>
+                <option value="Social Media">Follow on social media</option>
+              </select>
             </div>
 
             {errorMessage && (
@@ -259,13 +335,6 @@ function CompleteProfilePageContent() {
             >
               {isSubmitting ? 'Updating...' : 'Complete Profile'}
             </button>
-
-            <div className="text-center">
-              <p className="text-xs text-gray-500">
-                By completing this form, you&apos;ll get <strong>3x higher priority</strong> 
-                for our beta testing program!
-              </p>
-            </div>
           </form>
         )}
       </div>

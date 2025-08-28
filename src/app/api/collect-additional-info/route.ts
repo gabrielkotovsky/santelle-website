@@ -12,11 +12,11 @@ async function collectAdditionalInfoHandler(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { email, firstName, lastName, source } = body;
+    const { email, firstName, source, age_range, interest, purchasing_intent, communication_channel } = body;
 
     // Validate required fields
-    if (!email || !firstName || !lastName) {
-      throw Errors.validation('Email, first name, and last name are required');
+    if (!email || !firstName) {
+      throw Errors.validation('Email and first name are required');
     }
 
     // Validate email format
@@ -28,16 +28,22 @@ async function collectAdditionalInfoHandler(req: NextRequest) {
     // Sanitize inputs (basic sanitization)
     const sanitizedEmail = email.trim().toLowerCase();
     const sanitizedFirstName = firstName.trim().substring(0, 100);
-    const sanitizedLastName = lastName.trim().substring(0, 100);
     const sanitizedSource = source ? source.trim().substring(0, 255) : null;
+    const sanitizedAgeRange = age_range ? age_range.trim().substring(0, 50) : null;
+    const sanitizedInterest = interest ? interest.trim().substring(0, 100) : null;
+    const sanitizedPurchasingIntent = purchasing_intent ? purchasing_intent.trim().substring(0, 100) : null;
+    const sanitizedCommunicationChannel = communication_channel ? communication_channel.trim().substring(0, 50) : null;
 
     // Update the waitlist entry
     const { error } = await supabaseAdmin
       .from('waitlist')
       .update({
         first_name: sanitizedFirstName,
-        last_name: sanitizedLastName,
         source: sanitizedSource,
+        age_range: sanitizedAgeRange,
+        interest: sanitizedInterest,
+        purchasing_intent: sanitizedPurchasingIntent,
+        communication_channel: sanitizedCommunicationChannel,
         additional_data_collected: true
       })
       .eq('email', sanitizedEmail)
@@ -58,8 +64,11 @@ async function collectAdditionalInfoHandler(req: NextRequest) {
       data: {
         email: sanitizedEmail,
         firstName: sanitizedFirstName,
-        lastName: sanitizedLastName,
-        source: sanitizedSource
+        source: sanitizedSource,
+        age_range: sanitizedAgeRange,
+        interest: sanitizedInterest,
+        purchasing_intent: sanitizedPurchasingIntent,
+        communication_channel: sanitizedCommunicationChannel
       }
     });
 

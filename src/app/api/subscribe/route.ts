@@ -129,49 +129,50 @@ async function subscribeHandler(req: NextRequest) {
         <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; color:#333;">
           <!-- preheader -->
           <span style="display:none; font-size:0; line-height:0; max-height:0; max-width:0; opacity:0; overflow:hidden;">
-            You’re on the list. Early access, exclusive updates — and a chance to be one of 50 beta testers.
+            You’re on the list. Early access, exclusive insights — and your chance to shape the future of intimate health.
           </span>
-    
+
           <div style="text-align:center; padding:12px 0 4px;">
             <img src="https://santellehealth.com/logo-dark.svg" alt="Santelle" width="400" height="100" style="border:0; outline:none; text-decoration:none; border-radius:12px;">
           </div>
-    
+
           <h1 style="color:#721422; text-align:center; margin:8px 0 4px; font-size:28px;">
             Welcome to <span style="font-style:italic;">Santelle</span> 💗
           </h1>
-    
+
           <p style="font-size:18px; line-height:1.6; margin:12px 0;">
             Hi! Thanks for joining the <strong>Santelle waitlist</strong>! You’re officially first in line for a new way to
             check in on your intimate health — discreetly, from home, with science-backed insights (way beyond pH).
           </p>
-    
+
           <div style="background:#fff5f6; border:1px solid #f3d7db; padding:20px; border-radius:14px; margin:20px 0;">
             <h3 style="color:#721422; margin:0 0 8px; font-size:18px;">What’s next?</h3>
             <p style="margin:8px 0 0; font-size:16px; color:#555; line-height:1.6;">
-              We're selecting <strong>50 people</strong> from this waitlist to try Santelle first, give feedback, and help us polish the experience.
-              Keep an eye out for an email from us soon!
+              You’ll receive exclusive updates as we prepare for launch, plus early access to our self-check kits and
+              community insights designed to empower you with knowledge, confidence, and connection.
             </p>
           </div>
 
           <div style="background:#721422; color:white; padding:24px; border-radius:14px; margin:24px 0; text-align:center;">
-            <h3 style="color:white; margin:0 0 16px; font-size:20px;">🍀 Boost Your Beta Testing Chances!</h3>
+            <h3 style="color:white; margin:0 0 16px; font-size:20px;">🌸 Personalize Your Experience</h3>
             <p style="margin:0 0 20px; font-size:16px; line-height:1.6;">
-              Want to be one of our <strong>50 beta testers</strong>? 
-              Complete your profile and get <strong>higher priority</strong> in our selection process!
+              Complete your profile (just your name and location) and become part of our founding community. 
+              You’ll unlock region-specific updates, personalized insights, and exclusive first access before our public launch. 
+              Plus, completing your profile helps shape the future of intimate health for all women.
             </p>
             <a href="https://santellehealth.com/complete-profile?email=${sanitizedEmail}" 
-               style="background:#ff4fa3; color:white; padding:16px 32px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">
-              Complete Your Profile
+              style="background:#ff4fa3; color:white; padding:16px 32px; text-decoration:none; border-radius:999px; font-weight:bold; display:inline-block;">
+              Complete My Profile
             </a>
           </div>
-    
+
           <hr style="border:none; border-top:1px solid #f0e0e3; margin:24px 0;">
-    
+
           <p style="font-size:13px; color:#888; text-align:center; margin:28px 0 0;">
             To Her Health,<br>
             The Santelle Team
           </p>
-    
+
           <!-- Update the unsubscribe section -->
           <p style="font-size:12px; color:#aaa; text-align:center; margin-top:12px;">
             You're receiving this because you signed up at santellehealth.com. <br>
@@ -181,7 +182,7 @@ async function subscribeHandler(req: NextRequest) {
           </p>
         </div>
       `
-    });
+      });
 
     // Send notification email to gabrielkotovsky@hotmail.com
     await resend.emails.send({
