@@ -156,7 +156,7 @@ async function subscribeHandler(req: NextRequest) {
           <div style="background:#721422; color:white; padding:24px; border-radius:14px; margin:24px 0; text-align:center;">
             <h3 style="color:white; margin:0 0 16px; font-size:20px;">🌸 Personalize Your Experience</h3>
             <p style="margin:0 0 20px; font-size:16px; line-height:1.6;">
-              Complete your profile (just your name and location) and become part of our founding community. 
+              Complete your profile and become part of our founding community. 
               You’ll unlock region-specific updates, personalized insights, and exclusive first access before our public launch. 
               Plus, completing your profile helps shape the future of intimate health for all women.
             </p>
