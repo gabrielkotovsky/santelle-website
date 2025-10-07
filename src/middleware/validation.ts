@@ -58,6 +58,12 @@ export const contactSchema: ValidationSchema = {
   updates: {
     type: 'boolean',
     required: false
+  },
+  website: {
+    type: 'string',
+    required: false,
+    maxLength: 0, // Honeypot should always be empty
+    custom: (value: unknown) => typeof value === 'string' && value === '' // Must be empty string
   }
 };
 

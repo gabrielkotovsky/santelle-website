@@ -26,7 +26,13 @@ async function contactHandler(req: NextRequest) {
     throw Errors.validation(errorMessage);
   }
 
-  const { name, email, subject, message, updates } = validatedBody;
+  const { name, email, subject, message, updates, website } = validatedBody;
+
+  // Honeypot check - if website field is filled, it's a bot
+  if (website && website !== '') {
+    // Reject bot submissions with a generic error
+    throw Errors.validation('Invalid submission');
+  }
 
   // Sanitize inputs (already validated by middleware)
   const sanitizedEmail = sanitizeInput(email);

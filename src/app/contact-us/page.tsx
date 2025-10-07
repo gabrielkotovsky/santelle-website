@@ -22,6 +22,7 @@ export default function ContactUs() {
     subject: '',
     message: '',
     updates: false,
+    website: '', // Honeypot field
   });
 
   // Track page view on component mount
@@ -102,6 +103,22 @@ export default function ContactUs() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+    
+    // Honeypot check - if filled, it's likely a bot
+    if (form.website) {
+      // Silently fail for bots - show success but don't actually send
+      setStatus('success');
+      setTimeout(() => setStatus('idle'), 3000);
+      setForm({ name: '', email: '', subject: '', message: '', updates: false, website: '' });
+      setEmailValidation({
+        isValid: false,
+        isChecking: false,
+        error: '',
+        domainValid: false
+      });
+      return;
+    }
+    
     if (!form.email || !form.message) {
       setError('Please fill in all required fields.');
       return;
@@ -123,7 +140,7 @@ export default function ContactUs() {
       }
       setStatus('success');
       setTimeout(() => setStatus('idle'), 3000);
-      setForm({ name: '', email: '', subject: '', message: '', updates: false });
+      setForm({ name: '', email: '', subject: '', message: '', updates: false, website: '' });
       setEmailValidation({
         isValid: false,
         isChecking: false,
@@ -222,6 +239,19 @@ export default function ContactUs() {
               <div className="text-green-600 text-sm text-center font-medium">✓ Valid email address</div>
             )}
           </div>
+          
+          {/* Honeypot field - hidden from users but visible to bots */}
+          <input
+            type="text"
+            name="website"
+            value={form.website}
+            onChange={handleChange}
+            autoComplete="off"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="absolute opacity-0 pointer-events-none h-0 w-0"
+            style={{ position: 'absolute', left: '-9999px' }}
+          />
           
           <select
             name="subject"
