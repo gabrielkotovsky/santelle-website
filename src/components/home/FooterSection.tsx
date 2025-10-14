@@ -24,12 +24,12 @@ export default function FooterSection() {
             <Image src="/logo-dark.svg" alt="Santelle Logo" width={180} height={60} style={{objectFit: 'contain', height: 60}} priority />
           </div>
 
-          {/* Get Early Access Button */}
+          {/* Take the quiz to discover your ideal plan Button */}
           <button
             onClick={focusHeroEmailInput}
             className="bg-[#721422] text-white font-bold text-lg px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer"
           >
-            Get Early Access
+            Take the quiz to discover your ideal plan
           </button>
           
           {/* Divider */}
