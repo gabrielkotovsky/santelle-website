@@ -179,7 +179,7 @@ export default function HowItWorksSection() {
             onClick={focusHeroEmailInput}
             type="button"
           >
-            Get Early Access
+            Take the quiz to discover your ideal plan
           </button>
         </LazyText>
       </section>

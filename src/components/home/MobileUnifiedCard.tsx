@@ -110,7 +110,7 @@ export default function MobileUnifiedCard() {
                   onClick={focusHeroEmailInput}
                   type="button"
                 >
-                  Get Early Access
+                  Take the quiz to discover your ideal plan
                 </button>
                 </LazyText>
               </div>
@@ -188,7 +188,7 @@ export default function MobileUnifiedCard() {
             </LazyText>
           ))}
           
-          {/* Get Early Access Button */}
+          {/* Take the quiz to discover your ideal plan Button */}
           <div className="flex justify-center mt-0 mb-6">
             <LazyText>
             <button
@@ -196,7 +196,7 @@ export default function MobileUnifiedCard() {
               onClick={focusHeroEmailInput}
               type="button"
             >
-              Get Early Access
+              Take the quiz to discover your ideal plan
             </button>
             </LazyText>
           </div>

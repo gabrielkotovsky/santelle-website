@@ -110,7 +110,7 @@ export default function KitSection() {
             <LazyText className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center md:justify-start" delay={900}>
               <a
                 href="#how-it-works"
-                className="how-it-works-btn inline-block bg-white text-[#511828] font-bold rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full max-w-xs mx-auto md:mx-0 md:w-auto text-center hover:bg-[#511828] hover:text-white"
+                className="how-it-works-btn flex items-center justify-center bg-white text-[#511828] font-bold rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full max-w-xs mx-auto md:mx-0 md:w-auto hover:bg-[#511828] hover:text-white"
                 style={{
                   fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
                   paddingLeft: 'clamp(1rem, 2vw, 2rem)',
@@ -134,7 +134,7 @@ export default function KitSection() {
                 onClick={focusHeroEmailInput}
                 type="button"
               >
-                Get Early Access
+                Take the quiz to discover your ideal plan
               </button>
             </LazyText>
           </div>

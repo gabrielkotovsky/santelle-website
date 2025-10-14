@@ -157,9 +157,9 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
           </h2>
         </div>
         
-        {/* Desktop Get Early Access Button and Email Form Container */}
+        {/* Desktop Take the quiz to discover your ideal plan Button and Email Form Container */}
         <div className="relative">
-          {/* Desktop Get Early Access Button */}
+          {/* Desktop Take the quiz to discover your ideal plan Button */}
           <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
             <div className="flex gap-4 mt-5 w-full max-w-[680px] justify-center">
               <button
@@ -175,7 +175,7 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
                 }}
                 onClick={focusHeroEmailInput}
               >
-                Get Early Access
+                Take the quiz to discover your ideal plan
               </button>
               <button
                 className="bg-white text-[#721422] font-bold rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white"
@@ -229,16 +229,16 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
             Your vaginal health companion
           </span>
         
-          {/* Mobile Get Early Access Button and Email Form Container */}
+          {/* Mobile Take the quiz to discover your ideal plan Button and Email Form Container */}
           <div className="relative">
-            {/* Mobile Get Early Access Button */}
+            {/* Mobile Take the quiz to discover your ideal plan Button */}
             <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
               <div className="flex gap-4 justify-center">
                 <button
                   className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
                   onClick={focusHeroEmailInput}
                 >
-                  Get Early Access
+                  Take the quiz to discover your ideal plan
                 </button>
                 <button
                   className="bg-white text-[#721422] font-bold text-sm px-6 py-4 rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white touch-target"
