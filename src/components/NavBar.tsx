@@ -235,7 +235,7 @@ export default function NavBar() {
           }}
           type="button"
         >
-          Get Early Access
+          Take the Quiz
         </button>
       </div>
     </nav>

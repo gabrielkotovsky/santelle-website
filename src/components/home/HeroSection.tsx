@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { analytics } from '@/lib/analytics';
 import EmailForm from '../shared/EmailForm';
 
@@ -13,6 +14,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSectionProps) {
+  const router = useRouter();
   const [heroFadeOpacity, setHeroFadeOpacity] = useState(1);
 
   useEffect(() => {
@@ -73,12 +75,8 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
     // Track button click
     analytics.trackButtonClick('get_early_access', 'hero_section');
     
-    onEmailFormToggle(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-    if (emailInput) {
-      emailInput.focus();
-    }
+    // Navigate to quiz page
+    router.push('/quiz');
   };
 
   return (
@@ -161,17 +159,16 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
         <div className="relative">
           {/* Desktop Take the quiz to discover your ideal plan Button */}
           <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
-            <div className="flex gap-4 mt-5 w-full max-w-[680px] justify-center">
+            <div className="flex flex-col gap-4 mt-5 w-full max-w-[680px] items-center">
               <button
-                className="bg-[#721422] text-white font-bold rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse"
+                className="bg-[#721422] text-white font-bold rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-500 ease-in-out cursor-pointer get-access-pulse flex items-center justify-center text-center"
                 style={{
                   fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
                   paddingLeft: 'clamp(1rem, 2vw, 2rem)',
                   paddingRight: 'clamp(1rem, 2vw, 2rem)',
                   paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
                   paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  width: 'clamp(180px, 20vw, 280px)',
-                  whiteSpace: 'nowrap'
+                  width: 'clamp(320px, 35vw, 450px)'
                 }}
                 onClick={focusHeroEmailInput}
               >
@@ -185,7 +182,7 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
                   paddingRight: 'clamp(1rem, 2vw, 2rem)',
                   paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
                   paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  width: 'clamp(200px, 22vw, 320px)',
+                  width: 'clamp(320px, 35vw, 450px)',
                   whiteSpace: 'nowrap'
                 }}
                 type="button"
@@ -233,15 +230,15 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
           <div className="relative">
             {/* Mobile Take the quiz to discover your ideal plan Button */}
             <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
-              <div className="flex gap-4 justify-center">
+              <div className="flex flex-col gap-4 w-full">
                 <button
-                  className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target"
+                  className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target flex items-center justify-center text-center w-full"
                   onClick={focusHeroEmailInput}
                 >
                   Take the quiz to discover your ideal plan
                 </button>
                 <button
-                  className="bg-white text-[#721422] font-bold text-sm px-6 py-4 rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white touch-target"
+                  className="bg-white text-[#721422] font-bold text-sm px-6 py-4 rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white touch-target w-full"
                   onClick={() => {
                     const unifiedCard = document.getElementById('mobile-unified-card');
                     const statsSection = unifiedCard?.querySelector('[data-section="stats"]');

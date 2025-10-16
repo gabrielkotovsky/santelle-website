@@ -175,7 +175,8 @@ export default function HowItWorksSection() {
             Ready to take control?
           </div>
           <button
-            className="bg-[#721422] text-white font-bold text-2xl px-12 py-5 rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#8a1a2a] hover:text-[#ffffff] get-access-pulse"
+            className="bg-[#721422] text-white font-bold text-2xl px-12 py-6 rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer hover:bg-[#8a1a2a] hover:text-[#ffffff] get-access-pulse flex items-center justify-center text-center"
+            style={{ minHeight: '5rem' }}
             onClick={focusHeroEmailInput}
             type="button"
           >

@@ -106,7 +106,8 @@ export default function MobileUnifiedCard() {
               <div className="flex justify-center mt-0 mb-6">
                 <LazyText>
                 <button
-                  className="bg-[#721422] text-white font-bold text-xl px-8 py-4 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
+                  className="bg-[#721422] text-white font-bold text-xl px-8 py-6 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse flex items-center justify-center text-center"
+                  style={{ minHeight: '4.5rem' }}
                   onClick={focusHeroEmailInput}
                   type="button"
                 >
@@ -192,7 +193,8 @@ export default function MobileUnifiedCard() {
           <div className="flex justify-center mt-0 mb-6">
             <LazyText>
             <button
-              className="bg-[#721422] text-white font-bold text-xl px-8 py-4 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse"
+              className="bg-[#721422] text-white font-bold text-xl px-8 py-6 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse flex items-center justify-center text-center"
+              style={{ minHeight: '4.5rem' }}
               onClick={focusHeroEmailInput}
               type="button"
             >

@@ -110,26 +110,30 @@ export default function KitSection() {
             <LazyText className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center md:justify-start" delay={900}>
               <a
                 href="#how-it-works"
-                className="how-it-works-btn flex items-center justify-center bg-white text-[#511828] font-bold rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full max-w-xs mx-auto md:mx-0 md:w-auto hover:bg-[#511828] hover:text-white"
+                className="how-it-works-btn flex items-center justify-center bg-white text-[#511828] font-bold rounded-full shadow-lg border-2 border-[#511828] focus:outline-none focus:ring-4 focus:ring-[#18321f]/40 transition-all duration-300 cursor-pointer w-full mx-auto md:mx-0 hover:bg-[#511828] hover:text-white"
                 style={{
                   fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
                   paddingLeft: 'clamp(1rem, 2vw, 2rem)',
                   paddingRight: 'clamp(1rem, 2vw, 2rem)',
                   paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)'
+                  paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)',
+                  maxWidth: '200px',
+                  minWidth: '200px'
                 }}
                 onClick={e => handleSmoothScroll(e, 'how-it-works')}
               >
                 How It Works
               </a>
               <button
-                className="bg-[#721422] text-white font-bold rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse w-full max-w-xs mx-auto md:mx-0 md:w-auto"
+                className="bg-[#721422] text-white font-bold rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse w-full max-w-md mx-auto md:mx-0 flex items-center justify-center text-center"
                 style={{
                   fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
                   paddingLeft: 'clamp(1rem, 2vw, 2rem)',
                   paddingRight: 'clamp(1rem, 2vw, 2rem)',
-                  paddingTop: 'clamp(0.75rem, 1.5vw, 1rem)',
-                  paddingBottom: 'clamp(0.75rem, 1.5vw, 1rem)'
+                  paddingTop: 'clamp(1rem, 1.75vw, 1.5rem)',
+                  paddingBottom: 'clamp(1rem, 1.75vw, 1.5rem)',
+                  minHeight: 'clamp(3.5rem, 5vw, 4.5rem)',
+                  minWidth: 'clamp(250px, 30vw, 400px)'
                 }}
                 onClick={focusHeroEmailInput}
                 type="button"
