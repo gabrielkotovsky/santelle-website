@@ -6,12 +6,13 @@ import {
   getCurrentSession, 
   isSessionValid,
   getDeviceType,
-  getReferrer 
+  getReferrer,
+  type SessionData
 } from '@/lib/sessionTracking';
 
 export default function TestSessionPage() {
   const [uid, setUid] = useState<string>('');
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<SessionData | null>(null);
   const [sessionValid, setSessionValid] = useState<boolean>(false);
   const [device, setDevice] = useState<string>('');
   const [referrer, setReferrer] = useState<string>('');
@@ -74,7 +75,7 @@ export default function TestSessionPage() {
       <div style={{ marginTop: '2rem', padding: '1rem', background: '#fff3cd', borderRadius: '8px' }}>
         <h3>Instructions:</h3>
         <ol>
-          <li>Open your browser's Developer Console (F12)</li>
+            <li>Open your browser&apos;s Developer Console (F12)</li>
           <li>Look for logs starting with [SessionTracker] and [API /api/sessions]</li>
           <li>Check your Supabase dashboard → web_sessions table for new entries</li>
           <li>The UID should persist across page refreshes</li>
