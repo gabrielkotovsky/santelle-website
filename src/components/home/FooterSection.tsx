@@ -2,17 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function FooterSection() {
+  const router = useRouter();
+  
   const focusHeroEmailInput = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      window.dispatchEvent(new Event('openWaitlist'));
-      const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-      if (emailInput) {
-        emailInput.focus();
-      }
-    }, 600);
+    // Navigate to quiz page
+    router.push('/quiz');
   };
 
   return (

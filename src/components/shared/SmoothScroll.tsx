@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-
 // Custom smooth scroll function with easing options
 export function smoothScrollTo(element: HTMLElement, options: {
   duration?: number;

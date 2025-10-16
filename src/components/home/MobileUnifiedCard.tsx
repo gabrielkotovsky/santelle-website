@@ -1,8 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { LazyImage, LazyText } from '../shared';
 
 export default function MobileUnifiedCard() {
+  const router = useRouter();
+  
   const howItWorksSteps = [
     {
       number: 1,
@@ -37,13 +40,8 @@ export default function MobileUnifiedCard() {
   ];
 
   const focusHeroEmailInput = () => {
-    // Dispatch event to open waitlist
-    window.dispatchEvent(new Event('openWaitlist'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-    if (emailInput) {
-      emailInput.focus();
-    }
+    // Navigate to quiz page
+    router.push('/quiz');
   };
 
   return (

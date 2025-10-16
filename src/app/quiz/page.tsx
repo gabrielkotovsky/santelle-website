@@ -70,6 +70,8 @@ export default function QuizPage() {
   });
   const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
   const [quizId, setQuizId] = useState<number | null>(null);
+  const [showPlans, setShowPlans] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string>('');
 
   useEffect(() => {
     return () => {
@@ -228,13 +230,13 @@ export default function QuizPage() {
         setQuizId(quizData.data[0].id); // Store the quiz ID for later update
         
         setIsSubmitting(false);
-        // Show email form after successfully saving quiz
-        setShowEmailForm(true);
+        // Show plan selection after successfully saving quiz
+        setShowPlans(true);
       } catch (error) {
         console.error('Error saving quiz:', error);
         setIsSubmitting(false);
-        // Show email form anyway to not block the user
-        setShowEmailForm(true);
+        // Show plan selection anyway to not block the user
+        setShowPlans(true);
       }
     }
   };
@@ -296,6 +298,7 @@ export default function QuizPage() {
 
     try {
       // Update the existing quiz record with email and signup status
+      // (plan was already saved when user selected it)
       if (quizId) {
         const updateResponse = await fetch('/api/quiz', {
           method: 'PUT',
@@ -335,7 +338,8 @@ export default function QuizPage() {
         device: { type: 'desktop' },
         browser: { name: navigator.userAgent },
         timestamp: new Date().toISOString(),
-        source: 'quiz'
+        source: 'quiz',
+        selectedPlan: selectedPlan
       });
       
       setIsSubmitting(false);
@@ -361,12 +365,126 @@ export default function QuizPage() {
   };
 
   const currentAnswer = answers[currentQuestion];
+  const calculateRecommendedPlan = (): number => {
+    // Plans: 0=Proactive (Monthly), 1=Balanced (Bi-Monthly), 2=Essential (Quarterly)
+    // Convert to levels: 3=Monthly, 2=Bi-Monthly, 1=Quarterly
+    
+    // Rule 1: Frequency Baseline (Q1)
+    let planLevel = 1; // Default to Quarterly
+    
+    const q1Answer = Object.keys(answers).length > 0 ? 
+      quizQuestions[0].options.indexOf(answers[0]) + 1 : 1;
+    
+    if (q1Answer === 4) { // 4 or more times per year
+      planLevel = 3; // Monthly
+    } else if (q1Answer === 3) { // 2-4 times per year
+      planLevel = 2; // Bi-Monthly
+    } else { // 1-2 times per year or less than once
+      planLevel = 1; // Quarterly
+    }
+    
+    // Rule 2: Adjustments
+    // Q2 - Confidence
+    const q2Answer = quizQuestions[1].options.indexOf(answers[1]) + 1;
+    if (q2Answer === 3) { // Not confident
+      planLevel = Math.min(3, planLevel + 1); // Upgrade
+    } else if (q2Answer === 1) { // Very confident
+      planLevel = Math.max(1, planLevel - 1); // Downgrade
+    }
+    
+    // Q3 - Behavior
+    const q3Answer = quizQuestions[2].options.indexOf(answers[2]) + 1;
+    if (q3Answer === 3) { // Regularly
+      planLevel = Math.min(3, planLevel + 1); // Upgrade
+    } else if (q3Answer === 1) { // Only when there's a problem
+      planLevel = Math.max(1, planLevel - 1); // Downgrade
+    }
+    
+    // Q4 - Effort
+    const q4Answer = quizQuestions[3].options.indexOf(answers[3]) + 1;
+    if (q4Answer === 3) { // Full visibility
+      planLevel = Math.min(3, planLevel + 1); // Upgrade
+    } else if (q4Answer === 1) { // Simple & occasional
+      planLevel = Math.max(1, planLevel - 1); // Downgrade
+    }
+    
+    // Convert level to plan index: 3=0 (Proactive), 2=1 (Balanced), 1=2 (Essential)
+    return 3 - planLevel;
+  };
+
+  const handlePlanSelect = async (plan: string) => {
+    setSelectedPlan(plan);
+    
+    // Save the selected plan immediately
+    if (quizId) {
+      try {
+        const updateResponse = await fetch('/api/quiz', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: quizId,
+            plan: plan // Save plan name directly as text
+          })
+        });
+
+        if (!updateResponse.ok) {
+          console.error('Failed to update quiz with plan');
+        }
+      } catch (error) {
+        console.error('Error saving plan:', error);
+      }
+    }
+    
+    setShowPlans(false);
+    setShowEmailForm(true);
+  };
+
   const canProceed = currentAnswer !== undefined;
+  const recommendedPlanIndex = showPlans ? calculateRecommendedPlan() : 1;
+
+  const allPlans = [
+    {
+      name: 'Proactive',
+      frequency: 'Monthly Kit',
+      price: '€12.99',
+      period: 'month',
+      yearlyPrice: '€129.99 / year',
+      originalIndex: 0
+    },
+    {
+      name: 'Balanced',
+      frequency: 'Bi-Monthly Kit',
+      price: '€16.99',
+      period: '2 months',
+      yearlyPrice: '€79.99 / year',
+      originalIndex: 1
+    },
+    {
+      name: 'Essential',
+      frequency: 'Quarterly Kit',
+      price: '€19.99',
+      period: 'quarter',
+      yearlyPrice: '€59.99 / year',
+      originalIndex: 2
+    }
+  ];
+
+  // On mobile, sort plans to show recommended first
+  const plans = [...allPlans].sort((a, b) => {
+    if (a.originalIndex === recommendedPlanIndex) return -1;
+    if (b.originalIndex === recommendedPlanIndex) return 1;
+    return a.originalIndex - b.originalIndex;
+  });
+
+  const commonFeatures = [
+    'Full access to app',
+    '30% off on extra kits'
+  ];
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <main className="relative min-h-screen flex items-center justify-center">
       {/* Background - Video for Desktop, Image for Mobile */}
-      <div className="absolute inset-0 -z-10 flex items-center justify-center">
+      <div className="fixed inset-0 -z-10 flex items-center justify-center">
         {/* Desktop Video Background */}
         <video
           src="/background_desktop.mp4"
@@ -379,7 +497,7 @@ export default function QuizPage() {
             objectFit: 'cover', 
             objectPosition: 'center',
             width: '100vw',
-            height: '100vh'
+            height: '100dvh'
           }}
         />
         
@@ -391,8 +509,9 @@ export default function QuizPage() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
             width: '100vw',
-            height: '100vh'
+            height: '100dvh'
           }}
         />
         
@@ -404,7 +523,7 @@ export default function QuizPage() {
       {!quizStarted ? (
         <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
-            Let's find the perfect Santelle plan for you.
+            Let&apos;s find the perfect Santelle plan for you.
           </h1>
           <p className="text-xl text-[#721422]/80 mb-8">
             Answer four quick questions to discover how to better understand and care for your intimate health.
@@ -416,15 +535,105 @@ export default function QuizPage() {
             Start now
           </button>
         </div>
+      ) : showPlans ? (
+        <div className="relative z-10 w-[95%] mx-auto px-4 py-16">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-4 text-center">
+            Based on your answers, this plan helps you stay balanced and in control.
+          </h1>
+          <p className="text-lg text-[#721422]/80 mb-12 text-center">
+            Choose the plan that best fits your needs.
+          </p>
+          
+          <div className="flex flex-col gap-8 max-w-6xl mx-auto">
+            {/* Plan Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {plans.map((plan) => {
+              const isRecommended = plan.originalIndex === recommendedPlanIndex;
+              return (
+              <div
+                key={plan.name}
+                className={`bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col ${
+                  isRecommended ? 'border-[#721422] shadow-lg' : 'border-white/50'
+                }`}
+              >
+                {isRecommended && (
+                  <div className="text-center mb-4">
+                    <span className="bg-[#721422] text-white px-4 py-1 rounded-full text-sm font-bold">
+                      RECOMMENDED FOR YOU
+                    </span>
+                  </div>
+                )}
+                
+                <h2 className="text-2xl md:text-3xl font-bold text-[#721422] mb-4 text-center">
+                  {plan.name}
+                </h2>
+                
+                <div className="mb-6">
+                  <p className="text-lg text-[#721422] font-semibold text-center">
+                    {plan.frequency}
+                  </p>
+                </div>
+                
+                <div className="mt-auto">
+                  <div className="text-center mb-6">
+                    <div className="text-3xl font-bold text-[#721422]">
+                      {plan.price}
+                      <span className="text-lg font-normal"> / {plan.period}</span>
+                    </div>
+                    <div className="text-sm text-[#721422]/70 mt-1">
+                      {plan.yearlyPrice}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => handlePlanSelect(plan.name)}
+                    className={`w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
+                      isRecommended
+                        ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
+                        : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
+                    }`}
+                  >
+                    Join The Waitlist
+                  </button>
+                </div>
+              </div>
+            )})}
+            </div>
+
+            {/* Common Features - Below Plan Cards */}
+            <div className="flex justify-center">
+              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50">
+                <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
+                  All Plans Include:
+                </h3>
+                <ul className="flex flex-wrap gap-6 justify-center">
+                  {commonFeatures.map((feature, idx) => (
+                    <li key={idx} className="text-[#721422] flex items-center">
+                      <span className="mr-2 text-lg">✓</span>
+                      <span className="text-base">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : showEmailForm ? (
         <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16">
           <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-2xl mx-auto">
             <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-4 text-center">
               Join the waitlist
             </h1>
-            <p className="text-lg text-[#721422]/80 mb-8 text-center">
+            <p className="text-lg text-[#721422]/80 mb-4 text-center">
               Enter your email to get early access to your personalized Santelle plan and exclusive updates.
             </p>
+            {selectedPlan && (
+              <div className="text-center mb-8">
+                <span className="inline-block bg-[#721422] text-white px-6 py-2 rounded-full font-semibold">
+                  Selected: {selectedPlan} Plan
+                </span>
+              </div>
+            )}
             <form onSubmit={handleEmailSubmit} className="space-y-6">
               <div>
                 <input
@@ -459,7 +668,7 @@ export default function QuizPage() {
                   )}
                   {submitStatus === 'success' && (
                     <div className="text-green-600 font-semibold">
-                      ✓ You've been added to the waitlist!
+                      ✓ You&apos;ve been added to the waitlist!
                     </div>
                   )}
                   {submitStatus === 'error' && (

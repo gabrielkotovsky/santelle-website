@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const menuItems = [
   { href: '#stats', label: 'Why Santelle' },
@@ -74,7 +74,7 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function NavBar() {
-  const pathname = usePathname();
+  const router = useRouter();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -221,17 +221,8 @@ export default function NavBar() {
             height: 'clamp(2.5rem, 4vw, 3rem)'
           }}
           onClick={() => {
-            if (pathname !== '/') {
-              window.location.href = '/';
-            } else {
-              // Use the same function as other Get Early Access buttons
-              window.dispatchEvent(new Event('openWaitlist'));
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-              if (emailInput) {
-                emailInput.focus();
-              }
-            }
+            // Navigate to quiz page
+            router.push('/quiz');
           }}
           type="button"
         >

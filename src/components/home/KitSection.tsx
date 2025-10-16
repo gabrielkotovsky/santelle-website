@@ -1,9 +1,12 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { smoothScrollTo } from '../shared/SmoothScroll';
 import { LazyImage, LazyText } from '../shared';
 
 export default function KitSection() {
+  const router = useRouter();
+  
   function handleSmoothScroll(e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, sectionId: string) {
     e.preventDefault();
     const el = document.getElementById(sectionId);
@@ -23,13 +26,8 @@ export default function KitSection() {
       analytics.trackButtonClick('get_early_access', 'kit_section');
     });
     
-    // Dispatch event to open waitlist
-    window.dispatchEvent(new Event('openWaitlist'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const emailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-    if (emailInput) {
-      emailInput.focus();
-    }
+    // Navigate to quiz page
+    router.push('/quiz');
   };
 
   return (

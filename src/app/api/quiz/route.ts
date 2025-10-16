@@ -1,30 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+interface QuizInsertData {
+  q1: number | null;
+  q2: number | null;
+  q3: number | null;
+  q4: number | null;
+  'signup?': boolean;
+  email?: string;
+  plan?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { email, answers, signup } = await request.json();
+    const { email, answers, signup, plan } = await request.json();
 
-    // Validate required fields (email is optional for initial save)
-    if (!answers) {
-      return NextResponse.json(
-        { error: 'Answers are required' },
-        { status: 400 }
-      );
-    }
-
+    // Validate required fields (answers is optional for direct waitlist signups)
     // Save quiz answers to database
-    const insertData: any = {
-      q1: answers.q1,
-      q2: answers.q2,
-      q3: answers.q3,
-      q4: answers.q4,
+    const insertData: QuizInsertData = {
+      q1: answers?.q1 || null,
+      q2: answers?.q2 || null,
+      q3: answers?.q3 || null,
+      q4: answers?.q4 || null,
       'signup?': signup || false
     };
 
     // Only add email if provided
     if (email) {
       insertData.email = email;
+    }
+
+    // Only add plan if provided
+    if (plan) {
+      insertData.plan = plan;
     }
 
     const { data, error } = await supabaseAdmin
@@ -50,25 +58,46 @@ export async function POST(request: NextRequest) {
   }
 }
 
+interface QuizUpdateData {
+  email?: string;
+  'signup?'?: boolean;
+  plan?: string;
+}
+
 export async function PUT(request: NextRequest) {
   try {
-    const { id, email, signup } = await request.json();
+    const { id, email, signup, plan } = await request.json();
 
-    // Validate required fields
-    if (!id || !email) {
+    // Validate required fields (at least ID is required)
+    if (!id) {
       return NextResponse.json(
-        { error: 'ID and email are required' },
+        { error: 'ID is required' },
         { status: 400 }
       );
     }
 
-    // Update quiz record with email and signup status
+    // Build update object
+    const updateData: QuizUpdateData = {};
+
+    // Add email if provided
+    if (email !== undefined) {
+      updateData.email = email;
+    }
+
+    // Add signup if provided
+    if (signup !== undefined) {
+      updateData['signup?'] = signup;
+    }
+
+    // Add plan if provided
+    if (plan !== undefined) {
+      updateData.plan = plan;
+    }
+
+    // Update quiz record
     const { data, error } = await supabaseAdmin
       .from('quiz')
-      .update({
-        email: email,
-        'signup?': signup || false
-      })
+      .update(updateData)
       .eq('id', id)
       .select();
 
