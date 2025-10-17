@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 interface QuizInsertData {
   q1: number | null;
@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
       insertData.plan = plan;
     }
 
+    const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('quiz')
       .insert([insertData])
@@ -95,6 +96,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update quiz record
+    const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin
       .from('quiz')
       .update(updateData)

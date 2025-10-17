@@ -95,6 +95,7 @@ export default function QuizPage() {
         
         // Calculate recommended plan
         const recommendedPlan = calculateRecommendedPlan();
+        console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answers);
         
         // Store quiz ID in sessionStorage for later use
         sessionStorage.setItem('quizId', quizIdFromResponse.toString());

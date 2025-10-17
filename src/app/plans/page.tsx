@@ -49,6 +49,9 @@ function PlansContent() {
   const recommendedParam = searchParams.get('recommended');
   const recommendedPlanIndex = recommendedParam ? parseInt(recommendedParam) : null;
   
+  // Debug logging
+  console.log('Plans page loaded with:', { recommendedParam, recommendedPlanIndex });
+  
   // Check for success/cancel from Stripe redirect
   const success = searchParams.get('success');
   const canceled = searchParams.get('canceled');
@@ -316,19 +319,16 @@ function PlansContent() {
                       </div>
                     </div>
                     
-                    <form action="/create-checkout-session" method="POST">
-                      <input type="hidden" name="lookup_key" value={isAnnual ? plan.annualLookupKey : plan.cycleLookupKey} />
-                      <button
-                        type="submit"
-                        className={`w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
-                          isRecommended
-                            ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
-                            : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
-                        }`}
-                      >
-                        Subscribe
-                      </button>
-                    </form>
+                    <a
+                      href={`/auth?lookup_key=${isAnnual ? plan.annualLookupKey : plan.cycleLookupKey}`}
+                      className={`block text-center w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
+                        isRecommended
+                          ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
+                          : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
+                      }`}
+                    >
+                      Subscribe
+                    </a>
                   </div>
                 </div>
               );

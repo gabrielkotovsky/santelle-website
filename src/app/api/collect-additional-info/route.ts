@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { withErrorHandler, Errors } from '@/middleware/errorHandler';
 
 async function collectAdditionalInfoHandler(req: NextRequest) {
@@ -35,6 +35,7 @@ async function collectAdditionalInfoHandler(req: NextRequest) {
     const sanitizedCommunicationChannel = communication_channel ? communication_channel.trim().substring(0, 50) : null;
 
     // Update the waitlist entry
+    const supabaseAdmin = getSupabaseAdmin();
     const { error } = await supabaseAdmin
       .from('waitlist')
       .update({

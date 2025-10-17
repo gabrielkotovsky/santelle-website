@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { extractTechnicalData, getIPGeolocation } from '@/lib/technicalData';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
@@ -82,6 +82,7 @@ async function subscribeHandler(req: NextRequest) {
   }
 
   // First, try to save the email and technical data to Supabase
+  const supabaseAdmin = getSupabaseAdmin();
   const { data: dbData, error: dbError } = await supabaseAdmin
     .from('waitlist')
     .insert([
