@@ -40,7 +40,7 @@ export const handler: Handler = async (event) => {
 
     // This is the url to which the customer will be redirected when they're done
     // managing their billing with the portal.
-    const returnUrl = `${YOUR_DOMAIN}/checkout`;
+    const returnUrl = `${YOUR_DOMAIN}/plans`;
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: checkoutSession.customer as string,

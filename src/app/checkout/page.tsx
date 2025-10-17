@@ -4,6 +4,28 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
+// Plan configuration
+const PLANS = {
+  proactive: {
+    name: 'Proactive Plan - Monthly Kit',
+    price: '€12.99',
+    period: 'month',
+    lookupKey: 'proactive-monthly',
+  },
+  balanced: {
+    name: 'Balanced Plan - Bi-Monthly Kit',
+    price: '€16.99',
+    period: '2 months',
+    lookupKey: 'balanced-bimonthly',
+  },
+  essential: {
+    name: 'Essential Plan - Quarterly Kit',
+    price: '€19.99',
+    period: 'quarter',
+    lookupKey: 'essential-quarterly',
+  },
+};
+
 const Logo = () => (
   <div className="flex justify-center mb-6">
     <Image
@@ -16,33 +38,39 @@ const Logo = () => (
   </div>
 );
 
-const ProductDisplay = () => (
-  <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-2xl mx-auto">
-    <Logo />
-    
-    <div className="text-center mb-8">
-      <h3 className="text-2xl md:text-3xl font-bold text-[#721422] mb-2">
-        Proactive Plan - Monthly Kit
-      </h3>
-      <h5 className="text-xl text-[#721422]/80 font-semibold">
-        €12.99 / month
-      </h5>
+const ProductDisplay = ({ planKey }: { planKey: string }) => {
+  const plan = PLANS[planKey as keyof typeof PLANS] || PLANS.proactive;
+  
+  return (
+    <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-2xl mx-auto">
+      <Logo />
+      
+      <div className="text-center mb-8">
+        <h3 className="text-2xl md:text-3xl font-bold text-[#721422] mb-2">
+          {plan.name}
+        </h3>
+        <h5 className="text-xl text-[#721422]/80 font-semibold">
+          {plan.price} / {plan.period}
+        </h5>
+      </div>
+
+      <form action="/create-checkout-session" method="POST">
+        <input type="hidden" name="lookup_key" value={plan.lookupKey} />
+        <button
+          id="checkout-and-portal-button"
+          type="submit"
+          className="w-full bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
+        >
+          Checkout
+        </button>
+      </form>
     </div>
+  );
+};
 
-    <form action="/create-checkout-session" method="POST">
-      <input type="hidden" name="lookup_key" value="Proactive_Plan_-_Monthly_Kit-2465a9f" />
-      <button
-        id="checkout-and-portal-button"
-        type="submit"
-        className="w-full bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
-      >
-        Checkout
-      </button>
-    </form>
-  </div>
-);
-
-const SuccessDisplay = ({ sessionId }: { sessionId: string }) => {
+const SuccessDisplay = ({ sessionId, planKey }: { sessionId: string; planKey: string }) => {
+  const plan = PLANS[planKey as keyof typeof PLANS] || PLANS.proactive;
+  
   return (
     <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-2xl mx-auto">
       <Logo />
@@ -50,7 +78,7 @@ const SuccessDisplay = ({ sessionId }: { sessionId: string }) => {
       <div className="text-center mb-8">
         <div className="text-6xl mb-4">🎉</div>
         <h3 className="text-2xl md:text-3xl font-bold text-[#721422] mb-4">
-          Subscription to Proactive Plan - Monthly Kit successful!
+          Subscription to {plan.name} successful!
         </h3>
         <p className="text-lg text-[#721422]/80">
           Welcome to Santelle! You&apos;ll receive a confirmation email shortly.
@@ -100,6 +128,9 @@ function CheckoutContent() {
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [sessionId, setSessionId] = useState('');
+  
+  // Get plan from URL parameter (defaults to 'proactive')
+  const planParam = searchParams.get('plan')?.toLowerCase() || 'proactive';
 
   useEffect(() => {
     // Check to see if this is a redirect back from Checkout
@@ -161,9 +192,9 @@ function CheckoutContent() {
       {/* Content */}
       <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16">
         {!success && message === '' ? (
-          <ProductDisplay />
+          <ProductDisplay planKey={planParam} />
         ) : success && sessionId !== '' ? (
-          <SuccessDisplay sessionId={sessionId} />
+          <SuccessDisplay sessionId={sessionId} planKey={planParam} />
         ) : (
           <Message message={message} />
         )}

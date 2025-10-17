@@ -50,8 +50,8 @@ export const handler: Handler = async (event) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${YOUR_DOMAIN}/checkout?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${YOUR_DOMAIN}/checkout?canceled=true`,
+      success_url: `${YOUR_DOMAIN}/plans?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${YOUR_DOMAIN}/plans?canceled=true`,
     });
 
     // Redirect to Stripe Checkout
