@@ -1,0 +1,73 @@
+import { Handler } from '@netlify/functions';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-09-30.clover',
+});
+
+const YOUR_DOMAIN = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+export const handler: Handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method not allowed' }),
+    };
+  }
+
+  try {
+    // Parse form-encoded data from the request body
+    const params = new URLSearchParams(event.body || '');
+    const lookup_key = params.get('lookup_key');
+
+    if (!lookup_key) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing lookup_key' }),
+      };
+    }
+
+    // Get prices from Stripe using lookup key
+    const prices = await stripe.prices.list({
+      lookup_keys: [lookup_key],
+      expand: ['data.product'],
+    });
+
+    if (prices.data.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: 'Price not found for lookup key: ' + lookup_key }),
+      };
+    }
+
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create({
+      billing_address_collection: 'auto',
+      line_items: [
+        {
+          price: prices.data[0].id,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${YOUR_DOMAIN}/checkout?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${YOUR_DOMAIN}/checkout?canceled=true`,
+    });
+
+    // Redirect to Stripe Checkout
+    return {
+      statusCode: 303,
+      headers: {
+        Location: session.url!,
+      },
+      body: '',
+    };
+  } catch (error: any) {
+    console.error('Error creating checkout session:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
+};
+

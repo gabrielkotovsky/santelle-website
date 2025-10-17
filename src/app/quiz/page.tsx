@@ -19,7 +19,7 @@ const quizQuestions = [
   {
     id: 2,
     title: 'Confidence / Knowledge Level',
-    question: 'How confident do you feel about understanding and managing your intimate health?',
+    question: 'How confident do you feel about understanding and managing your vaginal health?',
     options: [
       'Very confident - I know my body well',
       'Somewhat confident - I\'d like more clarity',
@@ -29,7 +29,7 @@ const quizQuestions = [
   {
     id: 3,
     title: 'Preventive vs Reactive Behavior',
-    question: 'How do you usually take care of your intimate health?',
+    question: 'How often do you monitor your vaginal health (monitor discharge, do at-home tests, track symptoms)?',
     options: [
       'Only when there\'s a problem',
       'I try to check things occasionally',
@@ -39,7 +39,7 @@ const quizQuestions = [
   {
     id: 4,
     title: 'Desired Involvement',
-    question: 'How much effort would you like to put into tracking your intimate health?',
+    question: 'How much effort would you like to put into tracking your vaginal health?',
     options: [
       'I prefer something simple and occasional',
       'I don\'t mind testing regularly if it keeps me balanced',
@@ -586,14 +586,14 @@ export default function QuizPage() {
                   </div>
                   
                   <button
-                    onClick={() => handlePlanSelect(plan.name)}
+                    onClick={() => window.location.href = '/checkout'}
                     className={`w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
                       isRecommended
                         ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
                         : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
                     }`}
                   >
-                    Join The Waitlist
+                    Subscribe
                   </button>
                 </div>
               </div>
