@@ -26,12 +26,13 @@ const quizQuestions = [
   },
   {
     id: 3,
-    title: 'Preventive vs Reactive Behavior',
-    question: 'How often do you monitor your vaginal health (monitor discharge, do at-home tests, track symptoms)?',
+    title: 'Motivation',
+    question: 'What made you curious about Santelle?',
     options: [
-      'Only when there\'s a problem',
-      'I try to check things occasionally',
-      'I like to stay proactive and track changes regularly'
+      'I want to prevent recurring infections',
+      'I\'m trying to get pregnant',
+      'I want discreet insights into my vaginal health',
+      'I\'m just curious about my vaginal health'
     ]
   },
   {
@@ -42,6 +43,17 @@ const quizQuestions = [
       'I prefer something simple and occasional',
       'I don\'t mind testing regularly if it keeps me balanced',
       'I want full visibility and personalized insights every month'
+    ]
+  },
+  {
+    id: 5,
+    title: 'Interest in Product',
+    question: 'Would you be interested in a subscription for vaginal health test kits with an AI companion app?',
+    options: [
+      'Definitely, I\'d love that!',
+      'Absolutely!',
+      'Yesss!',
+      'No (I hate puppies)'
     ]
   }
 ];
@@ -97,6 +109,16 @@ export default function QuizPage() {
         const recommendedPlan = calculateRecommendedPlan();
         console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answers);
         
+        // Check for opt-out case
+        if (recommendedPlan === -1) {
+          // User opted out - show thank you message
+          setIsSubmitting(false);
+          alert('Thank you for your honesty! We appreciate your time 💜');
+          // Redirect to home page
+          window.location.href = '/';
+          return;
+        }
+        
         // Store quiz ID in sessionStorage for later use
         sessionStorage.setItem('quizId', quizIdFromResponse.toString());
         
@@ -122,50 +144,103 @@ export default function QuizPage() {
 
   const currentAnswer = answers[currentQuestion];
   const calculateRecommendedPlan = (): number => {
-    // Plans: 0=Proactive (Monthly), 1=Balanced (Bi-Monthly), 2=Essential (Quarterly)
-    // Convert to levels: 3=Monthly, 2=Bi-Monthly, 1=Quarterly
-    
-    // Rule 1: Frequency Baseline (Q1)
-    let planLevel = 1; // Default to Quarterly
-    
-    const q1Answer = Object.keys(answers).length > 0 ? 
-      quizQuestions[0].options.indexOf(answers[0]) + 1 : 1;
-    
-    if (q1Answer === 4) { // 4 or more times per year
-      planLevel = 3; // Monthly
-    } else if (q1Answer === 3) { // 2-4 times per year
-      planLevel = 2; // Bi-Monthly
-    } else { // 1-2 times per year or less than once
-      planLevel = 1; // Quarterly
+    // Check for opt-out first (Q5 = "No (I hate puppies)")
+    const q5Answer = answers[4];
+    if (q5Answer === 'No (I hate puppies)') {
+      return -1; // Special case for opt-out
     }
-    
-    // Rule 2: Adjustments
-    // Q2 - Confidence
-    const q2Answer = quizQuestions[1].options.indexOf(answers[1]) + 1;
-    if (q2Answer === 3) { // Not confident
-      planLevel = Math.min(3, planLevel + 1); // Upgrade
-    } else if (q2Answer === 1) { // Very confident
-      planLevel = Math.max(1, planLevel - 1); // Downgrade
+
+    // Get answer indices (0-based)
+    const q1Index = quizQuestions[0].options.indexOf(answers[0]);
+    const q2Index = quizQuestions[1].options.indexOf(answers[1]);
+    const q3Index = quizQuestions[2].options.indexOf(answers[2]);
+    const q4Index = quizQuestions[3].options.indexOf(answers[3]);
+
+    // Rule 1: Main driver - Frequency of discomfort (Q1)
+    let baseScore = 0;
+    if (q1Index === 3) { // "4 or more times per year"
+      baseScore = 5; // Always Monthly
+    } else if (q1Index === 2) { // "2-4 times per year"
+      baseScore = 3;
+    } else if (q1Index === 1) { // "1-2 times per year"
+      baseScore = 2;
+    } else { // "Less than once"
+      baseScore = 1;
     }
-    
-    // Q3 - Behavior
-    const q3Answer = quizQuestions[2].options.indexOf(answers[2]) + 1;
-    if (q3Answer === 3) { // Regularly
-      planLevel = Math.min(3, planLevel + 1); // Upgrade
-    } else if (q3Answer === 1) { // Only when there's a problem
-      planLevel = Math.max(1, planLevel - 1); // Downgrade
+
+    // Rule 2: Motivation (Q3) - strong modifier
+    let motivationModifier = 0;
+    if (q3Index === 0) { // "Prevent recurring infections"
+      motivationModifier = 2;
+    } else if (q3Index === 1) { // "Trying to get pregnant"
+      motivationModifier = 2;
+    } else if (q3Index === 2) { // "Discreet insights"
+      motivationModifier = 1;
+    } else if (q3Index === 3) { // "Just curious"
+      motivationModifier = 0;
     }
-    
-    // Q4 - Effort
-    const q4Answer = quizQuestions[3].options.indexOf(answers[3]) + 1;
-    if (q4Answer === 3) { // Full visibility
-      planLevel = Math.min(3, planLevel + 1); // Upgrade
-    } else if (q4Answer === 1) { // Simple & occasional
-      planLevel = Math.max(1, planLevel - 1); // Downgrade
+
+    // Rule 3: Confidence (Q2) and Involvement (Q4) adjustments
+    let confidenceAdjustment = 0;
+    if (q2Index === 0) { // "Very confident"
+      confidenceAdjustment = -1;
+    } else if (q2Index === 1) { // "Somewhat confident"
+      confidenceAdjustment = 0;
+    } else if (q2Index === 2) { // "Not confident"
+      confidenceAdjustment = 1;
     }
-    
-    // Convert level to plan index: 3=0 (Proactive), 2=1 (Balanced), 1=2 (Essential)
-    return 3 - planLevel;
+
+    let involvementAdjustment = 0;
+    if (q4Index === 0) { // "Simple and occasional"
+      involvementAdjustment = 0;
+    } else if (q4Index === 1) { // "Regular testing"
+      involvementAdjustment = 1;
+    } else if (q4Index === 2) { // "Full visibility"
+      involvementAdjustment = 2;
+    }
+
+    // Calculate total score
+    let totalScore = baseScore + motivationModifier + confidenceAdjustment + involvementAdjustment;
+
+    // Rule 4: Determine initial recommendation based on score
+    let recommendation = 2; // Default to Quarterly
+    if (totalScore >= 5) {
+      recommendation = 0; // Monthly
+    } else if (totalScore >= 3) {
+      recommendation = 1; // Bi-Monthly
+    }
+
+    // Rule 5: If Q1 = "4 or more times per year," always Monthly
+    if (q1Index === 3) {
+      recommendation = 0; // Monthly
+    }
+
+    // Rule 6: If "full visibility," upgrade one tier
+    if (q4Index === 2) { // "Full visibility"
+      if (recommendation === 2) { // Quarterly → Bi-Monthly
+        recommendation = 1;
+      } else if (recommendation === 1) { // Bi-Monthly → Monthly
+        recommendation = 0;
+      }
+      // Monthly stays Monthly
+    }
+
+    // Rule 7: If "Very confident" AND "Just curious," downgrade one tier
+    if (q2Index === 0 && q3Index === 3) { // Very confident AND Just curious
+      if (recommendation === 0) { // Monthly → Bi-Monthly
+        recommendation = 1;
+      } else if (recommendation === 1) { // Bi-Monthly → Quarterly
+        recommendation = 2;
+      }
+      // Quarterly stays Quarterly
+    }
+
+    // Rule 8: If Q1 ≥ 2 (2-4 times per year) but result is Quarterly, upgrade to Bi-Monthly
+    if (q1Index >= 2 && recommendation === 2) { // 2-4 times per year but Quarterly
+      recommendation = 1; // Upgrade to Bi-Monthly
+    }
+
+    return recommendation;
   };
 
 
@@ -216,7 +291,7 @@ export default function QuizPage() {
             Let&apos;s find the perfect Santelle plan for you.
           </h1>
           <p className="text-xl text-[#721422]/80 mb-8">
-            Answer four quick questions to discover how to better understand and care for your intimate health.
+            Answer five quick questions to discover how to better understand and care for your intimate health.
           </p>
           <button
             onClick={handleStartQuiz}

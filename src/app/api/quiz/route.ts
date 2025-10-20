@@ -6,6 +6,7 @@ interface QuizInsertData {
   q2: number | null;
   q3: number | null;
   q4: number | null;
+  q5: number | null;
   'signup?': boolean;
   email?: string;
   plan?: string;
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
       q2: answers?.q2 || null,
       q3: answers?.q3 || null,
       q4: answers?.q4 || null,
+      q5: answers?.q5 || null,
       'signup?': signup || false
     };
 
