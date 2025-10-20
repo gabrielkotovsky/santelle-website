@@ -337,11 +337,11 @@ function PlansContent() {
 
           {/* Common Features - Below Plan Cards */}
           <div className="flex justify-center">
-            <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50">
+            <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 max-w-4xl">
               <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
                 All Plans Include:
               </h3>
-              <ul className="flex flex-wrap gap-6 justify-center">
+              <ul className="flex flex-wrap gap-6 justify-center mb-4">
                 {commonFeatures.map((feature, idx) => (
                   <li key={idx} className="text-[#721422] flex items-center">
                     <span className="mr-2 text-lg">✓</span>
@@ -349,6 +349,70 @@ function PlansContent() {
                   </li>
                 ))}
               </ul>
+              
+              {/* Expandable Section */}
+              <div className="text-center">
+                <button
+                  onClick={() => {
+                    const details = document.getElementById('kit-details');
+                    const arrow = document.getElementById('expand-arrow');
+                    if (details && arrow) {
+                      const isExpanded = details.classList.contains('expanded');
+                      
+                      if (isExpanded) {
+                        // Collapse
+                        details.style.maxHeight = '0px';
+                        details.style.opacity = '0';
+                        details.classList.remove('expanded');
+                        arrow.style.transform = 'rotate(0deg)';
+                      } else {
+                        // Expand
+                        details.style.maxHeight = details.scrollHeight + 'px';
+                        details.style.opacity = '1';
+                        details.classList.add('expanded');
+                        arrow.style.transform = 'rotate(180deg)';
+                      }
+                    }
+                  }}
+                  className="flex items-center justify-center gap-2 text-[#721422] hover:text-[#8a1a2a] transition-colors duration-200 mx-auto"
+                >
+                  <span className="text-sm font-medium">What's in the kit?</span>
+                  <svg
+                    id="expand-arrow"
+                    className="w-4 h-4 transition-transform duration-300 ease-in-out"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                <div 
+                  id="kit-details" 
+                  className="mt-4 text-left overflow-hidden transition-all duration-500 ease-in-out"
+                  style={{ 
+                    maxHeight: '0px', 
+                    opacity: '0',
+                    transform: 'translateY(-10px)'
+                  }}
+                >
+                  <div className="bg-white/20 rounded-2xl p-4 space-y-3 transform transition-transform duration-500 ease-in-out">
+                    <div className="text-[#721422]">
+                      <h4 className="font-semibold text-lg mb-2">Santelle Kit:</h4>
+                      <p className="text-sm">• 6 biomarkers testing for 4 types of infections, inflammation and good bacteria</p>
+                    </div>
+                    <div className="text-[#721422]">
+                      <h4 className="font-semibold text-lg mb-2">App Features:</h4>
+                      <ul className="text-sm space-y-1">
+                        <li>• AI analysis of your results</li>
+                        <li>• Personalized bite-sized educational content</li>
+                        <li>• (Analytics coming soon)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
