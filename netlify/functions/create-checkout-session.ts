@@ -42,7 +42,10 @@ export const handler: Handler = async (event) => {
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
-      billing_address_collection: 'auto',
+      billing_address_collection: 'required',
+      shipping_address_collection: {
+        allowed_countries: ['CH'],
+      },
       line_items: [
         {
           price: prices.data[0].id,
