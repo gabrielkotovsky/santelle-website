@@ -3,6 +3,12 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { requestEmailOtp, verifyEmailOtp } from '@/lib/auth';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 function AuthContent() {
   const searchParams = useSearchParams();
@@ -35,23 +41,47 @@ function AuthContent() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    
     try {
       const session = await verifyEmailOtp(email, otp);
       console.log('Authentication successful', { session, lookupKey });
-      
-      // Proceed to Stripe checkout
       if (lookupKey) {
+        // Fetch user from Supabase
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+          setError('Failed to fetch authenticated user after OTP.');
+          setIsLoading(false);
+          return;
+        }
+        const userId = user.id;
+        const userEmail = user.email;
+        if (!userId || !userEmail) {
+          setError('Authenticated user missing id or email');
+          setIsLoading(false);
+          return;
+        }
+        // Submit lookup_key, user_id, email
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/.netlify/functions/create-checkout-session';
-        
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'lookup_key';
-        input.value = lookupKey;
-        
-        form.appendChild(input);
+
+        const inputLookup = document.createElement('input');
+        inputLookup.type = 'hidden';
+        inputLookup.name = 'lookup_key';
+        inputLookup.value = lookupKey;
+
+        const inputUid = document.createElement('input');
+        inputUid.type = 'hidden';
+        inputUid.name = 'user_id';
+        inputUid.value = userId;
+
+        const inputEmail = document.createElement('input');
+        inputEmail.type = 'hidden';
+        inputEmail.name = 'email';
+        inputEmail.value = userEmail;
+
+        form.appendChild(inputLookup);
+        form.appendChild(inputUid);
+        form.appendChild(inputEmail);
         document.body.appendChild(form);
         form.submit();
       }

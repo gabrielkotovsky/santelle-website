@@ -85,6 +85,19 @@ function PlansContent() {
   
   // Show success message if payment was successful
   if (success && sessionId) {
+    const [detailsLoading, setDetailsLoading] = useState(false); // still allow fetch for backend-upsert
+    const [detailsError, setDetailsError] = useState("");
+
+    useEffect(() => {
+      // Keep upsert but do not show details
+      setDetailsLoading(true);
+      setDetailsError("");
+      fetch(`/api/stripe/session-details?session_id=${sessionId}`)
+        .then((res) => res.json())
+        .catch((err) => setDetailsError(err.message || 'Failed to upsert profile.'))
+        .finally(() => setDetailsLoading(false));
+    }, [sessionId]);
+
     return (
       <main className="relative min-h-screen flex items-center justify-center">
         {/* Background - Video for Desktop, Image for Mobile */}
@@ -125,9 +138,11 @@ function PlansContent() {
               <h3 className="text-2xl md:text-3xl font-bold text-[#721422] mb-4">
                 Subscription successful!
               </h3>
-              <p className="text-lg text-[#721422]/80">
-                Welcome to Santelle! You&apos;ll receive a confirmation email shortly.
+              <p className="text-lg text-[#721422]/80 mb-6">
+                Welcome to Santelle! You'll receive a confirmation email shortly.
               </p>
+              {detailsLoading && <p className="text-[#721422]">Finalizing your subscription...</p>}
+              {detailsError && <p className="text-red-600">{detailsError}</p>}
             </div>
 
             <form action="/create-portal-session" method="POST" className="space-y-4">
@@ -327,7 +342,7 @@ function PlansContent() {
                           : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
                       }`}
                     >
-                      Subscribe
+                      Pre-Order
                     </a>
                   </div>
                 </div>
