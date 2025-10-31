@@ -26,7 +26,7 @@ export default function FooterSection() {
             onClick={focusHeroEmailInput}
             className="bg-[#721422] text-white font-bold text-lg px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer"
           >
-            Take the quiz to discover your ideal plan
+            Take the quiz
           </button>
           
           {/* Divider */}

@@ -129,28 +129,30 @@ export default function NavBar() {
       {/* Logo - desktop only */}
       <Link href="/" className="hidden md:flex items-center h-full">
         <Image 
-          src="/logo-dark.svg" 
+          src="/logo.svg" 
           alt="Santelle Logo" 
           width={113} 
           height={38} 
           priority 
           style={{
             width: 'clamp(80px, 8vw, 113px)',
-            height: 'auto'
+            height: 'auto',
+            filter: 'brightness(0)'
           }}
         />
       </Link>
       {/* Logo - mobile only */}
       <Link href="/" className="flex md:hidden items-center h-full mx-auto">
         <Image 
-          src="/logo-dark.svg" 
+          src="/logo.svg" 
           alt="Santelle Logo" 
           width={90} 
           height={30} 
           priority 
           style={{
             width: 'clamp(60px, 6vw, 90px)',
-            height: 'auto'
+            height: 'auto',
+            filter: 'brightness(0)'
           }}
         />
       </Link>
