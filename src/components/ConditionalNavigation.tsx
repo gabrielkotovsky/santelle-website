@@ -30,8 +30,8 @@ export default function ConditionalNavigation() {
     );
   }
   
-  // Hide navigation on complete-profile, unsubscribe, and resubscribe pages after hydration
-  if (pathname === '/complete-profile' || pathname === '/unsubscribe' || pathname === '/resubscribe') {
+  // Hide navigation on complete-profile, unsubscribe, resubscribe, and account pages after hydration
+  if (pathname === '/complete-profile' || pathname === '/unsubscribe' || pathname === '/resubscribe' || pathname === '/account') {
     return null;
   }
 

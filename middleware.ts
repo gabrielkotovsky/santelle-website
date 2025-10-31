@@ -1,7 +1,28 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Define protected routes that require authentication
+const protectedRoutes = [
+  '/plans',
+  '/profile',
+  // Add more protected routes as needed
+];
+
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Check if the current path is a protected route
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  
+  // Note: Supabase stores sessions in localStorage (client-side only)
+  // For full server-side auth protection, you would need to:
+  // 1. Store session tokens in httpOnly cookies
+  // 2. Check those cookies in middleware
+  // 3. Verify the session with Supabase server-side
+  
+  // For now, client-side protection via AuthContext handles route protection
+  // This middleware structure is ready for server-side auth when needed
+  
   const response = NextResponse.next();
   
   // Security Headers

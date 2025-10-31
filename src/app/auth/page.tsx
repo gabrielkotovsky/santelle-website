@@ -13,6 +13,7 @@ const supabase = createClient(
 function AuthContent() {
   const searchParams = useSearchParams();
   const lookupKey = searchParams.get('lookup_key');
+  const redirectTo = searchParams.get('redirect');
   
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [email, setEmail] = useState('');
@@ -84,6 +85,13 @@ function AuthContent() {
         form.appendChild(inputEmail);
         document.body.appendChild(form);
         form.submit();
+      } else {
+        // No lookup key, redirect to intended destination or home
+        if (redirectTo) {
+          window.location.href = redirectTo;
+        } else {
+          window.location.href = '/';
+        }
       }
     } catch (err: any) {
       console.error('Error verifying OTP:', err);

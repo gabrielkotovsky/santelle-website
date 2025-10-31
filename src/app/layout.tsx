@@ -5,6 +5,7 @@ import '../styles/typography.css';
 import '../styles/mobile.css';
 import ConditionalNavigation from '../components/ConditionalNavigation';
 import PageTransitionWrapper from '../components/PageTransitionWrapper';
+import { AuthProvider } from '@/contexts/AuthContext';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -215,8 +216,10 @@ export default function RootLayout({
         />
       </head>
       <body className={`antialiased`}>
-        <ConditionalNavigation />
-        <PageTransitionWrapper>{children}</PageTransitionWrapper>
+        <AuthProvider>
+          <ConditionalNavigation />
+          <PageTransitionWrapper>{children}</PageTransitionWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

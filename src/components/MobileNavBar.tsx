@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
   { href: '#mobile-stats', label: 'Why Santelle', section: 'stats' },
@@ -68,6 +70,8 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function MobileNavBar() {
+  const router = useRouter();
+  const { user, loading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -237,14 +241,32 @@ export default function MobileNavBar() {
 
 
 
-          {/* Get Early Access Button */}
-          <button
-            onClick={handleGetAccess}
-            className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
-            aria-label="Get early access to Santelle"
-          >
-            Get Early Access
-          </button>
+          {/* Auth Button */}
+          {!loading && (
+            !user ? (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push('/auth');
+                }}
+                className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
+                aria-label="Sign in to Santelle"
+              >
+                Sign In
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push('/account');
+                }}
+                className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
+                aria-label="Account settings"
+              >
+                Account
+              </button>
+            )
+          )}
           
           {/* Close Menu Hint */}
           <p className="text-gray-400 text-sm text-center mt-4">

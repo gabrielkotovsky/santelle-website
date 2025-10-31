@@ -2,6 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 const allPlans = [
   {
@@ -66,6 +69,7 @@ function PlansContent() {
   const searchParams = useSearchParams();
   const recommendedParam = searchParams.get('recommended');
   const recommendedPlanIndex = recommendedParam ? parseInt(recommendedParam) : null;
+  const { user, loading: authLoading } = useAuth();
   
   // Debug logging
   console.log('Plans page loaded with:', { recommendedParam, recommendedPlanIndex });
@@ -80,6 +84,63 @@ function PlansContent() {
   
   // Billing period toggle state
   const [isAnnual, setIsAnnual] = useState(false);
+  
+  // Popup state
+  const [showPopup, setShowPopup] = useState(false);
+  const [pendingLookupKey, setPendingLookupKey] = useState<string | null>(null);
+  
+  // Handle checkout - direct if logged in, auth page if not
+  const handlePreOrder = async (lookupKey: string) => {
+    // Show popup first
+    setPendingLookupKey(lookupKey);
+    setShowPopup(true);
+  };
+  
+  // Confirm and proceed with checkout
+  const confirmPreOrder = async () => {
+    if (!pendingLookupKey) return;
+    
+    setShowPopup(false);
+    const lookupKey = pendingLookupKey;
+    setPendingLookupKey(null);
+    
+    if (user && user.email) {
+      // User is logged in, go directly to checkout
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/.netlify/functions/create-checkout-session';
+
+      const inputLookup = document.createElement('input');
+      inputLookup.type = 'hidden';
+      inputLookup.name = 'lookup_key';
+      inputLookup.value = lookupKey;
+
+      const inputUid = document.createElement('input');
+      inputUid.type = 'hidden';
+      inputUid.name = 'user_id';
+      inputUid.value = user.id;
+
+      const inputEmail = document.createElement('input');
+      inputEmail.type = 'hidden';
+      inputEmail.name = 'email';
+      inputEmail.value = user.email;
+
+      form.appendChild(inputLookup);
+      form.appendChild(inputUid);
+      form.appendChild(inputEmail);
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      // User not logged in, redirect to auth page
+      window.location.href = `/auth?lookup_key=${lookupKey}`;
+    }
+  };
+  
+  // Close popup without proceeding
+  const cancelPreOrder = () => {
+    setShowPopup(false);
+    setPendingLookupKey(null);
+  };
   
   useEffect(() => {
     const checkMobile = () => {
@@ -273,8 +334,66 @@ function PlansContent() {
         <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
       </div>
 
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={cancelPreOrder}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative bg-white/95 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 border-[#721422] max-w-lg w-full shadow-2xl">
+            <h3 className="text-2xl font-bold text-[#721422] mb-4 text-center">
+              Important Information
+            </h3>
+            
+            <div className="text-[#721422] mb-6 space-y-3">
+              <p className="font-semibold text-lg">
+                Start using the app right away — no payment needed!
+              </p>
+              <p>
+                You&apos;ll get full access to the Santelle app immediately. We won&apos;t charge you anything until your first kit is ready to ship.
+              </p>
+              <p>
+                We&apos;ll email you at least 48 hours before your first payment, so you have plenty of time to decide.
+              </p>
+              <p>
+                You can cancel your subscription anytime before your kit ships — completely free, no questions asked.
+              </p>
+              <p className="text-sm pt-2">
+                <a 
+                  href="https://santellehealth.com/terms_of_service" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline hover:text-[#8a1a2a] font-semibold"
+                >
+                  View Terms of Service
+                </a>
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={confirmPreOrder}
+                className="flex-1 bg-[#721422] text-white font-bold px-6 py-3 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
+              >
+                Continue
+              </button>
+              <button
+                onClick={cancelPreOrder}
+                className="flex-1 bg-white text-[#721422] font-bold px-6 py-3 rounded-full border-2 border-[#721422] hover:bg-[#721422] hover:text-white transition-colors duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
-      <div className="relative z-10 w-[95%] mx-auto px-4 py-40">
+      <div className="relative z-10 w-[95%] mx-auto px-4 py-30">
         <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
             ? 'Based on your answers, this plan helps you stay balanced and in control.'
@@ -332,10 +451,24 @@ function PlansContent() {
                     {plan.name}
                   </h2>
                   
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <p className="text-lg text-[#721422] font-semibold text-center">
                       {plan.frequency}
                     </p>
+                  </div>
+                  
+                  {/* Kit Image */}
+                  <div className="flex justify-center mb-6">
+                    <div className="bg-white/1 backdrop-blur-sm rounded-2xl p-4 border border-white/50">
+                      <Image
+                        src="/Kit.png"
+                        alt="Santelle Kit"
+                        width={200}
+                        height={200}
+                        className="object-contain"
+                        style={{ maxHeight: '200px', width: 'auto' }}
+                      />
+                    </div>
                   </div>
                   
                   <div className="mt-auto">
@@ -343,6 +476,11 @@ function PlansContent() {
                       <div className="text-3xl font-bold text-[#721422]">
                         {isAnnual ? plan.annualPrice : plan.cyclePrice}
                         <span className="text-lg font-normal"> / {isAnnual ? plan.annualPeriod : plan.cyclePeriod}</span>
+                        {isAnnual && (
+                          <span className="text-sm font-semibold text-green-600 ml-2">
+                            (Save {plan.savingsPercentage})
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm text-[#721422]/70 mt-1">
                         {isAnnual 
@@ -350,15 +488,10 @@ function PlansContent() {
                           : `${plan.annualPrice} / year`
                         }
                       </div>
-                      {isAnnual && (
-                        <div className="text-sm font-semibold text-green-600 mt-2">
-                          Save {plan.savingsPercentage}
-                        </div>
-                      )}
                     </div>
                     
-                    <a
-                      href={`/auth?lookup_key=${isAnnual ? plan.annualLookupKey : plan.cycleLookupKey}`}
+                    <button
+                      onClick={() => handlePreOrder(isAnnual ? plan.annualLookupKey : plan.cycleLookupKey)}
                       className={`block text-center w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
                         isRecommended
                           ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
@@ -366,7 +499,7 @@ function PlansContent() {
                       }`}
                     >
                       Pre-Order
-                    </a>
+                    </button>
                   </div>
                 </div>
               );
