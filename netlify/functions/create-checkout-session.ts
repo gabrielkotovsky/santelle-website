@@ -77,7 +77,7 @@ export const handler: Handler = async (event) => {
     }
 
     // Set trial end to December 31, 2026 UTC 23:59:59
-    const trialEndUnix = Math.floor(new Date('2026-12-31T23:59:59Z').getTime() / 1000);
+    const trialEndUnix = Math.floor(new Date('2026-01-01T23:59:59Z').getTime() / 1000);
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({

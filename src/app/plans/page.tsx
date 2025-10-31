@@ -11,6 +11,7 @@ const allPlans = [
     cyclePeriod: 'month',
     annualPrice: '€129.99',
     annualPeriod: 'year',
+    savingsPercentage: '16.6%',
     cycleLookupKey: 'proactive-monthly',
     annualLookupKey: 'proactive-annual',
     originalIndex: 0
@@ -22,6 +23,7 @@ const allPlans = [
     cyclePeriod: '2 months',
     annualPrice: '€79.99',
     annualPeriod: 'year',
+    savingsPercentage: '21.5%',
     cycleLookupKey: 'balanced-bimonthly',
     annualLookupKey: 'balanced-annual',
     originalIndex: 1
@@ -33,15 +35,31 @@ const allPlans = [
     cyclePeriod: '3 months',
     annualPrice: '€59.99',
     annualPeriod: 'year',
+    savingsPercentage: '25.0%',
     cycleLookupKey: 'essential-quarterly',
     annualLookupKey: 'essential-annual',
     originalIndex: 2
   }
 ];
 
+const preOrderFeatures = [
+  'Early access to the app',
+  'Ships now for first 15 subscribers'
+];
+
 const commonFeatures = [
   'Full access to app',
   '30% off on extra kits'
+];
+
+const kitContents = [
+  '6 biomarkers testing for 4 types of infections, inflammation, and good bacteria'
+];
+
+const appFeatures = [
+  'AI analysis of your results',
+  'Personalized bite-sized educational content',
+  '(Analytics coming soon)'
 ];
 
 function PlansContent() {
@@ -256,8 +274,8 @@ function PlansContent() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-[95%] mx-auto px-4 py-16">
-        <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-4 text-center">
+      <div className="relative z-10 w-[95%] mx-auto px-4 py-40">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
             ? 'Based on your answers, this plan helps you stay balanced and in control.'
             : 'Choose the plan that best fits your needs.'
@@ -332,6 +350,11 @@ function PlansContent() {
                           : `${plan.annualPrice} / year`
                         }
                       </div>
+                      {isAnnual && (
+                        <div className="text-sm font-semibold text-green-600 mt-2">
+                          Save {plan.savingsPercentage}
+                        </div>
+                      )}
                     </div>
                     
                     <a
@@ -350,79 +373,117 @@ function PlansContent() {
             })}
           </div>
 
-          {/* Common Features - Below Plan Cards */}
-          <div className="flex justify-center">
-            <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 max-w-4xl">
-              <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                All Plans Include:
-              </h3>
-              <ul className="flex flex-wrap gap-6 justify-center mb-4">
-                {commonFeatures.map((feature, idx) => (
-                  <li key={idx} className="text-[#721422] flex items-center">
-                    <span className="mr-2 text-lg">✓</span>
-                    <span className="text-base">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* Pre-Order Features and Common Features - Below Plan Cards */}
+          <div className="flex flex-col gap-6">
+            {/* First Row: Pre-Order Benefits and All Plans Include */}
+            <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch">
+              {/* Pre-Order Features Card */}
+              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
+                <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
+                  Pre-order benefits
+                </h3>
+                <ul className="flex flex-col gap-4 justify-center">
+                  {preOrderFeatures.map((feature, idx) => (
+                    <li key={idx} className="text-[#721422] flex items-center">
+                      <span className="mr-2 text-lg">✓</span>
+                      <span className="text-base">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               
-              {/* Expandable Section */}
-              <div className="text-center">
-                <button
-                  onClick={() => {
-                    const details = document.getElementById('kit-details');
-                    const arrow = document.getElementById('expand-arrow');
-                    if (details && arrow) {
-                      const isExpanded = details.classList.contains('expanded');
-                      
-                      if (isExpanded) {
-                        // Collapse
-                        details.style.maxHeight = '0px';
-                        details.style.opacity = '0';
-                        details.classList.remove('expanded');
-                        arrow.style.transform = 'rotate(0deg)';
-                      } else {
-                        // Expand
-                        details.style.maxHeight = details.scrollHeight + 'px';
-                        details.style.opacity = '1';
-                        details.classList.add('expanded');
-                        arrow.style.transform = 'rotate(180deg)';
+              {/* Common Features Card */}
+              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
+                <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
+                  All plans will include
+                </h3>
+                <ul className="flex flex-col gap-4 justify-center">
+                  {commonFeatures.map((feature, idx) => (
+                    <li key={idx} className="text-[#721422] flex items-center">
+                      <span className="mr-2 text-lg">✓</span>
+                      <span className="text-base">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Second Row: Kit Features Card */}
+            <div className="flex justify-center">
+              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 max-w-2xl w-full">
+                <div className="text-center">
+                  <button
+                    onClick={() => {
+                      const details = document.getElementById('kit-details');
+                      const arrow = document.getElementById('kit-expand-arrow');
+                      if (details && arrow) {
+                        const isExpanded = details.classList.contains('expanded');
+                        
+                        if (isExpanded) {
+                          // Collapse
+                          details.style.maxHeight = '0px';
+                          details.style.opacity = '0';
+                          details.classList.remove('expanded');
+                          arrow.style.transform = 'rotate(0deg)';
+                        } else {
+                          // Expand
+                          details.style.maxHeight = details.scrollHeight + 'px';
+                          details.style.opacity = '1';
+                          details.classList.add('expanded');
+                          arrow.style.transform = 'rotate(180deg)';
+                        }
                       }
-                    }
-                  }}
-                  className="flex items-center justify-center gap-2 text-[#721422] hover:text-[#8a1a2a] transition-colors duration-200 mx-auto"
-                >
-                  <span className="text-sm font-medium">What's in the kit?</span>
-                  <svg
-                    id="expand-arrow"
-                    className="w-4 h-4 transition-transform duration-300 ease-in-out"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    }}
+                    className="flex items-center justify-center gap-2 text-[#721422] hover:text-[#8a1a2a] transition-colors duration-200 mx-auto mb-0"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                    <h3 className="text-xl font-bold text-[#721422]">
+                      What's in the kit?
+                    </h3>
+                    <svg
+                      id="kit-expand-arrow"
+                      className="w-5 h-5 transition-transform duration-300 ease-in-out"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
                 
                 <div 
                   id="kit-details" 
-                  className="mt-4 text-left overflow-hidden transition-all duration-500 ease-in-out"
+                  className="overflow-hidden transition-all duration-500 ease-in-out"
                   style={{ 
                     maxHeight: '0px', 
                     opacity: '0',
                     transform: 'translateY(-10px)'
                   }}
                 >
-                  <div className="bg-white/20 rounded-2xl p-4 space-y-3 transform transition-transform duration-500 ease-in-out">
-                    <div className="text-[#721422]">
-                      <h4 className="font-semibold text-lg mb-2">Santelle Kit:</h4>
-                      <p className="text-sm">• 6 biomarkers testing for 4 types of infections, inflammation and good bacteria</p>
+                  <div className="pt-4 space-y-6">
+                    {/* Kit Contents Section */}
+                    <div>
+                      <h4 className="font-semibold text-lg mb-3 text-[#721422]">Santelle Kit:</h4>
+                      <ul className="flex flex-col gap-4 justify-center">
+                        {kitContents.map((content, idx) => (
+                          <li key={idx} className="text-[#721422] flex items-center">
+                            <span className="mr-2 text-lg">✓</span>
+                            <span className="text-base">{content}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <div className="text-[#721422]">
-                      <h4 className="font-semibold text-lg mb-2">App Features:</h4>
-                      <ul className="text-sm space-y-1">
-                        <li>• AI analysis of your results</li>
-                        <li>• Personalized bite-sized educational content</li>
-                        <li>• (Analytics coming soon)</li>
+                    
+                    {/* App Features Section */}
+                    <div>
+                      <h4 className="font-semibold text-lg mb-3 text-[#721422]">App Features:</h4>
+                      <ul className="flex flex-col gap-4 justify-center">
+                        {appFeatures.map((feature, idx) => (
+                          <li key={idx} className="text-[#721422] flex items-center">
+                            <span className="mr-2 text-lg">✓</span>
+                            <span className="text-base">{feature}</span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
