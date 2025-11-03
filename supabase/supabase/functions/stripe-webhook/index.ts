@@ -114,25 +114,14 @@ Deno.serve(async (req) => {
       let priceId: string | null = null
 
       if (session.subscription) {
-        // Always retrieve the full subscription object from Stripe
-        // The session.subscription might be a partial object or just an ID
-        const subscriptionId = typeof session.subscription === 'string' 
-          ? session.subscription 
-          : (session.subscription as Stripe.Subscription).id
-        
-        console.log('Retrieving subscription:', subscriptionId)
-        
-        // Retrieve full subscription details with all fields
-        subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-          expand: ['items.data.price']
-        })
-        
-        console.log('Retrieved subscription:', {
-          id: subscription.id,
-          status: subscription.status,
-          has_current_period_end: subscription.current_period_end != null,
-          current_period_end_raw: subscription.current_period_end,
-        })
+        // Expand subscription if it's just an ID, or use it directly if it's an object
+        if (typeof session.subscription === 'string') {
+          subscription = await stripe.subscriptions.retrieve(session.subscription, {
+            expand: ['items.data.price']
+          })
+        } else {
+          subscription = session.subscription
+        }
 
         customerId = typeof subscription.customer === 'string' 
           ? subscription.customer 
@@ -158,41 +147,19 @@ Deno.serve(async (req) => {
         subscription_status: subscription?.status || undefined,
         price_id: priceId || undefined,
         plan_lookup_key: lookup_key || undefined,
-        // current_period_end is a Unix timestamp (seconds), convert to ISO string
-        current_period_end: subscription?.current_period_end != null && subscription.current_period_end > 0
+        current_period_end: subscription?.current_period_end 
           ? new Date(subscription.current_period_end * 1000).toISOString() 
           : undefined,
-        // cancel_at is only set if subscription is scheduled to be cancelled
-        cancel_at: subscription?.cancel_at != null
+        cancel_at: subscription?.cancel_at 
           ? new Date(subscription.cancel_at * 1000).toISOString() 
-          : null,
-        // cancel_at_period_end indicates if subscription will cancel at period end
-        cancel_at_period_end: subscription?.cancel_at_period_end != null
-          ? subscription.cancel_at_period_end 
-          : null,
+          : undefined,
+        cancel_at_period_end: subscription?.cancel_at_period_end || undefined,
         subscription_id: subscription?.id || undefined,
         latest_checkout_session_id: session.id || undefined,
         updated_at: new Date().toISOString(),
-        trial_end_date: subscription?.trial_end != null
+        trial_end_date: subscription?.trial_end 
           ? new Date(subscription.trial_end * 1000).toISOString() 
           : undefined,
-      }
-
-      // Log subscription details for debugging
-      if (subscription) {
-        console.log('Subscription details:', {
-          id: subscription.id,
-          status: subscription.status,
-          current_period_start: subscription.current_period_start,
-          current_period_end: subscription.current_period_end,
-          current_period_end_iso: subscription.current_period_end 
-            ? new Date(subscription.current_period_end * 1000).toISOString() 
-            : 'missing',
-          cancel_at: subscription.cancel_at,
-          cancel_at_period_end: subscription.cancel_at_period_end,
-        })
-      } else {
-        console.log('No subscription found in checkout session')
       }
 
       // Remove undefined values
@@ -200,12 +167,6 @@ Deno.serve(async (req) => {
         if (profileData[key] === undefined) {
           delete profileData[key]
         }
-      })
-
-      // Log what we're about to save
-      console.log('Profile data to save:', {
-        ...profileData,
-        current_period_end: profileData.current_period_end || 'MISSING - will be removed',
       })
 
       // Update or insert profile
