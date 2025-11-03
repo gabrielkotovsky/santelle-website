@@ -6,6 +6,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export const handler: Handler = async (event) => {
+  // TEMPORARILY DISABLED - Testing Supabase webhook function
+  // Remove this early return to re-enable this function
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ 
+      message: 'Netlify webhook temporarily disabled - using Supabase webhook instead',
+      received: true 
+    }),
+  };
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
