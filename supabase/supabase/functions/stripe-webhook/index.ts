@@ -160,6 +160,7 @@ Deno.serve(async (req) => {
         trial_end_date: subscription?.trial_end 
           ? new Date(subscription.trial_end * 1000).toISOString() 
           : undefined,
+        shipping_details: session.collected_information?.shipping_details || undefined,
       }
 
       // Remove undefined values
