@@ -2,6 +2,19 @@
 
 import { useState } from 'react';
 
+// GTM Event Tracking Helper
+const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
+  if (typeof window !== 'undefined') {
+    const dataLayer = (window as any).dataLayer as Array<Record<string, any>> | undefined;
+    if (dataLayer) {
+      dataLayer.push({
+        event: eventName,
+        ...eventData,
+      });
+    }
+  }
+};
+
 const quizQuestions = [
   {
     id: 1,
@@ -66,6 +79,11 @@ export default function QuizPage() {
 
   const handleStartQuiz = () => {
     setQuizStarted(true);
+    // Track quiz start
+    trackGTMEvent('quiz_started', {
+      quiz_name: 'Santelle Plan Quiz',
+      total_questions: quizQuestions.length,
+    });
   };
 
   const handleSelectAnswer = (answer: string) => {
@@ -74,6 +92,13 @@ export default function QuizPage() {
 
   const handleNext = async () => {
     if (currentQuestion < quizQuestions.length - 1) {
+      // Track moving to next question
+      trackGTMEvent('quiz_question_next', {
+        quiz_name: 'Santelle Plan Quiz',
+        from_question: currentQuestion + 1,
+        to_question: currentQuestion + 2,
+        total_questions: quizQuestions.length,
+      });
       setCurrentQuestion(currentQuestion + 1);
     } else {
       // Save quiz answers and redirect to plans page
@@ -109,6 +134,23 @@ export default function QuizPage() {
         const recommendedPlan = calculateRecommendedPlan();
         console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answers);
         
+        // Track quiz completion
+        const planNames: { [key: number]: string } = {
+          0: 'Monthly',
+          1: 'Bi-Monthly',
+          2: 'Quarterly',
+          [-1]: 'Opt-out',
+        };
+        
+        trackGTMEvent('quiz_completed', {
+          quiz_name: 'Santelle Plan Quiz',
+          total_questions: quizQuestions.length,
+          recommended_plan: recommendedPlan,
+          recommended_plan_name: planNames[recommendedPlan] || 'Unknown',
+          quiz_id: quizIdFromResponse,
+          answers: answerIndices,
+        });
+        
         // Check for opt-out case
         if (recommendedPlan === -1) {
           // User opted out - show thank you message
@@ -138,6 +180,13 @@ export default function QuizPage() {
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
+      // Track going back to previous question
+      trackGTMEvent('quiz_question_previous', {
+        quiz_name: 'Santelle Plan Quiz',
+        from_question: currentQuestion + 1,
+        to_question: currentQuestion,
+        total_questions: quizQuestions.length,
+      });
       setCurrentQuestion(currentQuestion - 1);
     }
   };
