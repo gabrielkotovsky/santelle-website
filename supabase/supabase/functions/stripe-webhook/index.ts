@@ -27,7 +27,12 @@ Deno.serve(async (req) => {
     const signature = req.headers.get('stripe-signature')
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
 
+    console.log('Webhook received - Method:', req.method)
+    console.log('Has signature:', !!signature)
+    console.log('Has webhook secret:', !!webhookSecret)
+
     if (!signature) {
+      console.error('❌ Missing stripe-signature header')
       return new Response(
         JSON.stringify({ error: 'Missing stripe-signature header' }),
         { 
@@ -38,6 +43,7 @@ Deno.serve(async (req) => {
     }
 
     if (!webhookSecret) {
+      console.error('❌ STRIPE_WEBHOOK_SECRET is not configured')
       return new Response(
         JSON.stringify({ error: 'STRIPE_WEBHOOK_SECRET is not configured' }),
         { 
@@ -48,16 +54,44 @@ Deno.serve(async (req) => {
     }
 
     // Get the raw body for signature verification
-    const body = await req.text()
+    let body: string
+    try {
+      body = await req.text()
+      console.log('Body length:', body.length)
+    } catch (bodyError: any) {
+      console.error('❌ Error reading request body:', bodyError.message)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to read request body',
+          details: bodyError.message 
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
 
     // Verify webhook signature (using async version for Deno/Edge Functions)
     let event: Stripe.Event
     try {
       event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret)
+      console.log('✅ Webhook signature verified. Event type:', event.type, 'ID:', event.id)
     } catch (err: any) {
       console.error('⚠️ Webhook signature verification failed:', err.message)
+      console.error('Error type:', err.constructor.name)
+      console.error('Signature preview:', signature?.substring(0, 20) + '...')
+      console.error('Signature length:', signature?.length)
+      console.error('Body length:', body.length)
+      console.error('Webhook secret configured:', !!webhookSecret)
+      console.error('Webhook secret length:', webhookSecret?.length || 0)
+      
       return new Response(
-        JSON.stringify({ error: 'Webhook signature verification failed' }),
+        JSON.stringify({ 
+          error: 'Webhook signature verification failed',
+          details: err.message,
+          error_type: err.constructor.name
+        }),
         { 
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -85,6 +119,8 @@ Deno.serve(async (req) => {
         persistSession: false,
       },
     })
+
+    console.log('Processing webhook event:', event.type, 'ID:', event.id)
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
@@ -237,6 +273,210 @@ Deno.serve(async (req) => {
           received: true, 
           message: 'Checkout session processed successfully',
           user_id,
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Handle the customer.subscription.created event
+    if (event.type === 'customer.subscription.created') {
+      const subscription = event.data.object as Stripe.Subscription
+
+      console.log('Processing customer.subscription.created for subscription:', subscription.id)
+
+      // Extract metadata
+      let user_id = subscription.metadata?.user_id
+      let email = subscription.metadata?.email
+      const lookup_key = subscription.metadata?.lookup_key
+
+      // Extract customer ID
+      const customerId = typeof subscription.customer === 'string' 
+        ? subscription.customer 
+        : subscription.customer?.id || null
+
+      // If email is not in metadata, try to get it from customer
+      if (!email && customerId) {
+        try {
+          const customer = await stripe.customers.retrieve(customerId)
+          if (customer && !customer.deleted && typeof customer === 'object' && 'email' in customer) {
+            email = customer.email || undefined
+          }
+        } catch (err) {
+          console.log('Could not retrieve customer for email:', err)
+        }
+      }
+
+      // If user_id is not in metadata, try to find it by customer_id
+      if (!user_id && customerId) {
+        console.log('user_id not found in metadata, attempting to find by customer_id:', customerId)
+        const { data: profileByCustomer, error: customerLookupError } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('stripe_customer_id', customerId)
+          .single()
+
+        if (!customerLookupError && profileByCustomer) {
+          user_id = profileByCustomer.user_id
+          console.log('Found user_id by customer_id:', user_id)
+        }
+      }
+
+      // If user_id still not found, try to find it by email
+      if (!user_id && email) {
+        console.log('user_id not found by customer_id, attempting to find by email:', email)
+        const { data: profileByEmail, error: emailLookupError } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('email', email.toLowerCase().trim())
+          .single()
+
+        if (!emailLookupError && profileByEmail) {
+          user_id = profileByEmail.user_id
+          console.log('Found user_id by email:', user_id)
+        }
+      }
+
+      if (!user_id) {
+        console.error('Missing user_id - not found in metadata, by customer_id, or by email')
+        // Still process the event but log the issue
+        console.log('Subscription data:', {
+          subscription_id: subscription.id,
+          customer_id: customerId,
+          email: email,
+          metadata: subscription.metadata,
+        })
+        // Return 200 but log the issue - don't fail the webhook
+        return new Response(
+          JSON.stringify({ 
+            received: true,
+            warning: 'Could not find user_id - subscription data logged',
+            subscription_id: subscription.id,
+          }),
+          { 
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      // Extract price ID from subscription items
+      let priceId: string | null = null
+      if (subscription.items?.data?.[0]?.price?.id) {
+        priceId = subscription.items.data[0].price.id
+      } else if (subscription.items?.data?.[0]?.price && typeof subscription.items.data[0].price === 'string') {
+        priceId = subscription.items.data[0].price
+      }
+
+      // Get current_period_end - it might be at subscription level or in items
+      let current_period_end: number | null = null
+      if (subscription.current_period_end) {
+        current_period_end = subscription.current_period_end
+      } else if (subscription.items?.data?.[0]?.current_period_end) {
+        current_period_end = subscription.items.data[0].current_period_end
+      }
+
+      // Prepare profile update data
+      const profileData: any = {
+        email: email || undefined,
+        stripe_customer_id: customerId || undefined,
+        subscription_status: subscription.status || undefined,
+        price_id: priceId || undefined,
+        plan_lookup_key: lookup_key || undefined,
+        current_period_end: current_period_end 
+          ? new Date(current_period_end * 1000).toISOString() 
+          : undefined,
+        cancel_at: subscription.cancel_at 
+          ? new Date(subscription.cancel_at * 1000).toISOString() 
+          : undefined,
+        cancel_at_period_end: subscription.cancel_at_period_end || undefined,
+        subscription_id: subscription.id || undefined,
+        updated_at: new Date().toISOString(),
+        trial_end_date: subscription.trial_end 
+          ? new Date(subscription.trial_end * 1000).toISOString() 
+          : undefined,
+      }
+
+      // Remove undefined values
+      Object.keys(profileData).forEach(key => {
+        if (profileData[key] === undefined) {
+          delete profileData[key]
+        }
+      })
+
+      // Update or insert profile
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', user_id)
+        .single()
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // Error other than "not found"
+        console.error('Error fetching profile:', fetchError)
+        return new Response(
+          JSON.stringify({ error: 'Database error: ' + fetchError.message }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      if (existingProfile) {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update(profileData)
+          .eq('user_id', user_id)
+
+        if (updateError) {
+          console.error('Error updating profile:', updateError)
+          return new Response(
+            JSON.stringify({ error: 'Database error updating profile: ' + updateError.message }),
+            { 
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          )
+        }
+
+        console.log('Profile updated successfully for user:', user_id)
+      } else {
+        // Insert new profile
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([{
+            user_id,
+            ...profileData,
+            created_at: new Date().toISOString(),
+          }])
+
+        if (insertError) {
+          console.error('Error inserting profile:', insertError)
+          return new Response(
+            JSON.stringify({ error: 'Database error inserting profile: ' + insertError.message }),
+            { 
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          )
+        }
+
+        console.log('Profile created successfully for user:', user_id)
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          received: true, 
+          message: 'Subscription created event processed successfully',
+          user_id,
+          subscription_id: subscription.id,
+          current_period_end: current_period_end 
+            ? new Date(current_period_end * 1000).toISOString() 
+            : null,
         }),
         { 
           status: 200,

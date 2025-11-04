@@ -98,6 +98,7 @@ export const handler: Handler = async (event) => {
         lookup_key,
       },
       subscription_data: {
+        trial_period_days: 60,
         metadata: {
           user_id,
           email,
