@@ -5,6 +5,19 @@ import { Suspense, useState } from 'react';
 import { requestEmailOtp, verifyEmailOtp } from '@/lib/auth';
 import { createClient } from '@supabase/supabase-js';
 
+// GTM Event Tracking Helper
+const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
+  if (typeof window !== 'undefined') {
+    const dataLayer = (window as any).dataLayer as Array<Record<string, any>> | undefined;
+    if (dataLayer) {
+      dataLayer.push({
+        event: eventName,
+        ...eventData,
+      });
+    }
+  }
+};
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -26,13 +39,31 @@ function AuthContent() {
     setError('');
     setIsLoading(true);
     
+    // Track email submission
+    trackGTMEvent('Auth_Email_Submitted', {
+      has_lookup_key: !!lookupKey,
+      redirect_to: redirectTo || null,
+    });
+    
     try {
       await requestEmailOtp(email);
       console.log('OTP sent to', email);
+      
+      // Track successful OTP request
+      trackGTMEvent('Auth_OTP_Sent', {
+        has_lookup_key: !!lookupKey,
+      });
+      
       setStep('otp');
     } catch (err: any) {
       console.error('Error sending OTP:', err);
       setError(err.message || 'Failed to send verification code. Please try again.');
+      
+      // Track OTP send failure
+      trackGTMEvent('Auth_OTP_Send_Failed', {
+        error_message: err.message || 'Unknown error',
+        has_lookup_key: !!lookupKey,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -42,9 +73,23 @@ function AuthContent() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    
+    // Track OTP verification attempt
+    trackGTMEvent('Auth_OTP_Submitted', {
+      has_lookup_key: !!lookupKey,
+      redirect_to: redirectTo || null,
+    });
+    
     try {
       const session = await verifyEmailOtp(email, otp);
       console.log('Authentication successful', { session, lookupKey });
+      
+      // Track successful OTP verification
+      trackGTMEvent('Auth_OTP_Verified', {
+        has_lookup_key: !!lookupKey,
+        redirect_to: redirectTo || null,
+      });
+      
       if (lookupKey) {
         // Fetch user from Supabase
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -96,6 +141,13 @@ function AuthContent() {
     } catch (err: any) {
       console.error('Error verifying OTP:', err);
       setError(err.message || 'Invalid verification code. Please try again.');
+      
+      // Track OTP verification failure
+      trackGTMEvent('Auth_OTP_Verification_Failed', {
+        error_message: err.message || 'Unknown error',
+        has_lookup_key: !!lookupKey,
+      });
+      
       setIsLoading(false);
     }
   };

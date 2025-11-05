@@ -93,11 +93,17 @@ export default function QuizPage() {
   const handleNext = async () => {
     if (currentQuestion < quizQuestions.length - 1) {
       // Track moving to next question
+      const currentAnswer = answers[currentQuestion];
+      const currentQ = quizQuestions[currentQuestion];
       trackGTMEvent('quiz_question_next', {
         quiz_name: 'Santelle Plan Quiz',
         from_question: currentQuestion + 1,
         to_question: currentQuestion + 2,
         total_questions: quizQuestions.length,
+        answer_selected: currentAnswer || null,
+        answer_index: currentAnswer ? currentQ.options.indexOf(currentAnswer) + 1 : null,
+        question_id: currentQ.id,
+        question_title: currentQ.title,
       });
       setCurrentQuestion(currentQuestion + 1);
     } else {

@@ -6,6 +6,19 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 
+// GTM Event Tracking Helper
+const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
+  if (typeof window !== 'undefined') {
+    const dataLayer = (window as any).dataLayer as Array<Record<string, any>> | undefined;
+    if (dataLayer) {
+      dataLayer.push({
+        event: eventName,
+        ...eventData,
+      });
+    }
+  }
+};
+
 const allPlans = [
   {
     name: 'Proactive',
@@ -88,21 +101,41 @@ function PlansContent() {
   // Popup state
   const [showPopup, setShowPopup] = useState(false);
   const [pendingLookupKey, setPendingLookupKey] = useState<string | null>(null);
+  const [pendingPlan, setPendingPlan] = useState<typeof allPlans[0] | null>(null);
+  const [pendingBillingPeriod, setPendingBillingPeriod] = useState<'cycle' | 'annual' | null>(null);
   
   // Handle checkout - direct if logged in, auth page if not
-  const handlePreOrder = async (lookupKey: string) => {
+  const handlePreOrder = async (lookupKey: string, plan: typeof allPlans[0], billingPeriod: 'cycle' | 'annual') => {
+    // Track plan selection
+    trackGTMEvent('plan_selected', {
+      plan_name: plan.name,
+      billing_type: billingPeriod === 'annual' ? 'annual' : 'per_cycle',
+      is_recommended: recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex,
+    });
+    
     // Show popup first
     setPendingLookupKey(lookupKey);
+    setPendingPlan(plan);
+    setPendingBillingPeriod(billingPeriod);
     setShowPopup(true);
   };
   
   // Confirm and proceed with checkout
   const confirmPreOrder = async () => {
-    if (!pendingLookupKey) return;
+    if (!pendingLookupKey || !pendingPlan || !pendingBillingPeriod) return;
+    
+    // Track disclaimer confirmation
+    trackGTMEvent('Disclaimer_Confirmed', {
+      plan_name: pendingPlan.name,
+      billing_type: pendingBillingPeriod === 'annual' ? 'annual' : 'per_cycle',
+      lookup_key: pendingLookupKey,
+    });
     
     setShowPopup(false);
     const lookupKey = pendingLookupKey;
     setPendingLookupKey(null);
+    setPendingPlan(null);
+    setPendingBillingPeriod(null);
     
     if (user && user.email) {
       // User is logged in, go directly to checkout
@@ -138,8 +171,19 @@ function PlansContent() {
   
   // Close popup without proceeding
   const cancelPreOrder = () => {
+    // Track disclaimer cancellation
+    if (pendingPlan && pendingBillingPeriod) {
+      trackGTMEvent('Disclaimer_Cancelled', {
+        plan_name: pendingPlan.name,
+        billing_type: pendingBillingPeriod === 'annual' ? 'annual' : 'per_cycle',
+        lookup_key: pendingLookupKey || null,
+      });
+    }
+    
     setShowPopup(false);
     setPendingLookupKey(null);
+    setPendingPlan(null);
+    setPendingBillingPeriod(null);
   };
   
   useEffect(() => {
@@ -491,7 +535,11 @@ function PlansContent() {
                     </div>
                     
                     <button
-                      onClick={() => handlePreOrder(isAnnual ? plan.annualLookupKey : plan.cycleLookupKey)}
+                      onClick={() => handlePreOrder(
+                        isAnnual ? plan.annualLookupKey : plan.cycleLookupKey,
+                        plan,
+                        isAnnual ? 'annual' : 'cycle'
+                      )}
                       className={`block text-center w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
                         isRecommended
                           ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
