@@ -80,7 +80,7 @@ export default function QuizPage() {
   const handleStartQuiz = () => {
     setQuizStarted(true);
     // Track quiz start
-    trackGTMEvent('quiz_started', {
+    trackGTMEvent('Quiz_Started', {
       quiz_name: 'Santelle Plan Quiz',
       total_questions: quizQuestions.length,
     });
@@ -148,7 +148,7 @@ export default function QuizPage() {
           [-1]: 'Opt-out',
         };
         
-        trackGTMEvent('quiz_completed', {
+        trackGTMEvent('Quiz_Completed', {
           quiz_name: 'Santelle Plan Quiz',
           total_questions: quizQuestions.length,
           recommended_plan: recommendedPlan,

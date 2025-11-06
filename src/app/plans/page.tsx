@@ -206,20 +206,70 @@ function PlansContent() {
       })
     : allPlans;
   
-  // Show success message if payment was successful
-  if (success && sessionId) {
-    const [detailsLoading, setDetailsLoading] = useState(false); // still allow fetch for backend-upsert
-    const [detailsError, setDetailsError] = useState("");
+  // State for checkout success handling
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState("");
+  const [checkoutTracked, setCheckoutTracked] = useState(false);
+  const [cancelTracked, setCancelTracked] = useState(false);
 
-    useEffect(() => {
-      // Keep upsert but do not show details
+  // Handle successful checkout - fetch details and track event
+  useEffect(() => {
+    if (success && sessionId && !checkoutTracked) {
       setDetailsLoading(true);
       setDetailsError("");
+      
+      // Track checkout success immediately
+      trackGTMEvent('Checkout_Success', {
+        session_id: sessionId,
+        timestamp: new Date().toISOString(),
+      });
+      
+      // Fetch session details to get plan information
       fetch(`/api/stripe/session-details?session_id=${sessionId}`)
         .then((res) => res.json())
-        .catch((err) => setDetailsError(err.message || 'Failed to upsert profile.'))
+        .then((data) => {
+          // Track checkout success with plan details
+          if (data.plan_lookup_key) {
+            // Determine plan name and billing type from lookup key
+            const plan = allPlans.find(
+              p => p.cycleLookupKey === data.plan_lookup_key || p.annualLookupKey === data.plan_lookup_key
+            );
+            const isAnnual = plan?.annualLookupKey === data.plan_lookup_key;
+            
+            trackGTMEvent('Checkout_Success_Complete', {
+              session_id: sessionId,
+              plan_name: plan?.name || 'unknown',
+              billing_type: isAnnual ? 'annual' : 'per_cycle',
+              lookup_key: data.plan_lookup_key,
+              subscription_id: data.subscription_id || null,
+              customer_id: data.stripe_customer_id || null,
+            });
+          }
+          setCheckoutTracked(true);
+        })
+        .catch((err) => {
+          setDetailsError(err.message || 'Failed to upsert profile.');
+          // Still mark as tracked to avoid duplicate events
+          setCheckoutTracked(true);
+        })
         .finally(() => setDetailsLoading(false));
-    }, [sessionId]);
+    }
+  }, [success, sessionId, checkoutTracked]);
+
+  // Handle canceled checkout - track event
+  useEffect(() => {
+    if (canceled && !cancelTracked) {
+      // Track checkout cancellation
+      trackGTMEvent('Checkout_Canceled', {
+        timestamp: new Date().toISOString(),
+        canceled_at: new Date().toISOString(),
+      });
+      setCancelTracked(true);
+    }
+  }, [canceled, cancelTracked]);
+
+  // Show success message if payment was successful
+  if (success && sessionId) {
 
     return (
       <main className="relative min-h-screen flex items-center justify-center">
