@@ -76,19 +76,20 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    const price = prices.data[0];
+    const isRecurringPrice = price.type === 'recurring' || !!price.recurring;
+
+    const baseSessionParams: Stripe.Checkout.SessionCreateParams = {
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['CH'],
       },
       line_items: [
         {
-          price: prices.data[0].id,
+          price: price.id,
           quantity: 1,
         },
       ],
-      mode: 'subscription',
       success_url: `${YOUR_DOMAIN}/plans?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${YOUR_DOMAIN}/plans?canceled=true`,
       customer_email: email,
@@ -96,16 +97,30 @@ export const handler: Handler = async (event) => {
         user_id,
         email,
         lookup_key,
+        purchase_type: isRecurringPrice ? 'subscription' : 'one_time',
       },
-      subscription_data: {
-        trial_period_days: 60,
-        metadata: {
-          user_id,
-          email,
-          lookup_key,
+    };
+
+    let session: Stripe.Checkout.Session;
+    if (isRecurringPrice) {
+      session = await stripe.checkout.sessions.create({
+        ...baseSessionParams,
+        mode: 'subscription',
+        subscription_data: {
+          trial_period_days: 60,
+          metadata: {
+            user_id,
+            email,
+            lookup_key,
+          },
         },
-      },
-    });
+      });
+    } else {
+      session = await stripe.checkout.sessions.create({
+        ...baseSessionParams,
+        mode: 'payment',
+      });
+    }
 
     // Redirect to Stripe Checkout
     return {

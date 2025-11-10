@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Follow this setup guide to integrate the Deno language server with your editor:
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
@@ -162,6 +163,26 @@ Deno.serve(async (req) => {
       return undefined
     }
 
+    const getLast4FromPaymentIntent = async (paymentIntentId: string): Promise<string | undefined> => {
+      try {
+        const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+          expand: ['payment_method', 'latest_charge.payment_method_details'],
+        })
+
+        if (pi.payment_method && typeof pi.payment_method !== 'string' && pi.payment_method.card?.last4) {
+          return pi.payment_method.card.last4
+        }
+
+        const latestCharge = pi.latest_charge && typeof pi.latest_charge !== 'string' ? pi.latest_charge : undefined
+        if (latestCharge?.payment_method_details?.card?.last4) {
+          return latestCharge.payment_method_details.card.last4
+        }
+      } catch (err) {
+        console.log('Could not retrieve payment intent for last4:', err)
+      }
+      return undefined
+    }
+
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
@@ -216,6 +237,18 @@ Deno.serve(async (req) => {
           : session.customer?.id || null
       }
 
+      if (!priceId && (!subscription || session.mode === 'payment')) {
+        try {
+          const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 })
+          const firstItem = lineItems.data[0]
+          if (firstItem?.price?.id) {
+            priceId = firstItem.price.id
+          }
+        } catch (err) {
+          console.log('Could not retrieve line items for price info:', err)
+        }
+      }
+
       // Get customer details and payment method info
       const customerDetails = await getCustomerAndPaymentDetails(customerId)
       let paymentMethodLast4: string | undefined = undefined
@@ -227,33 +260,61 @@ Deno.serve(async (req) => {
       // Get payment method last4 from subscription if available
       if (subscription) {
         paymentMethodLast4 = await getPaymentMethodLast4(subscription)
+      } else if (session.payment_intent && typeof session.payment_intent === 'string') {
+        paymentMethodLast4 = await getLast4FromPaymentIntent(session.payment_intent)
       }
 
-      // Prepare profile update data
-      const profileData: any = {
-        email: email || undefined,
-        stripe_customer_id: customerId || undefined,
-        subscription_status: subscription?.status || undefined,
-        price_id: priceId || undefined,
-        plan_lookup_key: lookup_key || undefined,
-        current_period_end: subscription?.current_period_end 
-          ? new Date(subscription.current_period_end * 1000).toISOString() 
-          : undefined,
-        cancel_at: subscription?.cancel_at 
-          ? new Date(subscription.cancel_at * 1000).toISOString() 
-          : undefined,
-        cancel_at_period_end: subscription?.cancel_at_period_end || undefined,
-        subscription_id: subscription?.id || undefined,
-        latest_checkout_session_id: session.id || undefined,
-        updated_at: new Date().toISOString(),
-        trial_end_date: subscription?.trial_end 
-          ? new Date(subscription.trial_end * 1000).toISOString() 
-          : undefined,
-        shipping_details: session.collected_information?.shipping_details ? JSON.stringify(session.collected_information.shipping_details) : undefined,
-        name: name || undefined,
-        country: country || undefined,
-        default_payment_method_last4: paymentMethodLast4 || undefined,
-        raw: event.data.object ? JSON.parse(JSON.stringify(event.data.object)) : undefined,
+      const nowIso = new Date().toISOString()
+      let profileData: any
+
+      if (session.mode === 'payment') {
+        const trialEndDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        profileData = {
+          email: email || undefined,
+          stripe_customer_id: customerId || undefined,
+          subscription_status: 'trialing',
+          price_id: priceId || undefined,
+          plan_lookup_key: lookup_key || undefined,
+          current_period_end: trialEndDate.toISOString(),
+          cancel_at: null,
+          cancel_at_period_end: false,
+          subscription_id: null,
+          latest_checkout_session_id: session.id || undefined,
+          updated_at: nowIso,
+          trial_end_date: trialEndDate.toISOString(),
+          shipping_details: session.collected_information?.shipping_details ? JSON.stringify(session.collected_information.shipping_details) : undefined,
+          name: name || undefined,
+          country: country || undefined,
+          default_payment_method_last4: paymentMethodLast4 || undefined,
+          raw: event.data.object ? JSON.parse(JSON.stringify(event.data.object)) : undefined,
+        }
+      } else {
+        // Prepare profile update data for subscription mode
+        profileData = {
+          email: email || undefined,
+          stripe_customer_id: customerId || undefined,
+          subscription_status: subscription?.status || undefined,
+          price_id: priceId || undefined,
+          plan_lookup_key: lookup_key || undefined,
+          current_period_end: subscription?.current_period_end 
+            ? new Date(subscription.current_period_end * 1000).toISOString() 
+            : undefined,
+          cancel_at: subscription?.cancel_at 
+            ? new Date(subscription.cancel_at * 1000).toISOString() 
+            : undefined,
+          cancel_at_period_end: subscription?.cancel_at_period_end || undefined,
+          subscription_id: subscription?.id || undefined,
+          latest_checkout_session_id: session.id || undefined,
+          updated_at: nowIso,
+          trial_end_date: subscription?.trial_end 
+            ? new Date(subscription.trial_end * 1000).toISOString() 
+            : undefined,
+          shipping_details: session.collected_information?.shipping_details ? JSON.stringify(session.collected_information.shipping_details) : undefined,
+          name: name || undefined,
+          country: country || undefined,
+          default_payment_method_last4: paymentMethodLast4 || undefined,
+          raw: event.data.object ? JSON.parse(JSON.stringify(event.data.object)) : undefined,
+        }
       }
 
       // Remove undefined values

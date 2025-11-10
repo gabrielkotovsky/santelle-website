@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // GTM Event Tracking Helper
 const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
@@ -32,9 +32,9 @@ const quizQuestions = [
     title: 'Confidence / Knowledge Level',
     question: 'How confident do you feel about understanding and managing your vaginal health?',
     options: [
-      'Very confident - I know my body well',
-      'Somewhat confident - I\'d like more clarity',
-      'Not confident - I often feel unsure or lost'
+      'Very - I know my body well',
+      'Somewhat - I\'d like more clarity',
+      'Not - I often feel unsure or lost'
     ]
   },
   {
@@ -44,7 +44,7 @@ const quizQuestions = [
     options: [
       'I want to prevent recurring infections',
       'I\'m trying to get pregnant',
-      'I want discreet insights into my vaginal health',
+      'I want discreet insights',
       'I\'m just curious about my vaginal health'
     ]
   },
@@ -76,6 +76,190 @@ export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const answersRef = useRef<{ [key: number]: string }>({});
+  const questionRef = useRef<number>(currentQuestion);
+  const quizStartedRef = useRef<boolean>(quizStarted);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    questionRef.current = currentQuestion;
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    quizStartedRef.current = quizStarted;
+  }, [quizStarted]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const existingState = window.history.state ?? {};
+    if (existingState.quizQuestionIndex === undefined) {
+      window.history.replaceState(
+        {
+          ...existingState,
+          quizQuestionIndex: -1,
+        },
+        '',
+        window.location.pathname
+      );
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
+
+      const state = (event.state as { quizQuestionIndex?: number } | null) ?? null;
+      const previousQuestionIndex = questionRef.current;
+
+      if (!state || state.quizQuestionIndex === undefined || state.quizQuestionIndex === -1) {
+        if (quizStartedRef.current) {
+          setQuizStarted(false);
+        }
+        if (previousQuestionIndex !== 0) {
+          setCurrentQuestion(0);
+        }
+        return;
+      }
+
+      const targetIndex = Math.min(
+        Math.max(state.quizQuestionIndex, 0),
+        quizQuestions.length - 1
+      );
+
+      const goingBack = targetIndex < previousQuestionIndex;
+      const goingForward = targetIndex > previousQuestionIndex;
+
+      if (!quizStartedRef.current) {
+        setQuizStarted(true);
+      }
+
+      if (goingBack) {
+        const returningQuestion = quizQuestions[targetIndex];
+        const returningAnswer = answersRef.current[targetIndex];
+
+        trackGTMEvent('quiz_question_previous', {
+          quiz_name: 'Santelle Plan Quiz',
+          from_question: previousQuestionIndex + 1,
+          to_question: targetIndex + 1,
+          total_questions: quizQuestions.length,
+          returning_to_question_id: returningQuestion.id,
+          returning_to_question_title: returningQuestion.title,
+          answer_selected: returningAnswer || null,
+          answer_index: returningAnswer
+            ? returningQuestion.options.indexOf(returningAnswer) + 1
+            : null,
+        });
+      } else if (goingForward) {
+        const leavingIndex = previousQuestionIndex;
+        const boundedLeavingIndex = Math.min(
+          Math.max(leavingIndex, 0),
+          quizQuestions.length - 1
+        );
+        const leavingQuestion = quizQuestions[boundedLeavingIndex];
+        const selectedAnswer = answersRef.current[boundedLeavingIndex];
+
+        trackGTMEvent('quiz_question_next', {
+          quiz_name: 'Santelle Plan Quiz',
+          from_question: boundedLeavingIndex + 1,
+          to_question: targetIndex + 1,
+          total_questions: quizQuestions.length,
+          answer_selected: selectedAnswer || null,
+          answer_index: selectedAnswer
+            ? leavingQuestion.options.indexOf(selectedAnswer) + 1
+            : null,
+          question_id: leavingQuestion.id,
+          question_title: leavingQuestion.title,
+        });
+      }
+
+      setCurrentQuestion(targetIndex);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const submitQuiz = async (answersState: { [key: number]: string }) => {
+    try {
+      setIsSubmitting(true);
+
+      const answerIndices = Object.keys(answersState).reduce((acc, key) => {
+        const questionIndex = parseInt(key, 10);
+        const answerIndex = quizQuestions[questionIndex].options.indexOf(answersState[questionIndex]);
+        acc[`q${questionIndex + 1}`] = answerIndex + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const quizResponse = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers: answerIndices,
+          signup: false,
+        }),
+      });
+
+      if (!quizResponse.ok) {
+        throw new Error('Failed to save quiz answers');
+      }
+
+      const quizData = await quizResponse.json();
+      const quizIdFromResponse = quizData.data[0].id;
+
+      const recommendedPlan = calculateRecommendedPlan(answersState);
+      console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answersState);
+
+      const planNames: { [key: number]: string } = {
+        0: 'Monthly',
+        1: 'Bi-Monthly',
+        2: 'Quarterly',
+        [-1]: 'Opt-out',
+      };
+
+      trackGTMEvent('Quiz_Completed', {
+        quiz_name: 'Santelle Plan Quiz',
+        total_questions: quizQuestions.length,
+        recommended_plan: recommendedPlan,
+        recommended_plan_name: planNames[recommendedPlan] || 'Unknown',
+        quiz_id: quizIdFromResponse,
+        answers: answerIndices,
+      });
+
+      if (recommendedPlan === -1) {
+        setIsSubmitting(false);
+        alert('Thank you for your honesty! We appreciate your time 💜');
+        window.location.href = '/';
+        return;
+      }
+
+      sessionStorage.setItem('quizId', quizIdFromResponse.toString());
+
+      setIsSubmitting(false);
+      window.location.href = `/plans?recommended=${recommendedPlan}`;
+    } catch (error) {
+      console.error('Error saving quiz:', error);
+      setIsSubmitting(false);
+      window.location.href = '/plans';
+    }
+  };
 
   const handleStartQuiz = () => {
     setQuizStarted(true);
@@ -84,132 +268,86 @@ export default function QuizPage() {
       quiz_name: 'Santelle Plan Quiz',
       total_questions: quizQuestions.length,
     });
+
+    if (typeof window !== 'undefined') {
+      const existingState = window.history.state ?? {};
+      window.history.replaceState(
+        {
+          ...existingState,
+          quizQuestionIndex: -1,
+        },
+        '',
+        window.location.pathname
+      );
+
+      window.history.pushState(
+        {
+          quizQuestionIndex: 0,
+        },
+        '',
+        window.location.pathname
+      );
+    }
   };
 
-  const handleSelectAnswer = (answer: string) => {
-    setAnswers({ ...answers, [currentQuestion]: answer });
-  };
+  const handleSelectAnswer = async (answer: string) => {
+    if (isSubmitting) {
+      return;
+    }
 
-  const handleNext = async () => {
-    if (currentQuestion < quizQuestions.length - 1) {
-      // Track moving to next question
-      const currentAnswer = answers[currentQuestion];
-      const currentQ = quizQuestions[currentQuestion];
+    const questionIndex = currentQuestion;
+    const currentQ = quizQuestions[questionIndex];
+    const updatedAnswers = { ...answers, [questionIndex]: answer };
+    setAnswers(updatedAnswers);
+
+    if (questionIndex < quizQuestions.length - 1) {
+      const selectedIndex = currentQ.options.indexOf(answer);
       trackGTMEvent('quiz_question_next', {
         quiz_name: 'Santelle Plan Quiz',
-        from_question: currentQuestion + 1,
-        to_question: currentQuestion + 2,
+        from_question: questionIndex + 1,
+        to_question: questionIndex + 2,
         total_questions: quizQuestions.length,
-        answer_selected: currentAnswer || null,
-        answer_index: currentAnswer ? currentQ.options.indexOf(currentAnswer) + 1 : null,
+        answer_selected: answer,
+        answer_index: selectedIndex + 1,
         question_id: currentQ.id,
         question_title: currentQ.title,
       });
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      // Save quiz answers and redirect to plans page
-      try {
-        setIsSubmitting(true);
-        
-        // Map answers to integers for database (1-based indices)
-        const answerIndices = Object.keys(answers).reduce((acc, key) => {
-          const questionIndex = parseInt(key);
-          const answerIndex = quizQuestions[questionIndex].options.indexOf(answers[questionIndex]);
-          acc[`q${questionIndex + 1}`] = answerIndex + 1; // Add 1 to make it 1-based
-          return acc;
-        }, {} as Record<string, number>);
 
-        // Save quiz answers to database without email
-        const quizResponse = await fetch('/api/quiz', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            answers: answerIndices,
-            signup: false // Will be updated to true when email is submitted
-          })
-        });
-
-        if (!quizResponse.ok) {
-          throw new Error('Failed to save quiz answers');
-        }
-
-        const quizData = await quizResponse.json();
-        const quizIdFromResponse = quizData.data[0].id;
-        
-        // Calculate recommended plan
-        const recommendedPlan = calculateRecommendedPlan();
-        console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answers);
-        
-        // Track quiz completion
-        const planNames: { [key: number]: string } = {
-          0: 'Monthly',
-          1: 'Bi-Monthly',
-          2: 'Quarterly',
-          [-1]: 'Opt-out',
-        };
-        
-        trackGTMEvent('Quiz_Completed', {
-          quiz_name: 'Santelle Plan Quiz',
-          total_questions: quizQuestions.length,
-          recommended_plan: recommendedPlan,
-          recommended_plan_name: planNames[recommendedPlan] || 'Unknown',
-          quiz_id: quizIdFromResponse,
-          answers: answerIndices,
-        });
-        
-        // Check for opt-out case
-        if (recommendedPlan === -1) {
-          // User opted out - show thank you message
-          setIsSubmitting(false);
-          alert('Thank you for your honesty! We appreciate your time 💜');
-          // Redirect to home page
-          window.location.href = '/';
-          return;
-        }
-        
-        // Store quiz ID in sessionStorage for later use
-        sessionStorage.setItem('quizId', quizIdFromResponse.toString());
-        
-        setIsSubmitting(false);
-        
-        // Redirect to plans page with recommended plan
-        window.location.href = `/plans?recommended=${recommendedPlan}`;
-      } catch (error) {
-        console.error('Error saving quiz:', error);
-        setIsSubmitting(false);
-        // Redirect to plans page anyway to not block the user
-        window.location.href = '/plans';
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
       }
+
+      transitionTimeoutRef.current = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.history.pushState(
+            {
+              quizQuestionIndex: questionIndex + 1,
+            },
+            '',
+            window.location.pathname
+          );
+        }
+
+        setCurrentQuestion(questionIndex + 1);
+        transitionTimeoutRef.current = null;
+      }, 150);
+    } else {
+      await submitQuiz(updatedAnswers);
     }
   };
 
-
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      // Track going back to previous question
-      trackGTMEvent('quiz_question_previous', {
-        quiz_name: 'Santelle Plan Quiz',
-        from_question: currentQuestion + 1,
-        to_question: currentQuestion,
-        total_questions: quizQuestions.length,
-      });
-      setCurrentQuestion(currentQuestion - 1);
-    }
-  };
-
-  const currentAnswer = answers[currentQuestion];
-  const calculateRecommendedPlan = (): number => {
+  function calculateRecommendedPlan(answersState: { [key: number]: string }): number {
     // Check for opt-out first (Q5 = "No (I hate puppies)")
-    const q5Answer = answers[4];
+    const q5Answer = answersState[4];
     if (q5Answer === 'No (I hate puppies)') {
       return -1; // Special case for opt-out
     }
 
     // Get answer indices (0-based)
-    const q1Index = quizQuestions[0].options.indexOf(answers[0]);
-    const q2Index = quizQuestions[1].options.indexOf(answers[1]);
-    const q3Index = quizQuestions[2].options.indexOf(answers[2]);
-    const q4Index = quizQuestions[3].options.indexOf(answers[3]);
+    const q1Index = quizQuestions[0].options.indexOf(answersState[0]);
+    const q2Index = quizQuestions[1].options.indexOf(answersState[1]);
+    const q3Index = quizQuestions[2].options.indexOf(answersState[2]);
+    const q4Index = quizQuestions[3].options.indexOf(answersState[3]);
 
     // Rule 1: Main driver - Frequency of discomfort (Q1)
     let baseScore = 0;
@@ -296,13 +434,13 @@ export default function QuizPage() {
     }
 
     return recommendation;
-  };
+  }
 
+  const currentAnswer = answers[currentQuestion];
 
-  const canProceed = currentAnswer !== undefined;
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center">
+    <main className="relative min-h-screen w-full">
       {/* Background - Video for Desktop, Image for Mobile */}
       <div className="fixed inset-0 -z-10 flex items-center justify-center">
         {/* Desktop Video Background */}
@@ -341,83 +479,68 @@ export default function QuizPage() {
 
       {/* Content */}
       {!quizStarted ? (
-        <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
-            Let&apos;s find the perfect Santelle plan for you.
-          </h1>
-          <p className="text-xl text-[#721422]/80 mb-8">
-            Answer five quick questions to discover how to better understand and care for your intimate health.
-          </p>
-          <button
-            onClick={handleStartQuiz}
-            className="inline-block bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer"
-          >
-            Start now
-          </button>
+        <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-6 py-12 text-center">
+          <div className="w-full max-w-4xl rounded-3xl border border-white/50 bg-white/40 px-8 py-16 md:px-16 md:py-20 backdrop-blur-md">
+            <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
+              Let&apos;s find the perfect Santelle plan for you.
+            </h1>
+            <p className="text-xl text-[#721422]/80 mb-10">
+              Answer five quick questions to discover how to better understand and care for your intimate health.
+            </p>
+            <button
+              onClick={handleStartQuiz}
+              className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
+            >
+              Start now
+            </button>
+          </div>
         </div>
       ) : (
-        <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16">
-          <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-3xl mx-auto">
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="text-sm text-[#721422] mb-2">
-                <div className="text-center mb-1">Question {currentQuestion + 1} of {quizQuestions.length}</div>
-                <div className="font-semibold text-center">{quizQuestions[currentQuestion].title}</div>
+        <div className="relative z-10 w-full min-h-screen">
+          <div className="relative flex min-h-screen w-full flex-col border border-white/50 bg-white/40 px-6 py-10 text-[#721422] backdrop-blur-md md:px-16 md:py-16">
+            <div className="flex flex-1 flex-col items-center gap-6 pt-4 pb-6 md:gap-10 md:pt-0 md:pb-0 justify-start md:justify-center">
+              {/* Progress Bar */}
+              <div className="w-full max-w-2xl">
+                <div className="mb-4 text-sm">
+                  <div className="mb-1 text-center">
+                    Question {currentQuestion + 1} of {quizQuestions.length}
+                  </div>
+                  <div className="text-center font-semibold">
+                    {quizQuestions[currentQuestion].title}
+                  </div>
+                </div>
+                <div className="h-2 w-full rounded-full bg-white/50">
+                  <div
+                    className="h-1 rounded-full bg-[#721422] transition-all duration-300"
+                    style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-white/50 rounded-full h-2">
-                <div 
-                  className="bg-[#721422] h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
-                />
+
+              {/* Question */}
+              <div className="w-full max-w-2xl text-center">
+                <h2 className="text-2xl font-bold md:text-3xl">
+                  {quizQuestions[currentQuestion].question}
+                </h2>
               </div>
-            </div>
 
-            {/* Question */}
-            <h2 className="text-2xl md:text-3xl font-bold text-[#721422] mb-8 text-center">
-              {quizQuestions[currentQuestion].question}
-            </h2>
-
-            {/* Options */}
-            <div className="space-y-4 mb-8">
-              {quizQuestions[currentQuestion].options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSelectAnswer(option)}
-                  className={`w-full p-4 rounded-xl text-left font-medium transition-all duration-200 ${
-                    currentAnswer === option
-                      ? 'bg-[#721422] text-white shadow-lg'
-                      : 'bg-white/60 text-[#721422] hover:bg-white/80 hover:shadow-md'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-
-            {/* Navigation Buttons */}
-            <div className="flex gap-4 justify-between">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestion === 0}
-                className={`px-6 py-3 rounded-full font-bold transition-colors duration-200 ${
-                  currentQuestion === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-white text-[#721422] hover:bg-gray-100'
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={!canProceed}
-                className={`px-6 py-3 rounded-full font-bold transition-colors duration-200 ${
-                  canProceed
-                    ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {currentQuestion === quizQuestions.length - 1 ? 'Submit' : 'Next'}
-              </button>
+              {/* Options */}
+              <div className="w-full max-w-2xl space-y-2">
+                {quizQuestions[currentQuestion].options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSelectAnswer(option)}
+                    disabled={isSubmitting}
+                    className={`w-full rounded-full px-5 py-5 text-center text-md font-medium transition-all duration-200 ${
+                      currentAnswer === option
+                        ? 'bg-[#721422] text-white shadow-lg'
+                        : 'bg-white/60 text-[#721422] hover:bg-white/80 hover:shadow-md'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

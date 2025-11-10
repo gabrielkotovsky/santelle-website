@@ -55,6 +55,18 @@ const allPlans = [
     cycleLookupKey: 'essential-quarterly',
     annualLookupKey: 'essential-annual',
     originalIndex: 2
+  },
+  {
+    name: 'One-Off',
+    frequency: 'Single Kit',
+    cyclePrice: '€29.99',
+    cyclePeriod: 'one-time',
+    annualPrice: null,
+    annualPeriod: null,
+    savingsPercentage: null,
+    cycleLookupKey: '1pack',
+    annualLookupKey: null,
+    originalIndex: 3
   }
 ];
 
@@ -94,29 +106,28 @@ function PlansContent() {
   
   // Detect if on mobile device
   const [isMobile, setIsMobile] = useState(false);
-  
-  // Billing period toggle state
-  const [isAnnual, setIsAnnual] = useState(false);
+  const [showAllPlans, setShowAllPlans] = useState(false);
   
   // Popup state
   const [showPopup, setShowPopup] = useState(false);
   const [pendingLookupKey, setPendingLookupKey] = useState<string | null>(null);
   const [pendingPlan, setPendingPlan] = useState<typeof allPlans[0] | null>(null);
-  const [pendingBillingPeriod, setPendingBillingPeriod] = useState<'cycle' | 'annual' | null>(null);
+  const [pendingBillingPeriod, setPendingBillingPeriod] = useState<'cycle' | 'one_time' | null>(null);
   
   // Handle checkout - direct if logged in, auth page if not
-  const handlePreOrder = async (lookupKey: string, plan: typeof allPlans[0], billingPeriod: 'cycle' | 'annual') => {
+  const handlePreOrder = async (plan: typeof allPlans[0]) => {
+    const isOneOff = plan.cycleLookupKey === '1pack';
     // Track plan selection
     trackGTMEvent('plan_selected', {
       plan_name: plan.name,
-      billing_type: billingPeriod === 'annual' ? 'annual' : 'per_cycle',
+      billing_type: isOneOff ? 'one_time' : 'per_cycle',
       is_recommended: recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex,
     });
     
     // Show popup first
-    setPendingLookupKey(lookupKey);
+    setPendingLookupKey(plan.cycleLookupKey);
     setPendingPlan(plan);
-    setPendingBillingPeriod(billingPeriod);
+    setPendingBillingPeriod(isOneOff ? 'one_time' : 'cycle');
     setShowPopup(true);
   };
   
@@ -127,7 +138,7 @@ function PlansContent() {
     // Track disclaimer confirmation
     trackGTMEvent('Disclaimer_Confirmed', {
       plan_name: pendingPlan.name,
-      billing_type: pendingBillingPeriod === 'annual' ? 'annual' : 'per_cycle',
+      billing_type: pendingBillingPeriod === 'one_time' ? 'one_time' : 'per_cycle',
       lookup_key: pendingLookupKey,
     });
     
@@ -175,7 +186,7 @@ function PlansContent() {
     if (pendingPlan && pendingBillingPeriod) {
       trackGTMEvent('Disclaimer_Cancelled', {
         plan_name: pendingPlan.name,
-        billing_type: pendingBillingPeriod === 'annual' ? 'annual' : 'per_cycle',
+        billing_type: pendingBillingPeriod === 'one_time' ? 'one_time' : 'per_cycle',
         lookup_key: pendingLookupKey || null,
       });
     }
@@ -198,13 +209,37 @@ function PlansContent() {
   }, []);
 
   // On mobile, sort plans to show recommended first; on desktop, keep original order
-  const plans = isMobile && recommendedPlanIndex !== null
+  const sortedPlans = isMobile && recommendedPlanIndex !== null
     ? [...allPlans].sort((a, b) => {
         if (a.originalIndex === recommendedPlanIndex) return -1;
         if (b.originalIndex === recommendedPlanIndex) return 1;
         return a.originalIndex - b.originalIndex;
       })
     : allPlans;
+  
+  const recommendedPlan = recommendedPlanIndex !== null
+    ? sortedPlans.find(plan => plan.originalIndex === recommendedPlanIndex) || null
+    : null;
+
+  const oneOffPlan = sortedPlans.find(plan => plan.cycleLookupKey === '1pack') || null;
+  
+  const displayedPlans = showAllPlans || !recommendedPlan
+    ? sortedPlans
+    : [
+        recommendedPlan,
+        ...(oneOffPlan && oneOffPlan.originalIndex !== recommendedPlan.originalIndex ? [oneOffPlan] : []),
+      ];
+
+  const isPendingOneOff = pendingPlan?.cycleLookupKey === '1pack';
+
+  const handleShowAllPlans = () => {
+    if (recommendedPlan) {
+      trackGTMEvent('plans_view_other', {
+        recommended_plan: recommendedPlan.name,
+      });
+    }
+    setShowAllPlans(true);
+  };
   
   // State for checkout success handling
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -444,18 +479,34 @@ function PlansContent() {
             </h3>
             
             <div className="text-[#721422] mb-6 space-y-3">
-              <p className="font-semibold text-lg">
-                Start using the app right away — no payment needed!
-              </p>
-              <p>
-                You&apos;ll get full access to the Santelle app immediately. We won&apos;t charge you anything until your first kit is ready to ship.
-              </p>
-              <p>
-                We&apos;ll email you at least 48 hours before your first payment, so you have plenty of time to decide.
-              </p>
-              <p>
-                You can cancel your subscription anytime before your kit ships — completely free, no questions asked.
-              </p>
+              {isPendingOneOff ? (
+                <>
+                  <p className="font-semibold text-lg">
+                    IMPORTANT: Start exploring the app as soon as you order your kit — full access is unlocked instantly for 30 days.
+                  </p>
+                  <p>
+                    You won’t need a subscription to use Santelle during this time. Your one-off purchase includes complete access to insights, tracking, and personalized recommendations for an entire month after your test results.
+                  </p>
+                  <p>
+                    After 30 days, access will automatically close unless you choose to subscribe — no hidden fees, no automatic renewals, no strings attached.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-lg">
+                    Start using the app right away — no payment needed!
+                  </p>
+                  <p>
+                    You&apos;ll get full access to the Santelle app immediately. We won&apos;t charge you anything until your first kit is ready to ship.
+                  </p>
+                  <p>
+                    We&apos;ll email you at least 48 hours before your first payment, so you have plenty of time to decide.
+                  </p>
+                  <p>
+                    You can cancel your subscription anytime before your kit ships — completely free, no questions asked.
+                  </p>
+                </>
+              )}
               <p className="text-sm pt-2">
                 <a 
                   href="https://santellehealth.com/terms_of_service" 
@@ -487,7 +538,7 @@ function PlansContent() {
       )}
 
       {/* Content */}
-      <div className="relative z-10 w-[95%] mx-auto px-4 py-30">
+      <div className="relative z-10 w-[95%] mx-auto px-1 sm:px-4 py-10">
         <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
             ? 'Based on your answers, this plan helps you stay balanced and in control.'
@@ -495,48 +546,38 @@ function PlansContent() {
           }
         </h1>
         
-        {/* Billing Period Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white/40 backdrop-blur-md rounded-full p-1 border border-white/50 inline-flex">
-            <button
-              onClick={() => setIsAnnual(false)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-200 ${
-                !isAnnual
-                  ? 'bg-[#721422] text-white shadow-md'
-                  : 'text-[#721422] hover:bg-white/50'
-              }`}
-            >
-              Per Cycle
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-200 ${
-                isAnnual
-                  ? 'bg-[#721422] text-white shadow-md'
-                  : 'text-[#721422] hover:bg-white/50'
-              }`}
-            >
-              Annual
-            </button>
-          </div>
-        </div>
-        
-        <div className="flex flex-col gap-8 max-w-6xl mx-auto">
+        <div className="flex flex-col gap-4 sm:gap-8 max-w-7xl mx-auto">
           {/* Plan Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => {
-              const isRecommended = recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex;
+          <div
+            className={`grid gap-1 sm:gap-6 ${
+              displayedPlans.length === 1
+                ? 'grid-cols-1 max-w-2xl mx-auto'
+                : displayedPlans.length === 2
+                ? 'grid-cols-2 max-w-4xl mx-auto'
+                : 'grid-cols-2 md:grid-cols-4'
+            }`}
+          >
+            {displayedPlans.map((plan) => {
+              const recomFlag = recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex;
+              const isOneOff = plan.cycleLookupKey === '1pack';
               return (
                 <div
                   key={plan.name}
                   className={`bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col ${
-                    isRecommended ? 'border-[#721422] shadow-lg' : 'border-white/50'
+                    recomFlag ? 'border-[#721422] shadow-lg' : isOneOff ? 'border-[#721422]/60' : 'border-white/50'
                   }`}
                 >
-                  {isRecommended && (
+                  {recomFlag && (
                     <div className="text-center mb-4">
                       <span className="bg-[#721422] text-white px-4 py-1 rounded-full text-sm font-bold">
-                        RECOMMENDED FOR YOU
+                        RECOMMENDED
+                      </span>
+                    </div>
+                  )}
+                  {isOneOff && !recomFlag && (
+                    <div className="text-center mb-4">
+                      <span className="bg-white text-[#721422] px-4 py-1 rounded-full text-sm font-semibold border border-[#721422]/40">
+                        ONE-OFF
                       </span>
                     </div>
                   )}
@@ -568,41 +609,45 @@ function PlansContent() {
                   <div className="mt-auto">
                     <div className="text-center mb-6">
                       <div className="text-3xl font-bold text-[#721422]">
-                        {isAnnual ? plan.annualPrice : plan.cyclePrice}
-                        <span className="text-lg font-normal"> / {isAnnual ? plan.annualPeriod : plan.cyclePeriod}</span>
-                        {isAnnual && (
-                          <span className="text-sm font-semibold text-green-600 ml-2">
-                            (Save {plan.savingsPercentage})
-                          </span>
+                        {plan.cyclePrice}
+                        {plan.cyclePeriod && (
+                          <>
+                            <span className="hidden sm:inline text-lg font-normal"> / {plan.cyclePeriod}</span>
+                            <span className="block text-base font-normal sm:hidden">
+                              {isOneOff ? plan.cyclePeriod : `/ ${plan.cyclePeriod}`}
+                            </span>
+                          </>
                         )}
-                      </div>
-                      <div className="text-sm text-[#721422]/70 mt-1">
-                        {isAnnual 
-                          ? `${plan.cyclePrice} / ${plan.cyclePeriod}`
-                          : `${plan.annualPrice} / year`
-                        }
                       </div>
                     </div>
                     
                     <button
-                      onClick={() => handlePreOrder(
-                        isAnnual ? plan.annualLookupKey : plan.cycleLookupKey,
-                        plan,
-                        isAnnual ? 'annual' : 'cycle'
-                      )}
+                      onClick={() => handlePreOrder(plan)}
                       className={`block text-center w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
-                        isRecommended
+                        recomFlag
                           ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
                           : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
                       }`}
                     >
-                      Pre-Order
+                      {isOneOff ? 'Buy Now' : 'Pre-Order'}
                     </button>
                   </div>
                 </div>
               );
             })}
           </div>
+
+          {recommendedPlan && !showAllPlans && (
+            <div className="mt-0 text-center">
+              <button
+                type="button"
+                onClick={handleShowAllPlans}
+                className="inline-block rounded-full border-2 border-[#721422] px-8 py-3 font-semibold text-[#721422] transition-colors duration-200 hover:bg-[#721422] hover:text-white"
+              >
+                View other plans
+              </button>
+            </div>
+          )}
 
           {/* Pre-Order Features and Common Features - Below Plan Cards */}
           <div className="flex flex-col gap-6">
