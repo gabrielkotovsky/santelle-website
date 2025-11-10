@@ -539,7 +539,7 @@ function PlansContent() {
 
       {/* Content */}
       <div className="relative z-10 w-[95%] mx-auto px-1 sm:px-4 py-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
+        <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
             ? 'Based on your answers, this plan helps you stay balanced and in control.'
             : 'Choose the plan that best fits your needs.'
@@ -569,25 +569,25 @@ function PlansContent() {
                 >
                   {recomFlag && (
                     <div className="text-center mb-4">
-                      <span className="bg-[#721422] text-white px-4 py-1 rounded-full text-sm font-bold">
+                      <span className="bg-[#721422] text-white px-4 py-1 rounded-full text-xs sm:text-sm font-bold">
                         RECOMMENDED
                       </span>
                     </div>
                   )}
                   {isOneOff && !recomFlag && (
                     <div className="text-center mb-4">
-                      <span className="bg-white text-[#721422] px-4 py-1 rounded-full text-sm font-semibold border border-[#721422]/40">
+                      <span className="bg-white text-[#721422] px-4 py-1 rounded-full text-xs sm:text-sm font-semibold border border-[#721422]/40">
                         ONE-OFF
                       </span>
                     </div>
                   )}
                   
-                  <h2 className="text-2xl md:text-3xl font-bold text-[#721422] mb-4 text-center">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#721422] mb-4 text-center">
                     {plan.name}
                   </h2>
                   
                   <div className="mb-4">
-                    <p className="text-lg text-[#721422] font-semibold text-center">
+                    <p className="text-base sm:text-lg text-[#721422] font-semibold text-center">
                       {plan.frequency}
                     </p>
                   </div>
@@ -608,7 +608,7 @@ function PlansContent() {
                   
                   <div className="mt-auto">
                     <div className="text-center mb-6">
-                      <div className="text-3xl font-bold text-[#721422]">
+                      <div className="text-2xl sm:text-3xl font-bold text-[#721422]">
                         {plan.cyclePrice}
                         {plan.cyclePeriod && (
                           <>
@@ -623,7 +623,7 @@ function PlansContent() {
                     
                     <button
                       onClick={() => handlePreOrder(plan)}
-                      className={`block text-center w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
+                      className={`block text-center w-full font-bold px-3 sm:px-6 py-2 sm:py-4 rounded-full transition-colors duration-200 ${
                         recomFlag
                           ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
                           : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
