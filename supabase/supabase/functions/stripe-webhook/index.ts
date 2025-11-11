@@ -12,6 +12,9 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2025-09-30.clover',
 })
 
+const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
+const resendFromAddress = 'Santelle <marketing@santellehealth.com>'
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -385,6 +388,91 @@ Deno.serve(async (req) => {
 
         console.log('Profile created successfully for user:', user_id)
       }
+
+      const sendConfirmationEmail = async () => {
+        if (!resendApiKey || !email) {
+          if (!resendApiKey) {
+            console.log('RESEND_API_KEY not set, skipping confirmation email')
+          }
+          return
+        }
+
+        const safeEmail = email.toLowerCase().trim()
+        const isSubscription = session.mode === 'subscription'
+        const subject = isSubscription
+          ? 'Votre commande Santelle est confirmée'
+          : 'Votre kit ponctuel Santelle est confirmé'
+
+        const planDescription = isSubscription
+          ? `Votre commande Santelle est confirmée. Nous vous écrirons avant l’expédition de votre premier kit afin que vous puissiez modifier vos informations si besoin.`
+          : `Merci d’avoir acheté un kit ponctuel Santelle. Vous disposez maintenant de 30 jours d’accès complet à l’application Santelle dès votre connexion.`
+
+        const html = `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${subject}</title>
+    <style>
+      body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #3b0f16; margin: 0; padding: 0; background-color: #fff9f9; }
+      .container { max-width: 560px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 24px 60px rgba(123,22,34,0.1); }
+      h1 { font-size: 24px; margin: 24px 0 16px; }
+      p { font-size: 16px; line-height: 1.6; margin: 16px 0; }
+      .button { display: inline-block; margin: 24px 0; padding: 14px 28px; background: #721422; color: #ffffff; font-weight: 600; border-radius: 999px; text-decoration: none; }
+      .footer { margin-top: 40px; font-size: 13px; color: #9c5c67; text-align: center; }
+      .logo-wrapper { text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo-wrapper">
+        <img src="https://kvagkkkyashwuvbkegvo.supabase.co/storage/v1/object/public/marketing/logo.svg" alt="Santelle" width="240" style="max-width: 100%; height: auto;" />
+      </div>
+      <h1>${subject}</h1>
+      <p>Bonjour${name ? ` ${name.split(' ')[0]}` : ''},</p>
+      <p>${planDescription}</p>
+      <p>Votre e-mail de connexion : <strong>${safeEmail}</strong></p>
+      <p>Si vous avez des questions ou besoin d’aide pour démarrer, répondez simplement à cet e-mail.</p>
+      <p style="margin-top: 32px; font-size: 15px;">
+        Besoin de mettre à jour vos informations de paiement ou de consulter votre commande ?
+        <a href="https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00" target="_blank" rel="noopener noreferrer">
+          Accédez au portail de compte Santelle
+        </a>.
+      </p>
+      <p class="footer">Avec gratitude,<br/>L’équipe Santelle</p>
+    </div>
+  </body>
+</html>
+        `.trim()
+
+        try {
+          const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: resendFromAddress,
+              to: [safeEmail],
+              subject,
+              html,
+            }),
+          })
+
+          if (!response.ok) {
+            const text = await response.text()
+            console.error('Failed to send confirmation email via Resend', response.status, text)
+          } else {
+            console.log('Confirmation email queued for', safeEmail)
+          }
+        } catch (err) {
+          console.error('Error sending confirmation email:', err)
+        }
+      }
+
+      await sendConfirmationEmail()
 
       return new Response(
         JSON.stringify({ 

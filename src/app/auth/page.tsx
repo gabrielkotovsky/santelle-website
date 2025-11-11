@@ -57,7 +57,7 @@ function AuthContent() {
       setStep('otp');
     } catch (err: any) {
       console.error('Error sending OTP:', err);
-      setError(err.message || 'Failed to send verification code. Please try again.');
+      setError(err.message || 'Échec de l’envoi du code de vérification. Veuillez réessayer.');
       
       // Track OTP send failure
       trackGTMEvent('Auth_OTP_Send_Failed', {
@@ -94,14 +94,14 @@ function AuthContent() {
         // Fetch user from Supabase
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError || !user) {
-          setError('Failed to fetch authenticated user after OTP.');
+          setError('Impossible de récupérer votre compte après la vérification du code.');
           setIsLoading(false);
           return;
         }
         const userId = user.id;
         const userEmail = user.email;
         if (!userId || !userEmail) {
-          setError('Authenticated user missing id or email');
+          setError('Le compte authentifié ne contient pas d’identifiant ou d’e-mail');
           setIsLoading(false);
           return;
         }
@@ -140,7 +140,7 @@ function AuthContent() {
       }
     } catch (err: any) {
       console.error('Error verifying OTP:', err);
-      setError(err.message || 'Invalid verification code. Please try again.');
+      setError(err.message || 'Code de vérification invalide. Veuillez réessayer.');
       
       // Track OTP verification failure
       trackGTMEvent('Auth_OTP_Verification_Failed', {
@@ -186,17 +186,17 @@ function AuthContent() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-[95%] max-w-md mx-auto px-4 py-16">
-        <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-10 border border-white/50">
+      <div className="relative z-10 w-full max-w-md mx-auto px-0 sm:px-4 py-0 sm:py-16 md:py-20">
+        <div className="bg-white/40 backdrop-blur-md rounded-none sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-white/30 sm:border-white/50 max-w-none min-h-[100dvh] sm:min-h-0 sm:max-w-full mx-auto flex flex-col justify-center">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-2">
-              {step === 'email' ? 'Welcome' : 'Verify Your Email'}
+              {step === 'email' ? 'Bienvenue' : 'Vérifiez votre e-mail'}
             </h1>
             <p className="text-[#721422]/70">
               {step === 'email' 
-                ? 'Enter your email to continue'
-                : `We sent a verification code to ${email}`
+                ? 'Saisissez votre e-mail pour continuer'
+                : `Nous avons envoyé un code de vérification à ${email}`
               }
             </p>
           </div>
@@ -214,7 +214,7 @@ function AuthContent() {
               {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-[#721422] mb-2">
-                  Email Address
+                  Adresse e-mail
                 </label>
                 <input
                   type="email"
@@ -222,7 +222,7 @@ function AuthContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-white/60 border border-white/50 text-[#721422] placeholder-[#721422]/40 focus:outline-none focus:ring-2 focus:ring-[#721422] focus:bg-white/80 transition-all"
-                  placeholder="Enter your email"
+                  placeholder="Entrez votre e-mail"
                   required
                 />
               </div>
@@ -233,7 +233,7 @@ function AuthContent() {
                 disabled={isLoading}
                 className="w-full bg-[#721422] text-white font-bold px-6 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Sending code...' : 'Continue'}
+                {isLoading ? 'Envoi du code…' : 'Continuer'}
               </button>
             </form>
           )}
@@ -244,7 +244,7 @@ function AuthContent() {
               {/* OTP Field */}
               <div>
                 <label htmlFor="otp" className="block text-sm font-semibold text-[#721422] mb-2">
-                  Verification Code
+                  Code de vérification
                 </label>
                 <input
                   type="text"
@@ -270,7 +270,7 @@ function AuthContent() {
                       // Show success message
                       setError('');
                     } catch (err: any) {
-                      setError(err.message || 'Failed to resend code.');
+                      setError(err.message || 'Échec du renvoi du code.');
                     } finally {
                       setIsLoading(false);
                     }
@@ -278,10 +278,10 @@ function AuthContent() {
                   disabled={isLoading}
                   className="text-sm text-[#721422] hover:text-[#8a1a2a] font-semibold transition-colors disabled:opacity-50"
                 >
-                  Resend verification code
+                  Renvoyer le code
                 </button>
                 <span className="text-[#721422]/50 text-sm block mt-2">
-                  or{' '}
+                  ou{' '}
                   <button
                     type="button"
                     onClick={() => {
@@ -291,7 +291,7 @@ function AuthContent() {
                     }}
                     className="text-[#721422] hover:text-[#8a1a2a] font-semibold transition-colors"
                   >
-                    change email
+                    changer d’e-mail
                   </button>
                 </span>
               </div>
@@ -302,7 +302,7 @@ function AuthContent() {
                 disabled={isLoading || otp.length !== 6}
                 className="w-full bg-[#721422] text-white font-bold px-6 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Verifying...' : 'Verify & Continue'}
+                {isLoading ? 'Vérification…' : 'Valider et continuer'}
               </button>
             </form>
           )}
@@ -322,8 +322,8 @@ function AuthContent() {
                   type="button"
                   onClick={async () => {
                     // TODO: Implement Apple Sign-In with proper identity token and nonce
-                    console.log('Apple login clicked', { lookupKey });
-                    setError('Apple Sign-In is not yet configured. Please use email authentication.');
+                  console.log('Apple login clicked', { lookupKey });
+                  setError('La connexion avec Apple n’est pas encore configurée. Merci d’utiliser l’authentification par e-mail.');
                   }}
                   className="w-full bg-white/60 hover:bg-white/80 border border-white/50 text-[#721422] font-semibold px-6 py-3 rounded-full transition-all duration-200 flex items-center justify-center space-x-2"
                 >
@@ -338,14 +338,15 @@ function AuthContent() {
 
           {/* Terms and Privacy */}
           <p className="mt-6 text-xs text-center text-[#721422]/60">
-            By continuing, you agree to Santelle&apos;s{' '}
+            En continuant, vous acceptez les{' '}
             <a href="/privacy-policy" className="underline hover:text-[#721422]">
-              Terms of Service
+              conditions d’utilisation
             </a>{' '}
-            and{' '}
+            et la{' '}
             <a href="/privacy-policy" className="underline hover:text-[#721422]">
-              Privacy Policy
-            </a>
+              politique de confidentialité
+            </a>{' '}
+            de Santelle.
           </p>
         </div>
       </div>
@@ -386,7 +387,7 @@ export default function AuthPage() {
           />
           <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
         </div>
-        <div className="relative z-10 text-[#721422] text-xl">Loading...</div>
+        <div className="relative z-10 text-[#721422] text-xl">Chargement…</div>
       </main>
     }>
       <AuthContent />

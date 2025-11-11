@@ -16,6 +16,10 @@ const shouldHideNavigation = (pathname: string | null) => {
     return true;
   }
 
+  if (pathname.startsWith('/auth')) {
+    return true;
+  }
+
   if (pathname.startsWith('/quiz') || pathname.startsWith('/plans')) {
     return true;
   }

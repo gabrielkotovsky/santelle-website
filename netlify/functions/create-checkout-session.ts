@@ -88,6 +88,13 @@ export const handler: Handler = async (event) => {
         {
           price: price.id,
           quantity: 1,
+          adjustable_quantity: isRecurringPrice
+            ? undefined
+            : {
+                enabled: true,
+                minimum: 1,
+                maximum: 10,
+              },
         },
       ],
       success_url: `${YOUR_DOMAIN}/plans?success=true&session_id={CHECKOUT_SESSION_ID}`,
@@ -107,7 +114,6 @@ export const handler: Handler = async (event) => {
         ...baseSessionParams,
         mode: 'subscription',
         subscription_data: {
-          trial_period_days: 60,
           metadata: {
             user_id,
             email,

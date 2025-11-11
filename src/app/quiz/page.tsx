@@ -18,55 +18,55 @@ const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
 const quizQuestions = [
   {
     id: 1,
-    title: 'Frequency of Discomfort',
-    question: 'How often do you experience vaginal infections or discomfort per year?',
+    title: 'Fréquence de l’inconfort',
+    question: 'À quelle fréquence avez-vous des infections vaginales ou de l’inconfort chaque année ?',
     options: [
-      'Less than once',
-      '1-2 times per year',
-      '2-4 times per year',
-      '4 or more times per year'
+      'Moins d’une fois',
+      '1 à 2 fois par an',
+      '2 à 4 fois par an',
+      '4 fois ou plus par an'
     ]
   },
   {
     id: 2,
-    title: 'Confidence / Knowledge Level',
-    question: 'How confident do you feel about understanding and managing your vaginal health?',
+    title: 'Niveau de confiance / connaissance',
+    question: 'Quel est votre niveau de confiance dans la compréhension et la gestion de votre santé vaginale ?',
     options: [
-      'Very - I know my body well',
-      'Somewhat - I\'d like more clarity',
-      'Not - I often feel unsure or lost'
+      'Très confiante – je connais bien mon corps',
+      'Plutôt confiante – j’aimerais plus de clarté',
+      'Peu confiante – je me sens souvent incertaine ou perdue'
     ]
   },
   {
     id: 3,
     title: 'Motivation',
-    question: 'What made you curious about Santelle?',
+    question: 'Qu’est-ce qui vous a donné envie de découvrir Santelle ?',
     options: [
-      'I want to prevent recurring infections',
-      'I\'m trying to get pregnant',
-      'I want discreet insights',
-      'I\'m just curious about my vaginal health'
+      'Je veux prévenir les infections récurrentes',
+      'J’essaie de tomber enceinte',
+      'Je veux des informations discrètes',
+      'Je suis simplement curieuse de ma santé vaginale'
     ]
   },
   {
     id: 4,
-    title: 'Desired Involvement',
-    question: 'How much effort would you like to put into tracking your vaginal health?',
+    title: 'Implication souhaitée',
+    question: 'Quel niveau d’implication souhaitez-vous pour suivre votre santé vaginale ?',
     options: [
-      'I prefer something simple and occasional',
-      'I don\'t mind testing regularly if it keeps me balanced',
-      'I want full visibility and personalized insights every month'
+      'Je préfère quelque chose de simple et ponctuel',
+      'Tester régulièrement ne me dérange pas si cela m’aide à rester équilibrée',
+      'Je veux une visibilité complète et des informations personnalisées chaque mois'
     ]
   },
   {
     id: 5,
-    title: 'Interest in Product',
-    question: 'Would you be interested in a subscription for vaginal health test kits with an AI companion app?',
+    title: 'Intérêt pour le produit',
+    question: 'Seriez-vous intéressée par un abonnement aux kits de test de santé vaginale avec une application compagnon IA ?',
     options: [
-      'Definitely, I\'d love that!',
-      'Absolutely!',
-      'Yesss!',
-      'No (I hate puppies)'
+      'Certainement, j’adorerais !',
+      'Absolument !',
+      'OUIIII !',
+      'Non (je déteste les chiots)'
     ]
   }
 ];
@@ -227,12 +227,12 @@ export default function QuizPage() {
       const recommendedPlan = calculateRecommendedPlan(answersState);
       console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answersState);
 
-      const planNames: { [key: number]: string } = {
-        0: 'Monthly',
-        1: 'Bi-Monthly',
-        2: 'Quarterly',
-        [-1]: 'Opt-out',
-      };
+        const planNames: { [key: number]: string } = {
+          0: 'Mensuel',
+          1: 'Bimestriel',
+          2: 'Trimestriel',
+          [-1]: 'Sans recommandation',
+        };
 
       trackGTMEvent('Quiz_Completed', {
         quiz_name: 'Santelle Plan Quiz',
@@ -243,9 +243,9 @@ export default function QuizPage() {
         answers: answerIndices,
       });
 
-      if (recommendedPlan === -1) {
+        if (recommendedPlan === -1) {
         setIsSubmitting(false);
-        alert('Thank you for your honesty! We appreciate your time 💜');
+          alert('Merci pour votre sincérité ! Nous apprécions votre temps 💜');
         window.location.href = '/';
         return;
       }
@@ -339,7 +339,7 @@ export default function QuizPage() {
   function calculateRecommendedPlan(answersState: { [key: number]: string }): number {
     // Check for opt-out first (Q5 = "No (I hate puppies)")
     const q5Answer = answersState[4];
-    if (q5Answer === 'No (I hate puppies)') {
+    if (q5Answer === 'Non (je déteste les chiots)') {
       return -1; // Special case for opt-out
     }
 
@@ -482,16 +482,16 @@ export default function QuizPage() {
         <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-6 py-12 text-center">
           <div className="w-full max-w-4xl rounded-3xl border border-white/50 bg-white/40 px-8 py-16 md:px-16 md:py-20 backdrop-blur-md">
             <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
-              Let&apos;s find the perfect Santelle plan for you.
+              Trouvons l’offre Santelle idéale pour vous.
             </h1>
             <p className="text-xl text-[#721422]/80 mb-10">
-              Answer five quick questions to discover how to better understand and care for your intimate health.
+              Répondez à cinq questions rapides pour mieux comprendre et prendre soin de votre intimité.
             </p>
             <button
               onClick={handleStartQuiz}
               className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
             >
-              Start now
+              Commencer
             </button>
           </div>
         </div>
@@ -503,7 +503,7 @@ export default function QuizPage() {
               <div className="w-full max-w-2xl">
                 <div className="mb-4 text-sm">
                   <div className="mb-1 text-center">
-                    Question {currentQuestion + 1} of {quizQuestions.length}
+                    Question {currentQuestion + 1} sur {quizQuestions.length}
                   </div>
                   <div className="text-center font-semibold">
                     {quizQuestions[currentQuestion].title}

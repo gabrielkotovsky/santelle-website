@@ -22,45 +22,45 @@ const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
 const allPlans = [
   {
     name: 'Proactive',
-    frequency: 'Monthly Kit',
-    cyclePrice: '€12.99',
-    cyclePeriod: 'month',
-    annualPrice: '€129.99',
-    annualPeriod: 'year',
-    savingsPercentage: '16.6%',
+    frequency: 'Kit mensuel',
+    cyclePrice: '12,99 €',
+    cyclePeriod: 'mois',
+    annualPrice: '129,99 €',
+    annualPeriod: 'an',
+    savingsPercentage: '16,6 %',
     cycleLookupKey: 'proactive-monthly',
     annualLookupKey: 'proactive-annual',
     originalIndex: 0
   },
   {
     name: 'Balanced',
-    frequency: 'Bi-Monthly Kit',
-    cyclePrice: '€16.99',
-    cyclePeriod: '2 months',
-    annualPrice: '€79.99',
-    annualPeriod: 'year',
-    savingsPercentage: '21.5%',
+    frequency: 'Kit bimestriel',
+    cyclePrice: '16,99 €',
+    cyclePeriod: '2 mois',
+    annualPrice: '79,99 €',
+    annualPeriod: 'an',
+    savingsPercentage: '21,5 %',
     cycleLookupKey: 'balanced-bimonthly',
     annualLookupKey: 'balanced-annual',
     originalIndex: 1
   },
   {
     name: 'Essential',
-    frequency: 'Quarterly Kit',
-    cyclePrice: '€19.99',
-    cyclePeriod: '3 months',
-    annualPrice: '€59.99',
-    annualPeriod: 'year',
-    savingsPercentage: '25.0%',
+    frequency: 'Kit trimestriel',
+    cyclePrice: '19,99 €',
+    cyclePeriod: '3 mois',
+    annualPrice: '59,99 €',
+    annualPeriod: 'an',
+    savingsPercentage: '25,0 %',
     cycleLookupKey: 'essential-quarterly',
     annualLookupKey: 'essential-annual',
     originalIndex: 2
   },
   {
     name: 'One-Off',
-    frequency: 'Single Kit',
-    cyclePrice: '€29.99',
-    cyclePeriod: 'one-time',
+    frequency: 'Kit à l’unité',
+    cyclePrice: '29,99 €',
+    cyclePeriod: 'achat unique',
     annualPrice: null,
     annualPeriod: null,
     savingsPercentage: null,
@@ -71,23 +71,45 @@ const allPlans = [
 ];
 
 const preOrderFeatures = [
-  'Early access to the app',
-  'Ships now for first 15 subscribers'
+  'Accès anticipé à l’application',
+  'Expédition immédiate pour les 15 premières abonnées'
 ];
 
 const commonFeatures = [
-  'Full access to app',
-  '30% off on extra kits'
+  'Accès complet à l’application',
+  'Suivi et personnalisation',
+  '-30 % sur les kits supplémentaires'
+];
+
+const oneOffVariants = [
+  {
+    lookupKey: '1pack',
+    label: 'Pack de 1',
+    price: '29,99 €',
+    savings: 'Tarif standard',
+  },
+  {
+    lookupKey: '5pack',
+    label: 'Pack de 5',
+    price: '119,99 €',
+    savings: 'Économisez 29,96 €',
+  },
+  {
+    lookupKey: '10pack',
+    label: 'Pack de 10',
+    price: '199,99 €',
+    savings: 'Économisez 99,91 €',
+  },
 ];
 
 const kitContents = [
-  '6 biomarkers testing for 4 types of infections, inflammation, and good bacteria'
+  '6 biomarqueurs pour 4 types d’infections, l’inflammation et la flore protectrice'
 ];
 
 const appFeatures = [
-  'AI analysis of your results',
-  'Personalized bite-sized educational content',
-  '(Analytics coming soon)'
+  'Analyse de vos résultats par IA',
+  'Contenus éducatifs personnalisés et concis',
+  '(Analyses avancées bientôt disponibles)'
 ];
 
 function PlansContent() {
@@ -106,50 +128,37 @@ function PlansContent() {
   
   // Detect if on mobile device
   const [isMobile, setIsMobile] = useState(false);
-  const [showAllPlans, setShowAllPlans] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Popup state
   const [showPopup, setShowPopup] = useState(false);
   const [pendingLookupKey, setPendingLookupKey] = useState<string | null>(null);
   const [pendingPlan, setPendingPlan] = useState<typeof allPlans[0] | null>(null);
   const [pendingBillingPeriod, setPendingBillingPeriod] = useState<'cycle' | 'one_time' | null>(null);
+  const [pendingOneOffVariant, setPendingOneOffVariant] = useState<string | null>(null);
   
   // Handle checkout - direct if logged in, auth page if not
-  const handlePreOrder = async (plan: typeof allPlans[0]) => {
-    const isOneOff = plan.cycleLookupKey === '1pack';
-    // Track plan selection
-    trackGTMEvent('plan_selected', {
-      plan_name: plan.name,
-      billing_type: isOneOff ? 'one_time' : 'per_cycle',
-      is_recommended: recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex,
+  const initiateCheckout = async (
+    lookupKeyParam: string,
+    planParam: typeof allPlans[0],
+    billingPeriodParam: 'cycle' | 'one_time'
+  ) => {
+    trackGTMEvent('Plan_Checkout_Initiated', {
+      plan_name: planParam.name,
+      billing_type: billingPeriodParam === 'one_time' ? 'one_time' : 'per_cycle',
+      lookup_key: lookupKeyParam,
+      is_recommended:
+        recommendedPlanIndex !== null && planParam.originalIndex === recommendedPlanIndex,
     });
-    
-    // Show popup first
-    setPendingLookupKey(plan.cycleLookupKey);
-    setPendingPlan(plan);
-    setPendingBillingPeriod(isOneOff ? 'one_time' : 'cycle');
-    setShowPopup(true);
-  };
-  
-  // Confirm and proceed with checkout
-  const confirmPreOrder = async () => {
-    if (!pendingLookupKey || !pendingPlan || !pendingBillingPeriod) return;
-    
-    // Track disclaimer confirmation
-    trackGTMEvent('Disclaimer_Confirmed', {
-      plan_name: pendingPlan.name,
-      billing_type: pendingBillingPeriod === 'one_time' ? 'one_time' : 'per_cycle',
-      lookup_key: pendingLookupKey,
-    });
-    
+
     setShowPopup(false);
-    const lookupKey = pendingLookupKey;
     setPendingLookupKey(null);
     setPendingPlan(null);
     setPendingBillingPeriod(null);
-    
+    setPendingOneOffVariant(null);
+    setIsRedirecting(true);
+
     if (user && user.email) {
-      // User is logged in, go directly to checkout
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/.netlify/functions/create-checkout-session';
@@ -157,7 +166,7 @@ function PlansContent() {
       const inputLookup = document.createElement('input');
       inputLookup.type = 'hidden';
       inputLookup.name = 'lookup_key';
-      inputLookup.value = lookupKey;
+      inputLookup.value = lookupKeyParam;
 
       const inputUid = document.createElement('input');
       inputUid.type = 'hidden';
@@ -175,9 +184,33 @@ function PlansContent() {
       document.body.appendChild(form);
       form.submit();
     } else {
-      // User not logged in, redirect to auth page
-      window.location.href = `/auth?lookup_key=${lookupKey}`;
+      window.location.href = `/auth?lookup_key=${lookupKeyParam}`;
     }
+  };
+
+  const handlePreOrder = async (plan: typeof allPlans[0]) => {
+    const isOneOff = plan.cycleLookupKey === '1pack';
+    trackGTMEvent('plan_selected', {
+      plan_name: plan.name,
+      billing_type: isOneOff ? 'one_time' : 'per_cycle',
+      is_recommended: recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex,
+    });
+    if (isOneOff) {
+      const defaultVariant = oneOffVariants[0];
+      setPendingLookupKey(defaultVariant.lookupKey);
+      setPendingOneOffVariant(defaultVariant.lookupKey);
+      setPendingPlan(plan);
+      setPendingBillingPeriod('one_time');
+      setShowPopup(true);
+    } else {
+      await initiateCheckout(plan.cycleLookupKey, plan, 'cycle');
+    }
+  };
+  
+  // Confirm and proceed with checkout
+  const confirmPreOrder = async () => {
+    if (!pendingLookupKey || !pendingPlan || !pendingBillingPeriod) return;
+    await initiateCheckout(pendingLookupKey, pendingPlan, pendingBillingPeriod);
   };
   
   // Close popup without proceeding
@@ -195,6 +228,8 @@ function PlansContent() {
     setPendingLookupKey(null);
     setPendingPlan(null);
     setPendingBillingPeriod(null);
+    setPendingOneOffVariant(null);
+    setIsRedirecting(false);
   };
   
   useEffect(() => {
@@ -221,26 +256,21 @@ function PlansContent() {
     ? sortedPlans.find(plan => plan.originalIndex === recommendedPlanIndex) || null
     : null;
 
+  const proactivePlan = sortedPlans.find(plan => plan.cycleLookupKey === 'proactive-monthly') || null;
   const oneOffPlan = sortedPlans.find(plan => plan.cycleLookupKey === '1pack') || null;
-  
-  const displayedPlans = showAllPlans || !recommendedPlan
-    ? sortedPlans
-    : [
-        recommendedPlan,
-        ...(oneOffPlan && oneOffPlan.originalIndex !== recommendedPlan.originalIndex ? [oneOffPlan] : []),
-      ];
+
+  let basePlans: typeof allPlans = [];
+  if (proactivePlan) {
+    basePlans.push(proactivePlan);
+  }
+  if (oneOffPlan) {
+    basePlans.push(oneOffPlan);
+  }
+
+  const displayedPlans = basePlans;
 
   const isPendingOneOff = pendingPlan?.cycleLookupKey === '1pack';
 
-  const handleShowAllPlans = () => {
-    if (recommendedPlan) {
-      trackGTMEvent('plans_view_other', {
-        recommended_plan: recommendedPlan.name,
-      });
-    }
-    setShowAllPlans(true);
-  };
-  
   // State for checkout success handling
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState("");
@@ -344,24 +374,23 @@ function PlansContent() {
             <div className="text-center mb-8">
               <div className="text-6xl mb-4">🎉</div>
               <h3 className="text-2xl md:text-3xl font-bold text-[#721422] mb-4">
-                Subscription successful!
+                Abonnement confirmé !
               </h3>
               <p className="text-lg text-[#721422]/80 mb-6">
-                Welcome to Santelle! You'll receive a confirmation email shortly.
+                Bienvenue chez Santelle ! Vous allez recevoir un e-mail de confirmation sous peu.
               </p>
-              {detailsLoading && <p className="text-[#721422]">Finalizing your subscription...</p>}
+              {detailsLoading && <p className="text-[#721422]">Finalisation de votre abonnement…</p>}
               {detailsError && <p className="text-red-600">{detailsError}</p>}
             </div>
 
-            <form action="/create-portal-session" method="POST" className="space-y-4">
-              <input type="hidden" name="session_id" value={sessionId} />
-              <button
-                type="submit"
-                className="w-full bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
-              >
-                Manage your billing information
-              </button>
-            </form>
+            <a
+              href="https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00"
+              className="block w-full bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 text-center"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Gérer mon compte
+            </a>
           </div>
         </div>
       </main>
@@ -407,7 +436,7 @@ function PlansContent() {
           <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50">
             <div className="text-center">
               <p className="text-xl text-[#721422] mb-6">
-                Order canceled -- continue to shop around and checkout when you&apos;re ready.
+                Commande annulée — poursuivez votre visite et revenez lorsque vous serez prête.
               </p>
             </div>
 
@@ -416,7 +445,7 @@ function PlansContent() {
                 href="/plans"
                 className="inline-block bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
               >
-                Back to Plans
+                Retour aux offres
               </a>
             </div>
           </div>
@@ -428,7 +457,7 @@ function PlansContent() {
   return (
     <main className="relative min-h-screen flex items-center justify-center">
       {/* Background - Video for Desktop, Image for Mobile */}
-      <div className="fixed inset-0 -z-10 flex items-center justify-center">
+      <div className="fixed inset-0 -z-10 flex items-center justify-center overflow-hidden">
         {/* Desktop Video Background */}
         <video
           src="/background_desktop.mp4"
@@ -446,18 +475,7 @@ function PlansContent() {
         />
         
         {/* Mobile Background Image */}
-        <div 
-          className="absolute inset-0 w-full h-full block md:hidden"
-          style={{
-            backgroundImage: 'url(/background-mobile.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
-            width: '100vw',
-            height: '100dvh'
-          }}
-        />
+        <div className="absolute inset-0 w-full h-full block md:hidden bg-[url('/background-mobile.jpg')] bg-cover bg-center bg-no-repeat bg-fixed" />
         
         {/* Overlay - Blur only, no color */}
         <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
@@ -474,36 +492,58 @@ function PlansContent() {
           
           {/* Modal Content */}
           <div className="relative bg-white/95 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 border-[#721422] max-w-lg w-full shadow-2xl">
-            <h3 className="text-2xl font-bold text-[#721422] mb-4 text-center">
-              Important Information
-            </h3>
             
             <div className="text-[#721422] mb-6 space-y-3">
               {isPendingOneOff ? (
-                <>
-                  <p className="font-semibold text-lg">
-                    IMPORTANT: Start exploring the app as soon as you order your kit — full access is unlocked instantly for 30 days.
-                  </p>
-                  <p>
-                    You won’t need a subscription to use Santelle during this time. Your one-off purchase includes complete access to insights, tracking, and personalized recommendations for an entire month after your test results.
-                  </p>
-                  <p>
-                    After 30 days, access will automatically close unless you choose to subscribe — no hidden fees, no automatic renewals, no strings attached.
-                  </p>
-                </>
+                  <div className="space-y-3">
+                    <p className="text-center font-semibold text-lg">
+                      Choisissez votre lot
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {oneOffVariants.map((variant) => {
+                        const isSelected = pendingOneOffVariant === variant.lookupKey;
+                        return (
+                          <button
+                            key={variant.lookupKey}
+                            type="button"
+                            onClick={() => {
+                              setPendingLookupKey(variant.lookupKey);
+                              setPendingOneOffVariant(variant.lookupKey);
+                            }}
+                            className={`rounded-2xl border-2 px-4 py-3 text-left transition-all duration-200 ${
+                              isSelected
+                                ? 'border-[#721422] bg-[#721422]/10 shadow-md'
+                                : 'border-[#721422]/20 bg-white/80 hover:border-[#721422]/60'
+                            }`}
+                          >
+                            <div className="font-semibold text-[#721422]">{variant.label}</div>
+                            <div className="text-sm text-[#721422]/80">{variant.price}</div>
+                            <div className="text-xs text-[#721422]/60 mt-1">
+                              {variant.savings}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {pendingOneOffVariant && (
+                      <p className="text-sm text-center text-[#721422]/70">
+                        Lot choisi : {oneOffVariants.find((v) => v.lookupKey === pendingOneOffVariant)?.label} · {oneOffVariants.find((v) => v.lookupKey === pendingOneOffVariant)?.price}
+                      </p>
+                    )}
+                  </div>
               ) : (
                 <>
                   <p className="font-semibold text-lg">
-                    Start using the app right away — no payment needed!
+                    Commencez à utiliser l’app immédiatement — aucun paiement requis !
                   </p>
                   <p>
-                    You&apos;ll get full access to the Santelle app immediately. We won&apos;t charge you anything until your first kit is ready to ship.
+                    Vous aurez un accès complet à l’app Santelle tout de suite. Nous ne vous facturerons rien avant l’expédition de votre premier kit.
                   </p>
                   <p>
-                    We&apos;ll email you at least 48 hours before your first payment, so you have plenty of time to decide.
+                    Nous vous avertirons au moins 48 heures avant votre premier paiement afin que vous ayez le temps de décider.
                   </p>
                   <p>
-                    You can cancel your subscription anytime before your kit ships — completely free, no questions asked.
+                    Vous pouvez annuler votre abonnement à tout moment avant l’envoi du kit — gratuitement et sans justification.
                   </p>
                 </>
               )}
@@ -514,7 +554,7 @@ function PlansContent() {
                   rel="noopener noreferrer"
                   className="underline hover:text-[#8a1a2a] font-semibold"
                 >
-                  View Terms of Service
+                  Voir les conditions d’utilisation
                 </a>
               </p>
             </div>
@@ -524,13 +564,13 @@ function PlansContent() {
                 onClick={confirmPreOrder}
                 className="flex-1 bg-[#721422] text-white font-bold px-6 py-3 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
               >
-                Continue
+                {isPendingOneOff ? 'Confirmer' : 'Confirmer'}
               </button>
               <button
                 onClick={cancelPreOrder}
                 className="flex-1 bg-white text-[#721422] font-bold px-6 py-3 rounded-full border-2 border-[#721422] hover:bg-[#721422] hover:text-white transition-colors duration-200"
               >
-                Cancel
+                Annuler
               </button>
             </div>
           </div>
@@ -541,12 +581,27 @@ function PlansContent() {
       <div className="relative z-10 w-[95%] mx-auto px-1 sm:px-4 py-10">
         <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
-            ? 'Based on your answers, this plan helps you stay balanced and in control.'
-            : 'Choose the plan that best fits your needs.'
+            ? 'Selon vos réponses, cette offre vous aide à rester équilibrée et sereine.'
+            : 'Choisissez l’offre qui correspond le mieux à vos besoins.'
           }
         </h1>
         
         <div className="flex flex-col gap-4 sm:gap-8 max-w-7xl mx-auto">
+          {/* Kit image (mobile only) */}
+          <div className="flex justify-center mb-4 sm:hidden">
+            <div className="bg-white/1 backdrop-blur-sm rounded-2xl p-4 border border-white/50">
+              <Image
+                src="/Kit.png"
+                alt="Santelle Kit"
+                width={200}
+                height={200}
+                className="object-contain"
+                style={{ maxHeight: '200px', width: 'auto' }}
+                priority
+              />
+            </div>
+          </div>
+
           {/* Plan Cards */}
           <div
             className={`grid gap-1 sm:gap-6 ${
@@ -560,24 +615,18 @@ function PlansContent() {
             {displayedPlans.map((plan) => {
               const recomFlag = recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex;
               const isOneOff = plan.cycleLookupKey === '1pack';
+              const showRecommendedBadge = recomFlag || (isOneOff && recommendedPlan && recommendedPlan.cycleLookupKey !== 'proactive-monthly');
               return (
                 <div
                   key={plan.name}
                   className={`bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col ${
-                    recomFlag ? 'border-[#721422] shadow-lg' : isOneOff ? 'border-[#721422]/60' : 'border-white/50'
+                    showRecommendedBadge ? 'border-[#721422] shadow-lg' : isOneOff ? 'border-[#721422]/60' : 'border-white/50'
                   }`}
                 >
-                  {recomFlag && (
+                  {showRecommendedBadge && (
                     <div className="text-center mb-4">
                       <span className="bg-[#721422] text-white px-4 py-1 rounded-full text-xs sm:text-sm font-bold">
-                        RECOMMENDED
-                      </span>
-                    </div>
-                  )}
-                  {isOneOff && !recomFlag && (
-                    <div className="text-center mb-4">
-                      <span className="bg-white text-[#721422] px-4 py-1 rounded-full text-xs sm:text-sm font-semibold border border-[#721422]/40">
-                        ONE-OFF
+                        RECOMMANDÉE
                       </span>
                     </div>
                   )}
@@ -593,7 +642,7 @@ function PlansContent() {
                   </div>
                   
                   {/* Kit Image */}
-                  <div className="flex justify-center mb-6">
+                  <div className="hidden sm:flex justify-center mb-6">
                     <div className="bg-white/1 backdrop-blur-sm rounded-2xl p-4 border border-white/50">
                       <Image
                         src="/Kit.png"
@@ -629,7 +678,7 @@ function PlansContent() {
                           : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
                       }`}
                     >
-                      {isOneOff ? 'Buy Now' : 'Pre-Order'}
+                      {isOneOff ? 'Acheter' : 'Acheter'}
                     </button>
                   </div>
                 </div>
@@ -637,41 +686,18 @@ function PlansContent() {
             })}
           </div>
 
-          {recommendedPlan && !showAllPlans && (
-            <div className="mt-0 text-center">
-              <button
-                type="button"
-                onClick={handleShowAllPlans}
-                className="inline-block rounded-full border-2 border-[#721422] px-8 py-3 font-semibold text-[#721422] transition-colors duration-200 hover:bg-[#721422] hover:text-white"
-              >
-                View other plans
-              </button>
-            </div>
-          )}
+          
 
           {/* Pre-Order Features and Common Features - Below Plan Cards */}
           <div className="flex flex-col gap-6">
             {/* First Row: Pre-Order Benefits and All Plans Include */}
             <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch">
               {/* Pre-Order Features Card */}
-              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
-                <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                  Pre-order benefits
-                </h3>
-                <ul className="flex flex-col gap-4 justify-center">
-                  {preOrderFeatures.map((feature, idx) => (
-                    <li key={idx} className="text-[#721422] flex items-center">
-                      <span className="mr-2 text-lg">✓</span>
-                      <span className="text-base">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
               
               {/* Common Features Card */}
               <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
                 <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                  All plans will include
+                  Avantages de l’abonnement
                 </h3>
                 <ul className="flex flex-col gap-4 justify-center">
                   {commonFeatures.map((feature, idx) => (
@@ -713,7 +739,7 @@ function PlansContent() {
                     className="flex items-center justify-center gap-2 text-[#721422] hover:text-[#8a1a2a] transition-colors duration-200 mx-auto mb-0"
                   >
                     <h3 className="text-xl font-bold text-[#721422]">
-                      What's in the kit?
+                      Que contient le kit ?
                     </h3>
                     <svg
                       id="kit-expand-arrow"
@@ -739,7 +765,7 @@ function PlansContent() {
                   <div className="pt-4 space-y-6">
                     {/* Kit Contents Section */}
                     <div>
-                      <h4 className="font-semibold text-lg mb-3 text-[#721422]">Santelle Kit:</h4>
+                      <h4 className="font-semibold text-lg mb-3 text-[#721422]">Kit Santelle :</h4>
                       <ul className="flex flex-col gap-4 justify-center">
                         {kitContents.map((content, idx) => (
                           <li key={idx} className="text-[#721422] flex items-center">
@@ -752,7 +778,7 @@ function PlansContent() {
                     
                     {/* App Features Section */}
                     <div>
-                      <h4 className="font-semibold text-lg mb-3 text-[#721422]">App Features:</h4>
+                      <h4 className="font-semibold text-lg mb-3 text-[#721422]">Fonctionnalités de l’app :</h4>
                       <ul className="flex flex-col gap-4 justify-center">
                         {appFeatures.map((feature, idx) => (
                           <li key={idx} className="text-[#721422] flex items-center">
@@ -769,6 +795,16 @@ function PlansContent() {
           </div>
         </div>
       </div>
+      {isRedirecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="flex flex-col items-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#721422] border-t-transparent" />
+            <p className="mt-4 text-base font-semibold text-[#721422]">
+              Redirection vers le paiement sécurisé…
+            </p>
+          </div>
+                    </div>
+                  )}
     </main>
   );
 }
@@ -806,7 +842,7 @@ export default function PlansPage() {
           />
           <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
         </div>
-        <div className="relative z-10 text-[#721422] text-xl">Loading...</div>
+        <div className="relative z-10 text-[#721422] text-xl">Chargement…</div>
       </main>
     }>
       <PlansContent />
