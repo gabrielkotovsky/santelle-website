@@ -317,9 +317,9 @@ Deno.serve(async (req) => {
           current_period_end: subscription?.current_period_end 
             ? new Date(subscription.current_period_end * 1000).toISOString() 
             : undefined,
-          cancel_at: subscription?.cancel_at 
-            ? new Date(subscription.cancel_at * 1000).toISOString() 
-            : undefined,
+        cancel_at: subscription?.cancel_at 
+          ? new Date(subscription.cancel_at * 1000).toISOString() 
+          : null,
           cancel_at_period_end: subscription?.cancel_at_period_end || undefined,
           subscription_id: subscription?.id || undefined,
           latest_checkout_session_id: session.id || undefined,
@@ -601,7 +601,7 @@ Deno.serve(async (req) => {
           : undefined,
         cancel_at: subscription.cancel_at 
           ? new Date(subscription.cancel_at * 1000).toISOString() 
-          : undefined,
+          : null,
         cancel_at_period_end: subscription.cancel_at_period_end || undefined,
         subscription_id: subscription.id || undefined,
         updated_at: new Date().toISOString(),
@@ -802,7 +802,7 @@ Deno.serve(async (req) => {
           : undefined,
         cancel_at: subscription.cancel_at 
           ? new Date(subscription.cancel_at * 1000).toISOString() 
-          : undefined,
+          : null,
         cancel_at_period_end: subscription.cancel_at_period_end || undefined,
         subscription_id: subscription.id || undefined,
         updated_at: new Date().toISOString(),
