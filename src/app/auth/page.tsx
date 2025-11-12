@@ -157,7 +157,7 @@ function AuthContent() {
   };
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center">
+    <main className="relative min-h-screen flex items-center justify-center overflow-hidden md:overflow-visible">
       {/* Background - Video for Desktop, Image for Mobile */}
       <div className="fixed inset-0 -z-10 flex items-center justify-center">
         <video
@@ -181,7 +181,7 @@ function AuthContent() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
             width: '100vw',
             height: '100dvh'
           }}
@@ -190,8 +190,8 @@ function AuthContent() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-md mx-auto px-0 sm:px-4 py-0 sm:py-16 md:py-20">
-        <div className="bg-white/40 backdrop-blur-md rounded-none sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-white/30 sm:border-white/50 max-w-none min-h-[100dvh] sm:min-h-0 sm:max-w-full mx-auto flex flex-col justify-center">
+      <div className="fixed inset-0 z-10 flex items-center justify-center px-0 sm:px-4">
+        <div className="bg-white/40 backdrop-blur-md rounded-none sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-white/30 sm:border-white/50 w-full max-w-md h-full sm:h-auto mx-auto flex flex-col justify-center">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-2">
@@ -361,7 +361,7 @@ function AuthContent() {
 export default function AuthPage() {
   return (
     <Suspense fallback={
-      <main className="relative min-h-screen flex items-center justify-center">
+      <main className="relative min-h-screen flex items-center justify-center overflow-hidden md:overflow-visible">
         <div className="fixed inset-0 -z-10 flex items-center justify-center">
           <video
             src="/background_desktop.mp4"
