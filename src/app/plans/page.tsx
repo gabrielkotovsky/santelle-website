@@ -121,34 +121,34 @@ function PlansContent() {
 
     setIsRedirecting(true);
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/.netlify/functions/create-checkout-session';
+    if (user && user.email) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/.netlify/functions/create-checkout-session';
 
-    const inputLookup = document.createElement('input');
-    inputLookup.type = 'hidden';
-    inputLookup.name = 'lookup_key';
-    inputLookup.value = lookupKeyParam;
-    form.appendChild(inputLookup);
+      const inputLookup = document.createElement('input');
+      inputLookup.type = 'hidden';
+      inputLookup.name = 'lookup_key';
+      inputLookup.value = lookupKeyParam;
 
-    if (user?.id) {
       const inputUid = document.createElement('input');
       inputUid.type = 'hidden';
       inputUid.name = 'user_id';
       inputUid.value = user.id;
-      form.appendChild(inputUid);
-    }
 
-    if (user?.email) {
       const inputEmail = document.createElement('input');
       inputEmail.type = 'hidden';
       inputEmail.name = 'email';
       inputEmail.value = user.email;
-      form.appendChild(inputEmail);
-    }
 
-    document.body.appendChild(form);
-    form.submit();
+      form.appendChild(inputLookup);
+      form.appendChild(inputUid);
+      form.appendChild(inputEmail);
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      window.location.href = `/auth?lookup_key=${lookupKeyParam}`;
+    }
   };
 
   const handlePreOrder = async (plan: typeof allPlans[0]) => {
