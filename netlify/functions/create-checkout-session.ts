@@ -20,47 +20,60 @@ export const handler: Handler = async (event) => {
     // Parse form-encoded data from the request body
     const params = new URLSearchParams(event.body || '');
     const lookup_key = params.get('lookup_key');
-    const user_id = params.get('user_id');
-    const email = params.get('email');
+    const user_id = params.get('user_id') || undefined;
+    const email = params.get('email') || undefined;
 
-    if (!lookup_key || !user_id || !email) {
+    if (!lookup_key) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing lookup_key, user_id, or email' }),
+        body: JSON.stringify({ error: 'Missing lookup_key' }),
       };
     }
 
-    // Init Supabase Admin
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    if (user_id && email) {
+      // Init Supabase Admin
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
 
-    // Check/create profile entry
-    const { data: profile, error: getProfileError } = await supabaseAdmin
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user_id)
-      .single();
-
-    if (getProfileError && getProfileError.code !== 'PGRST116') {
-      // Not the 'no rows found' code
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'DB error while looking up profile: ' + getProfileError.message }),
-      };
-    }
-    if (!profile) {
-      // Insert
-      const { error: insertError } = await supabaseAdmin
+      // Check/create profile entry
+      const { data: profile, error: getProfileError } = await supabaseAdmin
         .from('profiles')
-        .insert([{ user_id, email }]);
-      if (insertError) {
+        .select('*')
+        .eq('user_id', user_id)
+        .single();
+
+      if (getProfileError && getProfileError.code !== 'PGRST116') {
+        // Not the 'no rows found' code
         return {
           statusCode: 500,
-          body: JSON.stringify({ error: 'DB error while inserting profile: ' + insertError.message }),
+          body: JSON.stringify({ error: 'DB error while looking up profile: ' + getProfileError.message }),
         };
       }
+      if (!profile) {
+        // Insert
+        const { error: insertError } = await supabaseAdmin
+          .from('profiles')
+          .insert([{ user_id, email }]);
+        if (insertError) {
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'DB error while inserting profile: ' + insertError.message }),
+          };
+        }
+      }
+    }
+
+    const metadata: Record<string, string> = {
+      lookup_key,
+      purchase_type: 'one_time',
+    };
+    if (user_id) {
+      metadata.user_id = user_id;
+    }
+    if (email) {
+      metadata.email = email;
     }
 
     // Get prices from Stripe using lookup key
@@ -78,6 +91,8 @@ export const handler: Handler = async (event) => {
 
     const price = prices.data[0];
     const isRecurringPrice = price.type === 'recurring' || !!price.recurring;
+
+    metadata.purchase_type = isRecurringPrice ? 'subscription' : 'one_time';
 
     const baseSessionParams: Stripe.Checkout.SessionCreateParams = {
       billing_address_collection: 'required',
@@ -99,14 +114,12 @@ export const handler: Handler = async (event) => {
       ],
       success_url: `${YOUR_DOMAIN}/plans?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${YOUR_DOMAIN}/plans?canceled=true`,
-      customer_email: email,
-      metadata: {
-        user_id,
-        email,
-        lookup_key,
-        purchase_type: isRecurringPrice ? 'subscription' : 'one_time',
-      },
+      metadata,
     };
+
+    if (email) {
+      baseSessionParams.customer_email = email;
+    }
 
     let session: Stripe.Checkout.Session;
     if (isRecurringPrice) {
@@ -115,9 +128,7 @@ export const handler: Handler = async (event) => {
         mode: 'subscription',
         subscription_data: {
           metadata: {
-            user_id,
-            email,
-            lookup_key,
+            ...metadata,
           },
         },
       });
