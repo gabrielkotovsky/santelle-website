@@ -26,9 +26,9 @@ const allPlans = [
   {
     name: 'Proactive',
     frequency: 'Kit mensuel',
-    cyclePrice: '12,99 €',
+    cyclePrice: '12,99 CHF',
     cyclePeriod: 'mois',
-    annualPrice: '129,99 €',
+    annualPrice: '129,99 CHF',
     annualPeriod: 'an',
     savingsPercentage: '16,6 %',
     cycleLookupKey: 'proactive-monthly',
@@ -38,9 +38,9 @@ const allPlans = [
   {
     name: 'Balanced',
     frequency: 'Kit bimestriel',
-    cyclePrice: '16,99 €',
+    cyclePrice: '16,99 CHF',
     cyclePeriod: '2 mois',
-    annualPrice: '79,99 €',
+    annualPrice: '79,99 CHF',
     annualPeriod: 'an',
     savingsPercentage: '21,5 %',
     cycleLookupKey: 'balanced-bimonthly',
@@ -50,9 +50,9 @@ const allPlans = [
   {
     name: 'Essential',
     frequency: 'Kit trimestriel',
-    cyclePrice: '19,99 €',
+    cyclePrice: '19,99 CHF',
     cyclePeriod: '3 mois',
-    annualPrice: '59,99 €',
+    annualPrice: '59,99 CHF',
     annualPeriod: 'an',
     savingsPercentage: '25,0 %',
     cycleLookupKey: 'essential-quarterly',
@@ -62,7 +62,7 @@ const allPlans = [
   {
     name: 'One-Off',
     frequency: 'Kit à l’unité',
-    cyclePrice: '24,99 €',
+    cyclePrice: '24,99 CHF',
     cyclePeriod: 'achat unique',
     annualPrice: null,
     annualPeriod: null,
@@ -78,27 +78,6 @@ const commonFeatures = [
   'Suivi intelligent de ton équilibre intime avec des recommandations personnalisées à chaque test',
   'Contenus exclusifs : conseils d’expertes, ressources éducatives et rappels adaptés à ton profil',
   '-30 % sur les kits supplémentaires',
-];
-
-const oneOffVariants = [
-  {
-    lookupKey: '1pack',
-    label: 'Pack de 1',
-    price: '24,99 €',
-    savings: 'Tarif standard',
-  },
-  {
-    lookupKey: '5pack',
-    label: 'Pack de 5',
-    price: '119,99 €',
-    savings: 'Économisez 29,96 €',
-  },
-  {
-    lookupKey: '10pack',
-    label: 'Pack de 10',
-    price: '199,99 €',
-    savings: 'Économisez 99,91 €',
-  },
 ];
 
 const kitContents = [
@@ -126,13 +105,6 @@ function PlansContent() {
   const [isMobile, setIsMobile] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  // Popup state
-  const [showPopup, setShowPopup] = useState(false);
-  const [pendingLookupKey, setPendingLookupKey] = useState<string | null>(null);
-  const [pendingPlan, setPendingPlan] = useState<typeof allPlans[0] | null>(null);
-  const [pendingBillingPeriod, setPendingBillingPeriod] = useState<'cycle' | 'one_time' | null>(null);
-  const [pendingOneOffVariant, setPendingOneOffVariant] = useState<string | null>(null);
-  
   // Handle checkout - direct if logged in, auth page if not
   const initiateCheckout = async (
     lookupKeyParam: string,
@@ -147,11 +119,6 @@ function PlansContent() {
         recommendedPlanIndex !== null && planParam.originalIndex === recommendedPlanIndex,
     });
 
-    setShowPopup(false);
-    setPendingLookupKey(null);
-    setPendingPlan(null);
-    setPendingBillingPeriod(null);
-    setPendingOneOffVariant(null);
     setIsRedirecting(true);
 
     if (user && user.email) {
@@ -191,41 +158,8 @@ function PlansContent() {
       billing_type: isOneOff ? 'one_time' : 'per_cycle',
       is_recommended: recommendedPlanIndex !== null && plan.originalIndex === recommendedPlanIndex,
     });
-    if (isOneOff) {
-      const defaultVariant = oneOffVariants[0];
-      setPendingLookupKey(defaultVariant.lookupKey);
-      setPendingOneOffVariant(defaultVariant.lookupKey);
-      setPendingPlan(plan);
-      setPendingBillingPeriod('one_time');
-      setShowPopup(true);
-    } else {
-      await initiateCheckout(plan.cycleLookupKey, plan, 'cycle');
-    }
-  };
-  
-  // Confirm and proceed with checkout
-  const confirmPreOrder = async () => {
-    if (!pendingLookupKey || !pendingPlan || !pendingBillingPeriod) return;
-    await initiateCheckout(pendingLookupKey, pendingPlan, pendingBillingPeriod);
-  };
-  
-  // Close popup without proceeding
-  const cancelPreOrder = () => {
-    // Track disclaimer cancellation
-    if (pendingPlan && pendingBillingPeriod) {
-      trackGTMEvent('Disclaimer_Cancelled', {
-        plan_name: pendingPlan.name,
-        billing_type: pendingBillingPeriod === 'one_time' ? 'one_time' : 'per_cycle',
-        lookup_key: pendingLookupKey || null,
-      });
-    }
-    
-    setShowPopup(false);
-    setPendingLookupKey(null);
-    setPendingPlan(null);
-    setPendingBillingPeriod(null);
-    setPendingOneOffVariant(null);
-    setIsRedirecting(false);
+    const billingPeriod = isOneOff ? 'one_time' : 'cycle';
+    await initiateCheckout(plan.cycleLookupKey, plan, billingPeriod);
   };
   
   useEffect(() => {
@@ -264,8 +198,6 @@ function PlansContent() {
   }
 
   const displayedPlans = basePlans;
-
-  const isPendingOneOff = pendingPlan?.cycleLookupKey === '1pack';
 
   // State for checkout success handling
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -472,107 +404,22 @@ function PlansContent() {
         />
         
         {/* Mobile Background Image */}
-        <div className="absolute inset-0 w-full h-full block md:hidden bg-[url('/background-mobile.jpg')] bg-cover bg-center bg-no-repeat bg-fixed" />
+        <div 
+          className="absolute inset-0 w-full h-full block md:hidden"
+          style={{
+            backgroundImage: "url(/background-mobile.jpg)",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'scroll',
+            width: '100vw',
+            height: '100svh'
+          }}
+        />
         
         {/* Overlay - Blur only, no color */}
         <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
       </div>
-
-      {/* Popup Modal */}
-      {showPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={cancelPreOrder}
-          />
-          
-          {/* Modal Content */}
-          <div className="relative bg-white/95 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 border-[#721422] max-w-lg w-full shadow-2xl">
-            
-            <div className="text-[#721422] mb-6 space-y-3">
-              {isPendingOneOff ? (
-                  <div className="space-y-3">
-                    <p className="text-center font-semibold text-lg">
-                      Choisissez votre lot
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {oneOffVariants.map((variant) => {
-                        const isSelected = pendingOneOffVariant === variant.lookupKey;
-                        return (
-                          <button
-                            key={variant.lookupKey}
-                            type="button"
-                            onClick={() => {
-                              setPendingLookupKey(variant.lookupKey);
-                              setPendingOneOffVariant(variant.lookupKey);
-                            }}
-                            className={`rounded-2xl border-2 px-4 py-3 text-left transition-all duration-200 ${
-                              isSelected
-                                ? 'border-[#721422] bg-[#721422]/10 shadow-md'
-                                : 'border-[#721422]/20 bg-white/80 hover:border-[#721422]/60'
-                            }`}
-                          >
-                            <div className="font-semibold text-[#721422]">{variant.label}</div>
-                            <div className="text-sm text-[#721422]/80">{variant.price}</div>
-                            <div className="text-xs text-[#721422]/60 mt-1">
-                              {variant.savings}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {pendingOneOffVariant && (
-                      <p className="text-sm text-center text-[#721422]/70">
-                        Lot choisi : {oneOffVariants.find((v) => v.lookupKey === pendingOneOffVariant)?.label} · {oneOffVariants.find((v) => v.lookupKey === pendingOneOffVariant)?.price}
-                      </p>
-                    )}
-                  </div>
-              ) : (
-                <>
-                  <p className="font-semibold text-lg">
-                    Commencez à utiliser l’app immédiatement — aucun paiement requis !
-                  </p>
-                  <p>
-                    Vous aurez un accès complet à l’app Santelle tout de suite. Nous ne vous facturerons rien avant l’expédition de votre premier kit.
-                  </p>
-                  <p>
-                    Nous vous avertirons au moins 48 heures avant votre premier paiement afin que vous ayez le temps de décider.
-                  </p>
-                  <p>
-                    Vous pouvez annuler votre abonnement à tout moment avant l’envoi du kit — gratuitement et sans justification.
-                  </p>
-                </>
-              )}
-              <p className="text-sm pt-2">
-                <a 
-                  href="https://santellehealth.com/terms_of_service" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="underline hover:text-[#8a1a2a] font-semibold"
-                >
-                  Voir les conditions d’utilisation
-                </a>
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={confirmPreOrder}
-                className="flex-1 bg-[#721422] text-white font-bold px-6 py-3 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
-              >
-                {isPendingOneOff ? 'Confirmer' : 'Confirmer'}
-              </button>
-              <button
-                onClick={cancelPreOrder}
-                className="flex-1 bg-white text-[#721422] font-bold px-6 py-3 rounded-full border-2 border-[#721422] hover:bg-[#721422] hover:text-white transition-colors duration-200"
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Content */}
       <div className="relative z-10 w-[95%] mx-auto px-1 sm:px-4 py-10">
