@@ -114,7 +114,6 @@ export const handler: Handler = async (event) => {
         ...baseSessionParams,
         mode: 'subscription',
         subscription_data: {
-          trial_period_days: 30,
           metadata: {
             user_id,
             email,
