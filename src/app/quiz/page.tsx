@@ -447,7 +447,7 @@ export default function QuizPage() {
 
 
   return (
-    <main className="relative min-h-screen w-full">
+    <main className="relative min-h-[100svh] w-full">
       {/* Background - Video for Desktop, Image for Mobile */}
       <div className="fixed inset-0 -z-10 flex items-center justify-center">
         {/* Desktop Video Background */}
@@ -474,9 +474,9 @@ export default function QuizPage() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
             width: '100vw',
-            height: '100dvh'
+            height: '100svh'
           }}
         />
         
@@ -486,7 +486,7 @@ export default function QuizPage() {
 
       {/* Content */}
       {!quizStarted ? (
-        <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-6 py-12 text-center">
+        <div className="relative z-10 flex min-h-[100svh] w-full items-center justify-center px-6 py-12 text-center">
           <div className="w-full max-w-4xl rounded-3xl border border-white/50 bg-white/40 px-8 py-16 md:px-16 md:py-20 backdrop-blur-md">
             <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
               Trouvons l’offre Santelle idéale pour vous.
@@ -503,8 +503,8 @@ export default function QuizPage() {
           </div>
         </div>
       ) : (
-        <div className="relative z-10 w-full min-h-screen">
-          <div className="relative flex min-h-screen w-full flex-col border border-white/50 bg-white/40 px-6 py-10 text-[#721422] backdrop-blur-md md:px-16 md:py-16">
+        <div className="relative z-10 w-full min-h-[100svh]">
+          <div className="relative flex min-h-[100svh] w-full flex-col border border-white/50 bg-white/40 px-6 py-10 text-[#721422] backdrop-blur-md md:px-16 md:py-16">
             <div className="flex flex-1 flex-col items-center gap-6 pt-4 pb-6 md:gap-10 md:pt-0 md:pb-0 justify-start md:justify-center">
               {/* Progress Bar */}
               <div className="w-full max-w-2xl">

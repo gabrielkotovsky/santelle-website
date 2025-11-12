@@ -62,7 +62,7 @@ const allPlans = [
   {
     name: 'One-Off',
     frequency: 'Kit à l’unité',
-    cyclePrice: '29,99 €',
+    cyclePrice: '24,99 €',
     cyclePeriod: 'achat unique',
     annualPrice: null,
     annualPeriod: null,
@@ -84,7 +84,7 @@ const oneOffVariants = [
   {
     lookupKey: '1pack',
     label: 'Pack de 1',
-    price: '29,99 €',
+    price: '24,99 €',
     savings: 'Tarif standard',
   },
   {
@@ -334,7 +334,7 @@ function PlansContent() {
   if (success && sessionId) {
 
     return (
-      <main className="relative min-h-screen flex items-center justify-center">
+      <main className="relative min-h-[100svh] flex items-center justify-center">
         {/* Background - Video for Desktop, Image for Mobile */}
         <div className="fixed inset-0 -z-10 flex items-center justify-center">
           <video
@@ -358,9 +358,9 @@ function PlansContent() {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
               width: '100vw',
-              height: '100dvh'
+            height: '100svh'
             }}
           />
           <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
@@ -397,7 +397,7 @@ function PlansContent() {
   // Show cancel message if payment was canceled
   if (canceled) {
     return (
-      <main className="relative min-h-screen flex items-center justify-center">
+      <main className="relative min-h-[100svh] flex items-center justify-center">
         {/* Background - Video for Desktop, Image for Mobile */}
         <div className="fixed inset-0 -z-10 flex items-center justify-center">
           <video
@@ -421,9 +421,9 @@ function PlansContent() {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
               width: '100vw',
-              height: '100dvh'
+            height: '100svh'
             }}
           />
           <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
@@ -452,7 +452,7 @@ function PlansContent() {
   }
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center">
+    <main className="relative min-h-[100svh] flex items-center justify-center">
       {/* Background - Video for Desktop, Image for Mobile */}
       <div className="fixed inset-0 -z-10 flex items-center justify-center overflow-hidden">
         {/* Desktop Video Background */}
@@ -809,7 +809,7 @@ function PlansContent() {
 export default function PlansPage() {
   return (
     <Suspense fallback={
-      <main className="relative min-h-screen flex items-center justify-center">
+    <main className="relative min-h-[100svh] flex items-center justify-center">
         <div className="fixed inset-0 -z-10 flex items-center justify-center">
           <video
             src="/background_desktop.mp4"
@@ -832,9 +832,9 @@ export default function PlansPage() {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'fixed',
+            backgroundAttachment: 'scroll',
               width: '100vw',
-              height: '100dvh'
+            height: '100svh'
             }}
           />
           <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
