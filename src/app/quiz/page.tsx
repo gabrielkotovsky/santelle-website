@@ -233,7 +233,6 @@ export default function QuizPage() {
       const quizIdFromResponse = quizData.data[0].id;
 
       const recommendedPlan = calculateRecommendedPlan(answersState);
-      console.log('Quiz completed, recommended plan:', recommendedPlan, 'Answers:', answersState);
 
         const planNames: { [key: number]: string } = {
           0: 'Mensuel',

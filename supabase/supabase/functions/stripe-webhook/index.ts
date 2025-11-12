@@ -31,9 +31,6 @@ Deno.serve(async (req) => {
     const signature = req.headers.get('stripe-signature')
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
 
-    console.log('Webhook received - Method:', req.method)
-    console.log('Has signature:', !!signature)
-    console.log('Has webhook secret:', !!webhookSecret)
 
     if (!signature) {
       console.error('❌ Missing stripe-signature header')
@@ -61,7 +58,6 @@ Deno.serve(async (req) => {
     let body: string
     try {
       body = await req.text()
-      console.log('Body length:', body.length)
     } catch (bodyError: any) {
       console.error('❌ Error reading request body:', bodyError.message)
       return new Response(
@@ -80,7 +76,6 @@ Deno.serve(async (req) => {
     let event: Stripe.Event
     try {
       event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret)
-      console.log('✅ Webhook signature verified. Event type:', event.type, 'ID:', event.id)
     } catch (err: any) {
       console.error('⚠️ Webhook signature verification failed:', err.message)
       console.error('Error type:', err.constructor.name)
@@ -124,7 +119,6 @@ Deno.serve(async (req) => {
       },
     })
 
-    console.log('Processing webhook event:', event.type, 'ID:', event.id)
 
     // Helper function to get customer details and payment method info
     const getCustomerAndPaymentDetails = async (customerId: string | null) => {
@@ -140,7 +134,6 @@ Deno.serve(async (req) => {
             country = customer.address?.country || customer.shipping?.address?.country || undefined
           }
         } catch (err) {
-          console.log('Could not retrieve customer details:', err)
         }
       }
 
@@ -160,7 +153,6 @@ Deno.serve(async (req) => {
             return paymentMethod.card.last4 || undefined
           }
         } catch (err) {
-          console.log('Could not retrieve payment method:', err)
         }
       }
       return undefined
@@ -181,7 +173,6 @@ Deno.serve(async (req) => {
           return latestCharge.payment_method_details.card.last4
         }
       } catch (err) {
-        console.log('Could not retrieve payment intent for last4:', err)
       }
       return undefined
     }
@@ -208,7 +199,6 @@ Deno.serve(async (req) => {
         return paymentMethod.card.last4
       }
     } catch (err) {
-      console.log('Could not retrieve payment method for customer update:', err)
     }
 
     return undefined
@@ -217,8 +207,6 @@ Deno.serve(async (req) => {
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
-
-      console.log('Processing checkout.session.completed for session:', session.id)
 
       // Extract metadata
       const user_id = session.metadata?.user_id || session.client_reference_id
@@ -276,7 +264,6 @@ Deno.serve(async (req) => {
             priceId = firstItem.price.id
           }
         } catch (err) {
-          console.log('Could not retrieve line items for price info:', err)
         }
       }
 
@@ -391,8 +378,6 @@ Deno.serve(async (req) => {
             }
           )
         }
-
-        console.log('Profile updated successfully for user:', user_id)
       } else {
         // Insert new profile
         const { error: insertError } = await supabase
@@ -413,14 +398,11 @@ Deno.serve(async (req) => {
             }
           )
         }
-
-        console.log('Profile created successfully for user:', user_id)
       }
 
       const sendConfirmationEmail = async () => {
         if (!resendApiKey || !email) {
           if (!resendApiKey) {
-            console.log('RESEND_API_KEY not set, skipping confirmation email')
           }
           return
         }
@@ -492,8 +474,6 @@ Deno.serve(async (req) => {
           if (!response.ok) {
             const text = await response.text()
             console.error('Failed to send confirmation email via Resend', response.status, text)
-          } else {
-            console.log('Confirmation email queued for', safeEmail)
           }
         } catch (err) {
           console.error('Error sending confirmation email:', err)
@@ -518,8 +498,6 @@ Deno.serve(async (req) => {
     // Handle the customer.subscription.created event
     if (event.type === 'customer.subscription.created') {
       const subscription = event.data.object as Stripe.Subscription
-
-      console.log('Processing customer.subscription.created for subscription:', subscription.id)
 
       // Extract metadata
       let user_id = subscription.metadata?.user_id
@@ -546,7 +524,6 @@ Deno.serve(async (req) => {
             customerCountry = customer.address?.country || customer.shipping?.address?.country || undefined
           }
         } catch (err) {
-          console.log('Could not retrieve customer:', err)
         }
       }
 
@@ -555,7 +532,6 @@ Deno.serve(async (req) => {
 
       // If user_id is not in metadata, try to find it by customer_id
       if (!user_id && customerId) {
-        console.log('user_id not found in metadata, attempting to find by customer_id:', customerId)
         const { data: profileByCustomer, error: customerLookupError } = await supabase
           .from('profiles')
           .select('user_id')
@@ -564,13 +540,11 @@ Deno.serve(async (req) => {
 
         if (!customerLookupError && profileByCustomer) {
           user_id = profileByCustomer.user_id
-          console.log('Found user_id by customer_id:', user_id)
         }
       }
 
       // If user_id still not found, try to find it by email
       if (!user_id && email) {
-        console.log('user_id not found by customer_id, attempting to find by email:', email)
         const { data: profileByEmail, error: emailLookupError } = await supabase
           .from('profiles')
           .select('user_id')
@@ -579,19 +553,12 @@ Deno.serve(async (req) => {
 
         if (!emailLookupError && profileByEmail) {
           user_id = profileByEmail.user_id
-          console.log('Found user_id by email:', user_id)
         }
       }
 
       if (!user_id) {
         console.error('Missing user_id - not found in metadata, by customer_id, or by email')
         // Still process the event but log the issue
-        console.log('Subscription data:', {
-          subscription_id: subscription.id,
-          customer_id: customerId,
-          email: email,
-          metadata: subscription.metadata,
-        })
         // Return 200 but log the issue - don't fail the webhook
         return new Response(
           JSON.stringify({ 
@@ -690,8 +657,6 @@ Deno.serve(async (req) => {
             }
           )
         }
-
-        console.log('Profile updated successfully for user:', user_id)
       } else {
         // Insert new profile
         const { error: insertError } = await supabase
@@ -712,8 +677,6 @@ Deno.serve(async (req) => {
             }
           )
         }
-
-        console.log('Profile created successfully for user:', user_id)
       }
 
       return new Response(
@@ -736,8 +699,6 @@ Deno.serve(async (req) => {
     // Handle the customer.subscription.updated event
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object as Stripe.Subscription
-
-      console.log('Processing customer.subscription.updated for subscription:', subscription.id)
 
       // Extract metadata
       let user_id = subscription.metadata?.user_id
@@ -764,7 +725,6 @@ Deno.serve(async (req) => {
             customerCountry = customer.address?.country || customer.shipping?.address?.country || undefined
           }
         } catch (err) {
-          console.log('Could not retrieve customer:', err)
         }
       }
 
@@ -773,7 +733,6 @@ Deno.serve(async (req) => {
 
       // If user_id is not in metadata, try to find it by customer_id
       if (!user_id && customerId) {
-        console.log('user_id not found in metadata, attempting to find by customer_id:', customerId)
         const { data: profileByCustomer, error: customerLookupError } = await supabase
           .from('profiles')
           .select('user_id')
@@ -782,13 +741,11 @@ Deno.serve(async (req) => {
 
         if (!customerLookupError && profileByCustomer) {
           user_id = profileByCustomer.user_id
-          console.log('Found user_id by customer_id:', user_id)
         }
       }
 
       // If user_id still not found, try to find it by email
       if (!user_id && email) {
-        console.log('user_id not found by customer_id, attempting to find by email:', email)
         const { data: profileByEmail, error: emailLookupError } = await supabase
           .from('profiles')
           .select('user_id')
@@ -797,19 +754,12 @@ Deno.serve(async (req) => {
 
         if (!emailLookupError && profileByEmail) {
           user_id = profileByEmail.user_id
-          console.log('Found user_id by email:', user_id)
         }
       }
 
       if (!user_id) {
         console.error('Missing user_id - not found in metadata, by customer_id, or by email')
         // Still process the event but log the issue
-        console.log('Subscription data:', {
-          subscription_id: subscription.id,
-          customer_id: customerId,
-          email: email,
-          metadata: subscription.metadata,
-        })
         // Return 200 but log the issue - don't fail the webhook
         return new Response(
           JSON.stringify({ 
@@ -908,8 +858,6 @@ Deno.serve(async (req) => {
             }
           )
         }
-
-        console.log('Profile updated successfully for user:', user_id)
       } else {
         // Insert new profile
         const { error: insertError } = await supabase
@@ -930,8 +878,6 @@ Deno.serve(async (req) => {
             }
           )
         }
-
-        console.log('Profile created successfully for user:', user_id)
       }
 
       return new Response(
@@ -968,7 +914,6 @@ Deno.serve(async (req) => {
       }
 
       const customerId = customer.id
-      console.log('Processing customer.updated for customer:', customerId)
 
       const normalizedEmail = customer.email ? customer.email.toLowerCase().trim() : undefined
       const shippingDetailsString = customer.shipping ? JSON.stringify(customer.shipping) : null
@@ -1084,7 +1029,6 @@ Deno.serve(async (req) => {
       }
 
       if (!updateColumn || !updateValue) {
-        console.log('No matching profile found for customer.updated. customer_id:', customerId, 'email:', normalizedEmail)
         return new Response(
           JSON.stringify({
             received: true,
@@ -1114,8 +1058,6 @@ Deno.serve(async (req) => {
         )
       }
 
-      console.log('Profile updated successfully from customer.updated for user:', userId || 'unknown')
-
       return new Response(
         JSON.stringify({
           received: true,
@@ -1131,7 +1073,6 @@ Deno.serve(async (req) => {
     }
 
     // Handle other event types (for future expansion)
-    console.log(`Unhandled event type: ${event.type}`)
     
     return new Response(
       JSON.stringify({ received: true, event_type: event.type }),

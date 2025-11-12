@@ -142,14 +142,7 @@ export class RateLimiter {
 }
 
 // Request logging middleware
-export function logRequest(request: NextRequest, response: NextResponse) {
-  const startTime = Date.now();
-  const { method, url } = request;
-  const { status } = response;
-  const duration = Date.now() - startTime;
-  
-  console.log(`${method} ${url} - ${status} - ${duration}ms`);
-}
+export function logRequest(): void {}
 
 // Security middleware
 export function addSecurityHeaders(response: NextResponse): NextResponse {

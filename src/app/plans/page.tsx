@@ -116,9 +116,6 @@ function PlansContent() {
   const recommendedPlanIndex = recommendedParam ? parseInt(recommendedParam) : null;
   const { user } = useAuth();
   
-  // Debug logging
-  console.log('Plans page loaded with:', { recommendedParam, recommendedPlanIndex });
-  
   // Check for success/cancel from Stripe redirect
   const success = searchParams.get('success');
   const canceled = searchParams.get('canceled');

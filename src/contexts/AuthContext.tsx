@@ -48,8 +48,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email);
-      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -59,12 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Clear any local state if needed
         setUser(null);
         setSession(null);
-      } else if (event === 'TOKEN_REFRESHED') {
-        // Session refreshed successfully
-        console.log('Token refreshed successfully');
-      } else if (event === 'SIGNED_IN') {
-        // User signed in
-        console.log('User signed in:', session?.user?.email);
       }
     });
 

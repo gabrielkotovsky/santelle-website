@@ -211,8 +211,6 @@ export default function EmailForm({ variant = 'hero', onSubmitSuccess }: EmailFo
         throw new Error(errorData.error || 'Failed to subscribe to waitlist');
       }
 
-      console.log('Form submitted:', formData.email);
-      
       // Track waitlist signup with Google Analytics
       analytics.trackWaitlistSignup(formData.email, {
         device: { type: 'desktop' },

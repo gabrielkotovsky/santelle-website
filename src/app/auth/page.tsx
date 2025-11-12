@@ -51,7 +51,6 @@ function AuthContent() {
     
     try {
       await requestEmailOtp(email);
-      console.log('OTP sent to', email);
       
       // Track successful OTP request
       trackGTMEvent('Auth_OTP_Sent', {
@@ -86,8 +85,7 @@ function AuthContent() {
     });
     
     try {
-      const session = await verifyEmailOtp(email, otp);
-      console.log('Authentication successful', { session, lookupKey });
+      await verifyEmailOtp(email, otp);
       
       // Track successful OTP verification
       trackGTMEvent('Auth_OTP_Verified', {
@@ -329,7 +327,6 @@ function AuthContent() {
                   type="button"
                   onClick={async () => {
                     // TODO: Implement Apple Sign-In with proper identity token and nonce
-                  console.log('Apple login clicked', { lookupKey });
                   setError('La connexion avec Apple n’est pas encore configurée. Merci d’utiliser l’authentification par e-mail.');
                   }}
                   className="w-full bg-white/60 hover:bg-white/80 border border-white/50 text-[#721422] font-semibold px-6 py-3 rounded-full transition-all duration-200 flex items-center justify-center space-x-2"
