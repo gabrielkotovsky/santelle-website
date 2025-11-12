@@ -50,7 +50,7 @@ export default function MobileUnifiedCard() {
         
         {/* Stats Section */}
         <div data-section="stats" className="py-40">
-          <LazyText className="text-center" delay={200}>
+          <LazyText className="text-center" delay={0}>
             <div className="poppins-bold text-3xl font-bold text-[#721422] mb-20">
               Vaginal infections affect 3 in 4 women. 50% are recurrent.
             </div>
@@ -68,7 +68,7 @@ export default function MobileUnifiedCard() {
 
         {/* Meet Section Title */}
         <div data-section="meet" className="py-40">
-          <LazyText className="flex items-center gap-4 mb-6" delay={400}>
+          <LazyText className="flex items-center gap-4 mb-6" delay={100}>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
             <h2 className="font-bold text-4xl text-[#721422] text-center">
               <span className="chunko-bold">Meet Santelle</span>
@@ -77,7 +77,7 @@ export default function MobileUnifiedCard() {
           </LazyText>
           <div className="flex flex-col items-start text-left">
             
-            <LazyText className="mb-4 self-center" delay={600}>
+            <LazyText className="mb-4 self-center" delay={200}>
               <LazyImage
                 src="/SantelleKit+App.png"
                 alt="Santelle Kit and App"
@@ -88,28 +88,28 @@ export default function MobileUnifiedCard() {
                 quality={85}
               />
             </LazyText>
-            <LazyText className="font-bold text-xl text-[#721422] text-left mb-4" delay={800}>
+            <LazyText className="font-bold text-xl text-[#721422] text-left mb-4" delay={300}>
               Your discreet, at-home vaginal health companion
             </LazyText>
-            <LazyText className="text-lg text-[#721422] mb-4 leading-relaxed" delay={1000}>
+            <LazyText className="text-lg text-[#721422] mb-4 leading-relaxed" delay={400}>
               Santelle makes it simple to check in on your intimate health each month — with instant
               results, personalised insights, and no awkward clinic visits.
             </LazyText>
-            <LazyText className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left">
+            <LazyText className="list-disc pl-6 text-[#721422] mb-6 space-y-1 text-lg text-left" delay={500}>
               <li>Instant results from home</li>
               <li>Multi-biomarker analysis — beyond pH</li>
               <li>Connected app with personalised insights & tips</li>
             </LazyText>
             <div className="flex flex-col gap-3 w-full">
               <div className="flex justify-center mt-0 mb-6">
-                <LazyText>
+                <LazyText delay={600}>
                 <button
                   className="bg-[#721422] text-white font-bold text-xl px-8 py-6 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse flex items-center justify-center text-center"
                   style={{ minHeight: '4.5rem' }}
                   onClick={focusHeroEmailInput}
                   type="button"
                 >
-                  Take the quiz to discover your ideal plan
+                  Take the quiz
                 </button>
                 </LazyText>
               </div>
@@ -119,7 +119,7 @@ export default function MobileUnifiedCard() {
 
         {/* How It Works Section */}
         <div data-section="how-it-works" className="py-40">
-          <LazyText className="flex items-center gap-4 mb-6" delay={1200}>
+          <LazyText className="flex items-center gap-4 mb-6" delay={100}>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
             <h2 className="font-bold text-4xl text-[#721422] text-center">
               <span className="chunko-bold">How It Works</span>
@@ -127,7 +127,7 @@ export default function MobileUnifiedCard() {
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
           </LazyText>
           {howItWorksSteps.slice(0, 4).map((step, stepIdx) => (
-            <LazyText key={step.number} className="mb-6" delay={1400 + stepIdx * 100}>
+            <LazyText key={step.number} className="mb-6" delay={200 + stepIdx * 150}>
               {/* Step content */}
               <div className="flex flex-col items-start text-left">
                 {/* Step number and title */}
@@ -141,7 +141,7 @@ export default function MobileUnifiedCard() {
                 </div>
                 
                 {/* Image */}
-                <LazyText className="flex items-center justify-center w-full mb-3" delay={1600 + stepIdx * 100}>
+                <LazyText className="flex items-center justify-center w-full mb-3" delay={250 + stepIdx * 150}>
                   <LazyImage 
                     src={step.img}
                     width={240}
@@ -154,7 +154,7 @@ export default function MobileUnifiedCard() {
                 </LazyText>
                 
                 {/* Description */}
-                <LazyText className="text-lg text-[#721422] leading-relaxed" delay={1800 + stepIdx * 100}>
+                <LazyText className="text-lg text-[#721422] leading-relaxed" delay={300 + stepIdx * 150}>
                   {stepIdx === 0 && (
                     <>
                       A discreet kit delivered to your door each month — with everything you need to check in with your <span className="font-bold">vaginal health</span> from home.
@@ -189,14 +189,14 @@ export default function MobileUnifiedCard() {
           
           {/* Take the quiz to discover your ideal plan Button */}
           <div className="flex justify-center mt-0 mb-6">
-            <LazyText>
+            <LazyText delay={800}>
             <button
               className="bg-[#721422] text-white font-bold text-xl px-8 py-6 rounded-full hover:bg-[#8a1a2a] hover:text-white transition cursor-pointer get-access-pulse flex items-center justify-center text-center"
               style={{ minHeight: '4.5rem' }}
               onClick={focusHeroEmailInput}
               type="button"
             >
-              Take the quiz to discover your ideal plan
+              Take the quiz
             </button>
             </LazyText>
           </div>
@@ -204,7 +204,7 @@ export default function MobileUnifiedCard() {
 
         {/* Team Section */}
         <div data-section="team" className="py-40">
-          <LazyText className="flex items-center gap-4 mb-6" delay={2000}>
+          <LazyText className="flex items-center gap-4 mb-6" delay={100}>
             <div className="flex-1 h-1 bg-[#721422] rounded-full"></div>
             <h2 className="font-bold text-4xl text-[#721422] text-center">
               <span className="chunko-bold">Our Team</span>
@@ -220,7 +220,7 @@ export default function MobileUnifiedCard() {
               rel="noopener noreferrer"
               className="block"
             >
-              <LazyText className="block" delay={2200}>
+              <LazyText className="block" delay={200}>
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
@@ -252,7 +252,7 @@ export default function MobileUnifiedCard() {
               rel="noopener noreferrer"
               className="block"
             >
-              <LazyText className="block" delay={2400}>
+              <LazyText className="block" delay={300}>
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">
@@ -284,7 +284,7 @@ export default function MobileUnifiedCard() {
               rel="noopener noreferrer"
               className="block"
             >
-              <LazyText className="block" delay={2600}>
+              <LazyText className="block" delay={400}>
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors cursor-pointer">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#FBD5DB] to-[#F48CA3] rounded-full flex items-center justify-center overflow-hidden">

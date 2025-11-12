@@ -4,12 +4,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
   { href: '#stats', label: 'Why Santelle' },
   { href: '#how-it-works', label: 'How It Works' },
   { href: '#team', label: 'Our Team' },
+  { href: '/plans', label: 'Shop' },
 ];
+
+const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00';
 
 const navLinkBase =
   'font-bold transition duration-500 flex items-center h-full';
@@ -75,6 +79,7 @@ function smoothScrollTo(element: HTMLElement, options: {
 
 export default function NavBar() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -126,28 +131,30 @@ export default function NavBar() {
       {/* Logo - desktop only */}
       <Link href="/" className="hidden md:flex items-center h-full">
         <Image 
-          src="/logo-dark.svg" 
+          src="/logo.svg" 
           alt="Santelle Logo" 
           width={113} 
           height={38} 
           priority 
           style={{
             width: 'clamp(80px, 8vw, 113px)',
-            height: 'auto'
+            height: 'auto',
+            filter: 'brightness(0)'
           }}
         />
       </Link>
       {/* Logo - mobile only */}
       <Link href="/" className="flex md:hidden items-center h-full mx-auto">
         <Image 
-          src="/logo-dark.svg" 
+          src="/logo.svg" 
           alt="Santelle Logo" 
           width={90} 
           height={30} 
           priority 
           style={{
             width: 'clamp(60px, 6vw, 90px)',
-            height: 'auto'
+            height: 'auto',
+            filter: 'brightness(0)'
           }}
         />
       </Link>
@@ -198,6 +205,11 @@ export default function NavBar() {
                   }
                 : item.href.startsWith('#')
                 ? (e) => handleSmoothNavScroll(e, item.href)
+                : item.href === '/plans'
+                ? (e) => {
+                    e.preventDefault();
+                    router.push('/plans');
+                  }
                 : undefined
             }
           >
@@ -207,27 +219,48 @@ export default function NavBar() {
       </div>
       {/* Right-aligned buttons - desktop only */}
       <div className="items-center h-full hidden md:flex">
-
-        
-        {/* Get Early Access Button */}
-        <button
-          className="bg-white/20 backdrop-blur-md text-black font-bold px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition flex items-center justify-center"
-          style={{ 
-            WebkitBackdropFilter: 'blur(12px)', 
-            background: 'rgba(255,255,255,0.12)',
-            fontSize: 'clamp(0.75rem, 1vw, 1.25rem)',
-            paddingLeft: 'clamp(1rem, 1.5vw, 1.5rem)',
-            paddingRight: 'clamp(1rem, 1.5vw, 1.5rem)',
-            height: 'clamp(2.5rem, 4vw, 3rem)'
-          }}
-          onClick={() => {
-            // Navigate to quiz page
-            router.push('/quiz');
-          }}
-          type="button"
-        >
-          Take the Quiz
-        </button>
+        {!loading && (
+          !user ? (
+            /* Sign In Button */
+            <button
+              className="bg-white/20 backdrop-blur-md text-black font-bold px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition flex items-center justify-center"
+              style={{ 
+                WebkitBackdropFilter: 'blur(12px)', 
+                background: 'rgba(255,255,255,0.12)',
+                fontSize: 'clamp(0.75rem, 1vw, 1.25rem)',
+                paddingLeft: 'clamp(1rem, 1.5vw, 1.5rem)',
+                paddingRight: 'clamp(1rem, 1.5vw, 1.5rem)',
+                height: 'clamp(2.5rem, 4vw, 3rem)'
+              }}
+              onClick={() => {
+                // Navigate to auth page
+                router.push('/auth');
+              }}
+              type="button"
+            >
+              Sign In
+            </button>
+          ) : (
+            /* Account Button */
+            <button
+              className="bg-white/20 backdrop-blur-md text-black font-bold px-6 h-12 rounded-2xl hover:bg-white/40 hover:text-black transition flex items-center justify-center"
+              style={{ 
+                WebkitBackdropFilter: 'blur(12px)', 
+                background: 'rgba(255,255,255,0.12)',
+                fontSize: 'clamp(0.75rem, 1vw, 1.25rem)',
+                paddingLeft: 'clamp(1rem, 1.5vw, 1.5rem)',
+                paddingRight: 'clamp(1rem, 1.5vw, 1.5rem)',
+                height: 'clamp(2.5rem, 4vw, 3rem)'
+              }}
+              onClick={() => {
+                window.location.href = STRIPE_PORTAL_URL;
+              }}
+              type="button"
+            >
+              Account
+            </button>
+          )
+        )}
       </div>
     </nav>
   );

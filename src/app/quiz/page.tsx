@@ -1,49 +1,80 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import confetti from 'canvas-confetti';
-import { analytics } from '@/lib/analytics';
+import { useEffect, useRef, useState } from 'react';
+
+type GTMPrimitive = string | number | boolean | null | undefined;
+type GTMStructuredValue =
+  | GTMPrimitive
+  | GTMPrimitive[]
+  | Record<string, GTMPrimitive | GTMPrimitive[]>;
+type GTMEventData = Record<string, GTMStructuredValue>;
+type GTMWindow = Window & { dataLayer?: Array<GTMEventData & { event?: string }> };
+
+// GTM Event Tracking Helper
+const trackGTMEvent = (eventName: string, eventData: GTMEventData) => {
+  if (typeof window !== 'undefined') {
+    const dataLayer = (window as GTMWindow).dataLayer;
+    if (dataLayer) {
+      dataLayer.push({
+        event: eventName,
+        ...eventData,
+      });
+    }
+  }
+};
 
 const quizQuestions = [
   {
     id: 1,
-    title: 'Frequency of Discomfort',
-    question: 'How often do you experience vaginal infections or discomfort per year?',
+    title: 'Fréquence de l’inconfort',
+    question: 'À quelle fréquence avez-vous des infections vaginales ou de l’inconfort chaque année ?',
     options: [
-      'Less than once',
-      '1-2 times per year',
-      '2-4 times per year',
-      '4 or more times per year'
+      'Moins d’une fois',
+      '1 à 2 fois par an',
+      '2 à 4 fois par an',
+      '4 fois ou plus par an'
     ]
   },
   {
     id: 2,
-    title: 'Confidence / Knowledge Level',
-    question: 'How confident do you feel about understanding and managing your intimate health?',
+    title: 'Niveau de confiance / connaissance',
+    question: 'Quel est votre niveau de confiance dans la compréhension et la gestion de votre santé vaginale ?',
     options: [
-      'Very confident - I know my body well',
-      'Somewhat confident - I\'d like more clarity',
-      'Not confident - I often feel unsure or lost'
+      'Très confiante – je connais bien mon corps',
+      'Plutôt confiante – j’aimerais plus de clarté',
+      'Peu confiante – je me sens souvent incertaine ou perdue'
     ]
   },
   {
     id: 3,
-    title: 'Preventive vs Reactive Behavior',
-    question: 'How do you usually take care of your intimate health?',
+    title: 'Motivation',
+    question: 'Qu’est-ce qui vous a donné envie de découvrir Santelle ?',
     options: [
-      'Only when there\'s a problem',
-      'I try to check things occasionally',
-      'I like to stay proactive and track changes regularly'
+      'Je veux prévenir les infections récurrentes',
+      'J’essaie de tomber enceinte',
+      'Je veux des informations discrètes',
+      'Je suis simplement curieuse de ma santé vaginale'
     ]
   },
   {
     id: 4,
-    title: 'Desired Involvement',
-    question: 'How much effort would you like to put into tracking your intimate health?',
+    title: 'Implication souhaitée',
+    question: 'Quel niveau d’implication souhaitez-vous pour suivre votre santé vaginale ?',
     options: [
-      'I prefer something simple and occasional',
-      'I don\'t mind testing regularly if it keeps me balanced',
-      'I want full visibility and personalized insights every month'
+      'Je préfère quelque chose de simple et ponctuel',
+      'Tester régulièrement ne me dérange pas si cela m’aide à rester équilibrée',
+      'Je veux une visibilité complète et des informations personnalisées chaque mois'
+    ]
+  },
+  {
+    id: 5,
+    title: 'Intérêt pour le produit',
+    question: 'Seriez-vous intéressée par un abonnement aux kits de test de santé vaginale avec une application compagnon IA ?',
+    options: [
+      'Certainement, j’adorerais !',
+      'Absolument !',
+      'OUIIII !',
+      'Non (je déteste les chiots)'
     ]
   }
 ];
@@ -52,437 +83,371 @@ export default function QuizPage() {
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [emailValidation, setEmailValidation] = useState({
-    isValid: false,
-    isChecking: false,
-    error: '',
-    domainValid: false
-  });
-  const [rateLimit, setRateLimit] = useState({
-    attempts: 0,
-    lastAttempt: 0,
-    blocked: false,
-    cooldownEnd: 0
-  });
-  const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [quizId, setQuizId] = useState<number | null>(null);
-  const [showPlans, setShowPlans] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const answersRef = useRef<{ [key: number]: string }>({});
+  const questionRef = useRef<number>(currentQuestion);
+  const quizStartedRef = useRef<boolean>(quizStarted);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    questionRef.current = currentQuestion;
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    quizStartedRef.current = quizStarted;
+  }, [quizStarted]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const existingState = window.history.state ?? {};
+    if (existingState.quizQuestionIndex === undefined) {
+      window.history.replaceState(
+        {
+          ...existingState,
+          quizQuestionIndex: -1,
+        },
+        '',
+        window.location.pathname
+      );
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+        transitionTimeoutRef.current = null;
+      }
+
+      const state = (event.state as { quizQuestionIndex?: number } | null) ?? null;
+      const previousQuestionIndex = questionRef.current;
+
+      if (!state || state.quizQuestionIndex === undefined || state.quizQuestionIndex === -1) {
+        if (quizStartedRef.current) {
+          setQuizStarted(false);
+        }
+        if (previousQuestionIndex !== 0) {
+          setCurrentQuestion(0);
+        }
+        return;
+      }
+
+      const targetIndex = Math.min(
+        Math.max(state.quizQuestionIndex, 0),
+        quizQuestions.length - 1
+      );
+
+      const goingBack = targetIndex < previousQuestionIndex;
+      const goingForward = targetIndex > previousQuestionIndex;
+
+      if (!quizStartedRef.current) {
+        setQuizStarted(true);
+      }
+
+      if (goingBack) {
+        const returningQuestion = quizQuestions[targetIndex];
+        const returningAnswer = answersRef.current[targetIndex];
+
+        trackGTMEvent('quiz_question_previous', {
+          quiz_name: 'Santelle Plan Quiz',
+          from_question: previousQuestionIndex + 1,
+          to_question: targetIndex + 1,
+          total_questions: quizQuestions.length,
+          returning_to_question_id: returningQuestion.id,
+          returning_to_question_title: returningQuestion.title,
+          answer_selected: returningAnswer || null,
+          answer_index: returningAnswer
+            ? returningQuestion.options.indexOf(returningAnswer) + 1
+            : null,
+        });
+      } else if (goingForward) {
+        const leavingIndex = previousQuestionIndex;
+        const boundedLeavingIndex = Math.min(
+          Math.max(leavingIndex, 0),
+          quizQuestions.length - 1
+        );
+        const leavingQuestion = quizQuestions[boundedLeavingIndex];
+        const selectedAnswer = answersRef.current[boundedLeavingIndex];
+
+        trackGTMEvent('quiz_question_next', {
+          quiz_name: 'Santelle Plan Quiz',
+          from_question: boundedLeavingIndex + 1,
+          to_question: targetIndex + 1,
+          total_questions: quizQuestions.length,
+          answer_selected: selectedAnswer || null,
+          answer_index: selectedAnswer
+            ? leavingQuestion.options.indexOf(selectedAnswer) + 1
+            : null,
+          question_id: leavingQuestion.id,
+          question_title: leavingQuestion.title,
+        });
+      }
+
+      setCurrentQuestion(targetIndex);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (validationTimeout) {
-        clearTimeout(validationTimeout);
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
       }
     };
-  }, [validationTimeout]);
+  }, []);
 
-  useEffect(() => {
-    if (!rateLimit.blocked) return;
-    
-    const interval = setInterval(() => {
-      const now = Date.now();
-      if (now >= rateLimit.cooldownEnd) {
-        setRateLimit(prev => ({
-          ...prev,
-          blocked: false,
-          cooldownEnd: 0
-        }));
-      }
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, [rateLimit.blocked, rateLimit.cooldownEnd]);
-
-  const triggerConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#ff4fa3', '#721422', '#F7A8B8', '#721422', '#18321f'],
-      shapes: ['circle', 'square'],
-      gravity: 0.8,
-      ticks: 200
-    });
-    
-    setTimeout(() => {
-      confetti({
-        particleCount: 50,
-        spread: 50,
-        origin: { y: 0.7 },
-        colors: ['#ff4fa3', '#721422', '#F7A8B8'],
-        shapes: ['circle'],
-        gravity: 1,
-        ticks: 150
-      });
-    }, 200);
-  };
-
-  const validateEmailFormat = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validateEmailDomain = async (email: string): Promise<boolean> => {
-    const domain = email.split('@')[1];
-    if (!domain) return false;
-    
+  const submitQuiz = async (answersState: { [key: number]: string }) => {
     try {
-      const response = await fetch(`https://dns.google/resolve?name=${domain}&type=MX`);
-      const data = await response.json();
-      return data.Answer && data.Answer.length > 0;
-    } catch (error) {
-      console.error('Domain validation error:', error);
-      return false;
-    }
-  };
+      setIsSubmitting(true);
 
-  const validateEmail = async (email: string) => {
-    if (!email) {
-      setEmailValidation({
-        isValid: false,
-        isChecking: false,
-        error: '',
-        domainValid: false
+      const answerIndices = Object.keys(answersState).reduce((acc, key) => {
+        const questionIndex = parseInt(key, 10);
+        const answerIndex = quizQuestions[questionIndex].options.indexOf(answersState[questionIndex]);
+        acc[`q${questionIndex + 1}`] = answerIndex + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const quizResponse = await fetch('/api/quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers: answerIndices,
+          signup: false,
+        }),
       });
-      return;
-    }
 
-    const formatValid = validateEmailFormat(email);
-    if (!formatValid) {
-      setEmailValidation({
-        isValid: false,
-        isChecking: false,
-        error: 'Please enter a valid email address',
-        domainValid: false
+      if (!quizResponse.ok) {
+        throw new Error('Failed to save quiz answers');
+      }
+
+      const quizData = await quizResponse.json();
+      const quizIdFromResponse = quizData.data[0].id;
+
+      const recommendedPlan = calculateRecommendedPlan(answersState);
+
+        const planNames: { [key: number]: string } = {
+          0: 'Mensuel',
+          1: 'Bimestriel',
+          2: 'Trimestriel',
+          [-1]: 'Sans recommandation',
+        };
+
+      trackGTMEvent('Quiz_Completed', {
+        quiz_name: 'Santelle Plan Quiz',
+        total_questions: quizQuestions.length,
+        recommended_plan: recommendedPlan,
+        recommended_plan_name: planNames[recommendedPlan] || 'Unknown',
+        quiz_id: quizIdFromResponse,
+        answers: answerIndices,
       });
-      return;
-    }
 
-    setEmailValidation(prev => ({ ...prev, isChecking: true }));
-    const domainValid = await validateEmailDomain(email);
-    
-    setEmailValidation({
-      isValid: formatValid && domainValid,
-      isChecking: false,
-      error: domainValid ? '' : 'This email domain appears to be invalid',
-      domainValid
-    });
-  };
+        if (recommendedPlan === -1) {
+        setIsSubmitting(false);
+          alert('Merci pour votre sincérité ! Nous apprécions votre temps 💜');
+        window.location.href = '/';
+        return;
+      }
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    
-    if (validationTimeout) {
-      clearTimeout(validationTimeout);
+      sessionStorage.setItem('quizId', quizIdFromResponse.toString());
+
+      setIsSubmitting(false);
+      window.location.href = `/plans?recommended=${recommendedPlan}`;
+    } catch (error: unknown) {
+      console.error('Error saving quiz:', error);
+      setIsSubmitting(false);
+      window.location.href = '/plans';
     }
-    
-    const timeout = setTimeout(() => {
-      validateEmail(e.target.value);
-    }, 500);
-    
-    setValidationTimeout(timeout);
   };
 
   const handleStartQuiz = () => {
     setQuizStarted(true);
-  };
+    // Track quiz start
+    trackGTMEvent('Quiz_Started', {
+      quiz_name: 'Santelle Plan Quiz',
+      total_questions: quizQuestions.length,
+    });
 
-  const handleSelectAnswer = (answer: string) => {
-    setAnswers({ ...answers, [currentQuestion]: answer });
-  };
+    if (typeof window !== 'undefined') {
+      const existingState = window.history.state ?? {};
+      window.history.replaceState(
+        {
+          ...existingState,
+          quizQuestionIndex: -1,
+        },
+        '',
+        window.location.pathname
+      );
 
-  const handleNext = async () => {
-    if (currentQuestion < quizQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      // Save quiz answers immediately when completing the quiz
-      try {
-        setIsSubmitting(true);
-        
-        // Map answers to integers for database (1-based indices)
-        const answerIndices = Object.keys(answers).reduce((acc, key) => {
-          const questionIndex = parseInt(key);
-          const answerIndex = quizQuestions[questionIndex].options.indexOf(answers[questionIndex]);
-          acc[`q${questionIndex + 1}`] = answerIndex + 1; // Add 1 to make it 1-based
-          return acc;
-        }, {} as Record<string, number>);
-
-        // Save quiz answers to database without email
-        const quizResponse = await fetch('/api/quiz', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            answers: answerIndices,
-            signup: false // Will be updated to true when email is submitted
-          })
-        });
-
-        if (!quizResponse.ok) {
-          throw new Error('Failed to save quiz answers');
-        }
-
-        const quizData = await quizResponse.json();
-        setQuizId(quizData.data[0].id); // Store the quiz ID for later update
-        
-        setIsSubmitting(false);
-        // Show plan selection after successfully saving quiz
-        setShowPlans(true);
-      } catch (error) {
-        console.error('Error saving quiz:', error);
-        setIsSubmitting(false);
-        // Show plan selection anyway to not block the user
-        setShowPlans(true);
-      }
+      window.history.pushState(
+        {
+          quizQuestionIndex: 0,
+        },
+        '',
+        window.location.pathname
+      );
     }
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const now = Date.now();
-    
-    // Rate limiting checks
-    if (rateLimit.blocked && now < rateLimit.cooldownEnd) {
-      setSubmitStatus('error');
-      setTimeout(() => setSubmitStatus('idle'), 3000);
-      return;
-    }
-    
-    // Check for rapid submissions
-    const timeWindow = 60000; // 60 seconds
-    const maxAttempts = 3;
-    
-    if (now - rateLimit.lastAttempt < timeWindow) {
-      const newAttempts = rateLimit.attempts + 1;
-      
-      if (newAttempts > maxAttempts) {
-        const cooldownTime = 300000; // 5 minutes
-        setRateLimit({
-          attempts: newAttempts,
-          lastAttempt: now,
-          blocked: true,
-          cooldownEnd: now + cooldownTime
-        });
-        setSubmitStatus('error');
-        setTimeout(() => setSubmitStatus('idle'), 3000);
-        return;
-      }
-      
-      setRateLimit(prev => ({
-        ...prev,
-        attempts: newAttempts,
-        lastAttempt: now
-      }));
-    } else {
-      setRateLimit(prev => ({
-        ...prev,
-        attempts: 1,
-        lastAttempt: now,
-        blocked: false,
-        cooldownEnd: 0
-      }));
-    }
-    
-    if (!emailValidation.isValid) {
-      setEmailValidation(prev => ({ ...prev, error: 'Please enter a valid email address' }));
+  const handleSelectAnswer = async (answer: string) => {
+    if (isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
+    const questionIndex = currentQuestion;
+    const currentQ = quizQuestions[questionIndex];
+    const updatedAnswers = { ...answers, [questionIndex]: answer };
+    setAnswers(updatedAnswers);
 
-    try {
-      // Update the existing quiz record with email and signup status
-      // (plan was already saved when user selected it)
-      if (quizId) {
-        const updateResponse = await fetch('/api/quiz', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: quizId,
-            email: email,
-            signup: true
-          })
-        });
+    if (questionIndex < quizQuestions.length - 1) {
+      const selectedIndex = currentQ.options.indexOf(answer);
+      trackGTMEvent('quiz_question_next', {
+        quiz_name: 'Santelle Plan Quiz',
+        from_question: questionIndex + 1,
+        to_question: questionIndex + 2,
+        total_questions: quizQuestions.length,
+        answer_selected: answer,
+        answer_index: selectedIndex + 1,
+        question_id: currentQ.id,
+        question_title: currentQ.title,
+      });
 
-        if (!updateResponse.ok) {
-          console.error('Failed to update quiz with email');
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+
+      transitionTimeoutRef.current = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.history.pushState(
+            {
+              quizQuestionIndex: questionIndex + 1,
+            },
+            '',
+            window.location.pathname
+          );
         }
-      }
 
-      // Subscribe to waitlist
-      const subscribeResponse = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email,
-          screenData: {
-            width: window.screen.width,
-            height: window.screen.height
-          }
-        })
-      });
-
-      if (!subscribeResponse.ok) {
-        const errorData = await subscribeResponse.json();
-        throw new Error(errorData.error || 'Failed to subscribe to waitlist');
-      }
-
-      // Track with analytics
-      analytics.trackWaitlistSignup(email, {
-        device: { type: 'desktop' },
-        browser: { name: navigator.userAgent },
-        timestamp: new Date().toISOString(),
-        source: 'quiz',
-        selectedPlan: selectedPlan
-      });
-      
-      setIsSubmitting(false);
-      setSubmitStatus('success');
-      triggerConfetti();
-      
-      // Reset and redirect after success
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 3000);
-    } catch (error) {
-      console.error('Submission error:', error);
-      setIsSubmitting(false);
-      setSubmitStatus('error');
-      setTimeout(() => setSubmitStatus('idle'), 3000);
+        setCurrentQuestion(questionIndex + 1);
+        transitionTimeoutRef.current = null;
+      }, 150);
+    } else {
+      await submitQuiz(updatedAnswers);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
+  function calculateRecommendedPlan(answersState: { [key: number]: string }): number {
+    // Check for opt-out first (Q5 = "No (I hate puppies)")
+    const q5Answer = answersState[4];
+    if (q5Answer === 'Non (je déteste les chiots)') {
+      return -1; // Special case for opt-out
     }
-  };
+
+    // Get answer indices (0-based)
+    const q1Index = quizQuestions[0].options.indexOf(answersState[0]);
+    const q2Index = quizQuestions[1].options.indexOf(answersState[1]);
+    const q3Index = quizQuestions[2].options.indexOf(answersState[2]);
+    const q4Index = quizQuestions[3].options.indexOf(answersState[3]);
+
+    // Rule 1: Main driver - Frequency of discomfort (Q1)
+    let baseScore = 0;
+    if (q1Index === 3) { // "4 or more times per year"
+      baseScore = 5; // Always Monthly
+    } else if (q1Index === 2) { // "2-4 times per year"
+      baseScore = 3;
+    } else if (q1Index === 1) { // "1-2 times per year"
+      baseScore = 2;
+    } else { // "Less than once"
+      baseScore = 1;
+    }
+
+    // Rule 2: Motivation (Q3) - strong modifier
+    let motivationModifier = 0;
+    if (q3Index === 0) { // "Prevent recurring infections"
+      motivationModifier = 2;
+    } else if (q3Index === 1) { // "Trying to get pregnant"
+      motivationModifier = 2;
+    } else if (q3Index === 2) { // "Discreet insights"
+      motivationModifier = 1;
+    } else if (q3Index === 3) { // "Just curious"
+      motivationModifier = 0;
+    }
+
+    // Rule 3: Confidence (Q2) and Involvement (Q4) adjustments
+    let confidenceAdjustment = 0;
+    if (q2Index === 0) { // "Very confident"
+      confidenceAdjustment = -1;
+    } else if (q2Index === 1) { // "Somewhat confident"
+      confidenceAdjustment = 0;
+    } else if (q2Index === 2) { // "Not confident"
+      confidenceAdjustment = 1;
+    }
+
+    let involvementAdjustment = 0;
+    if (q4Index === 0) { // "Simple and occasional"
+      involvementAdjustment = 0;
+    } else if (q4Index === 1) { // "Regular testing"
+      involvementAdjustment = 1;
+    } else if (q4Index === 2) { // "Full visibility"
+      involvementAdjustment = 2;
+    }
+
+    // Calculate total score
+    const totalScore = baseScore + motivationModifier + confidenceAdjustment + involvementAdjustment;
+
+    // Rule 4: Determine initial recommendation based on score
+    let recommendation = 2; // Default to Quarterly
+    if (totalScore >= 5) {
+      recommendation = 0; // Monthly
+    } else if (totalScore >= 3) {
+      recommendation = 1; // Bi-Monthly
+    }
+
+    // Rule 5: If Q1 = "4 or more times per year," always Monthly
+    if (q1Index === 3) {
+      recommendation = 0; // Monthly
+    }
+
+    // Rule 6: If "full visibility," upgrade one tier
+    if (q4Index === 2) { // "Full visibility"
+      if (recommendation === 2) { // Quarterly → Bi-Monthly
+        recommendation = 1;
+      } else if (recommendation === 1) { // Bi-Monthly → Monthly
+        recommendation = 0;
+      }
+      // Monthly stays Monthly
+    }
+
+    // Rule 7: If "Very confident" AND "Just curious," downgrade one tier
+    if (q2Index === 0 && q3Index === 3) { // Very confident AND Just curious
+      if (recommendation === 0) { // Monthly → Bi-Monthly
+        recommendation = 1;
+      } else if (recommendation === 1) { // Bi-Monthly → Quarterly
+        recommendation = 2;
+      }
+      // Quarterly stays Quarterly
+    }
+
+    // Rule 8: If Q1 ≥ 2 (2-4 times per year) but result is Quarterly, upgrade to Bi-Monthly
+    if (q1Index >= 2 && recommendation === 2) { // 2-4 times per year but Quarterly
+      recommendation = 1; // Upgrade to Bi-Monthly
+    }
+
+    return recommendation;
+  }
 
   const currentAnswer = answers[currentQuestion];
-  const calculateRecommendedPlan = (): number => {
-    // Plans: 0=Proactive (Monthly), 1=Balanced (Bi-Monthly), 2=Essential (Quarterly)
-    // Convert to levels: 3=Monthly, 2=Bi-Monthly, 1=Quarterly
-    
-    // Rule 1: Frequency Baseline (Q1)
-    let planLevel = 1; // Default to Quarterly
-    
-    const q1Answer = Object.keys(answers).length > 0 ? 
-      quizQuestions[0].options.indexOf(answers[0]) + 1 : 1;
-    
-    if (q1Answer === 4) { // 4 or more times per year
-      planLevel = 3; // Monthly
-    } else if (q1Answer === 3) { // 2-4 times per year
-      planLevel = 2; // Bi-Monthly
-    } else { // 1-2 times per year or less than once
-      planLevel = 1; // Quarterly
-    }
-    
-    // Rule 2: Adjustments
-    // Q2 - Confidence
-    const q2Answer = quizQuestions[1].options.indexOf(answers[1]) + 1;
-    if (q2Answer === 3) { // Not confident
-      planLevel = Math.min(3, planLevel + 1); // Upgrade
-    } else if (q2Answer === 1) { // Very confident
-      planLevel = Math.max(1, planLevel - 1); // Downgrade
-    }
-    
-    // Q3 - Behavior
-    const q3Answer = quizQuestions[2].options.indexOf(answers[2]) + 1;
-    if (q3Answer === 3) { // Regularly
-      planLevel = Math.min(3, planLevel + 1); // Upgrade
-    } else if (q3Answer === 1) { // Only when there's a problem
-      planLevel = Math.max(1, planLevel - 1); // Downgrade
-    }
-    
-    // Q4 - Effort
-    const q4Answer = quizQuestions[3].options.indexOf(answers[3]) + 1;
-    if (q4Answer === 3) { // Full visibility
-      planLevel = Math.min(3, planLevel + 1); // Upgrade
-    } else if (q4Answer === 1) { // Simple & occasional
-      planLevel = Math.max(1, planLevel - 1); // Downgrade
-    }
-    
-    // Convert level to plan index: 3=0 (Proactive), 2=1 (Balanced), 1=2 (Essential)
-    return 3 - planLevel;
-  };
 
-  const handlePlanSelect = async (plan: string) => {
-    setSelectedPlan(plan);
-    
-    // Save the selected plan immediately
-    if (quizId) {
-      try {
-        const updateResponse = await fetch('/api/quiz', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: quizId,
-            plan: plan // Save plan name directly as text
-          })
-        });
-
-        if (!updateResponse.ok) {
-          console.error('Failed to update quiz with plan');
-        }
-      } catch (error) {
-        console.error('Error saving plan:', error);
-      }
-    }
-    
-    setShowPlans(false);
-    setShowEmailForm(true);
-  };
-
-  const canProceed = currentAnswer !== undefined;
-  const recommendedPlanIndex = showPlans ? calculateRecommendedPlan() : 1;
-
-  const allPlans = [
-    {
-      name: 'Proactive',
-      frequency: 'Monthly Kit',
-      price: '€12.99',
-      period: 'month',
-      yearlyPrice: '€129.99 / year',
-      originalIndex: 0
-    },
-    {
-      name: 'Balanced',
-      frequency: 'Bi-Monthly Kit',
-      price: '€16.99',
-      period: '2 months',
-      yearlyPrice: '€79.99 / year',
-      originalIndex: 1
-    },
-    {
-      name: 'Essential',
-      frequency: 'Quarterly Kit',
-      price: '€19.99',
-      period: 'quarter',
-      yearlyPrice: '€59.99 / year',
-      originalIndex: 2
-    }
-  ];
-
-  // On mobile, sort plans to show recommended first
-  const plans = [...allPlans].sort((a, b) => {
-    if (a.originalIndex === recommendedPlanIndex) return -1;
-    if (b.originalIndex === recommendedPlanIndex) return 1;
-    return a.originalIndex - b.originalIndex;
-  });
-
-  const commonFeatures = [
-    'Full access to app',
-    '30% off on extra kits'
-  ];
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center">
+    <main className="relative min-h-screen w-full">
       {/* Background - Video for Desktop, Image for Mobile */}
       <div className="fixed inset-0 -z-10 flex items-center justify-center">
         {/* Desktop Video Background */}
@@ -521,240 +486,68 @@ export default function QuizPage() {
 
       {/* Content */}
       {!quizStarted ? (
-        <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
-            Let&apos;s find the perfect Santelle plan for you.
-          </h1>
-          <p className="text-xl text-[#721422]/80 mb-8">
-            Answer four quick questions to discover how to better understand and care for your intimate health.
-          </p>
-          <button
-            onClick={handleStartQuiz}
-            className="inline-block bg-[#721422] text-white font-bold px-8 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer"
-          >
-            Start now
-          </button>
-        </div>
-      ) : showPlans ? (
-        <div className="relative z-10 w-[95%] mx-auto px-4 py-16">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-4 text-center">
-            Based on your answers, this plan helps you stay balanced and in control.
-          </h1>
-          <p className="text-lg text-[#721422]/80 mb-12 text-center">
-            Choose the plan that best fits your needs.
-          </p>
-          
-          <div className="flex flex-col gap-8 max-w-6xl mx-auto">
-            {/* Plan Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => {
-              const isRecommended = plan.originalIndex === recommendedPlanIndex;
-              return (
-              <div
-                key={plan.name}
-                className={`bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col ${
-                  isRecommended ? 'border-[#721422] shadow-lg' : 'border-white/50'
-                }`}
-              >
-                {isRecommended && (
-                  <div className="text-center mb-4">
-                    <span className="bg-[#721422] text-white px-4 py-1 rounded-full text-sm font-bold">
-                      RECOMMENDED FOR YOU
-                    </span>
-                  </div>
-                )}
-                
-                <h2 className="text-2xl md:text-3xl font-bold text-[#721422] mb-4 text-center">
-                  {plan.name}
-                </h2>
-                
-                <div className="mb-6">
-                  <p className="text-lg text-[#721422] font-semibold text-center">
-                    {plan.frequency}
-                  </p>
-                </div>
-                
-                <div className="mt-auto">
-                  <div className="text-center mb-6">
-                    <div className="text-3xl font-bold text-[#721422]">
-                      {plan.price}
-                      <span className="text-lg font-normal"> / {plan.period}</span>
-                    </div>
-                    <div className="text-sm text-[#721422]/70 mt-1">
-                      {plan.yearlyPrice}
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => handlePlanSelect(plan.name)}
-                    className={`w-full font-bold px-6 py-4 rounded-full transition-colors duration-200 ${
-                      isRecommended
-                        ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
-                        : 'bg-white text-[#721422] border-2 border-[#721422] hover:bg-[#721422] hover:text-white'
-                    }`}
-                  >
-                    Join The Waitlist
-                  </button>
-                </div>
-              </div>
-            )})}
-            </div>
-
-            {/* Common Features - Below Plan Cards */}
-            <div className="flex justify-center">
-              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50">
-                <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                  All Plans Include:
-                </h3>
-                <ul className="flex flex-wrap gap-6 justify-center">
-                  {commonFeatures.map((feature, idx) => (
-                    <li key={idx} className="text-[#721422] flex items-center">
-                      <span className="mr-2 text-lg">✓</span>
-                      <span className="text-base">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : showEmailForm ? (
-        <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16">
-          <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-2xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold text-[#721422] mb-4 text-center">
-              Join the waitlist
+        <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-6 py-12 text-center">
+          <div className="w-full max-w-4xl rounded-3xl border border-white/50 bg-white/40 px-8 py-16 md:px-16 md:py-20 backdrop-blur-md">
+            <h1 className="text-4xl md:text-5xl font-bold text-[#721422] mb-6">
+              Trouvons l’offre Santelle idéale pour vous.
             </h1>
-            <p className="text-lg text-[#721422]/80 mb-4 text-center">
-              Enter your email to get early access to your personalized Santelle plan and exclusive updates.
+            <p className="text-xl text-[#721422]/80 mb-10">
+              Répondez à cinq questions rapides pour mieux comprendre et prendre soin de votre intimité.
             </p>
-            {selectedPlan && (
-              <div className="text-center mb-8">
-                <span className="inline-block bg-[#721422] text-white px-6 py-2 rounded-full font-semibold">
-                  Selected: {selectedPlan} Plan
-                </span>
-              </div>
-            )}
-            <form onSubmit={handleEmailSubmit} className="space-y-6">
-              <div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={handleEmailChange}
-                  placeholder="Enter your email"
-                  required
-                  disabled={isSubmitting}
-                  className={`w-full px-6 py-4 rounded-full border-2 focus:outline-none text-[#721422] bg-white/80 placeholder:text-[#721422]/50 transition ${
-                    emailValidation.error ? 'border-red-500' : 
-                    emailValidation.isValid ? 'border-green-500' : 
-                    'border-[#721422]/20 focus:border-[#721422]'
-                  }`}
-                />
-                
-                {/* Validation feedback */}
-                <div className="mt-2 text-center">
-                  {emailValidation.isChecking && (
-                    <div className="text-blue-600 text-sm">Checking email domain...</div>
-                  )}
-                  {emailValidation.error && (
-                    <div className="text-red-600 text-sm">{emailValidation.error}</div>
-                  )}
-                  {emailValidation.isValid && !emailValidation.isChecking && (
-                    <div className="text-green-600 text-sm">✓ Valid email address</div>
-                  )}
-                  {rateLimit.blocked && (
-                    <div className="text-red-600 text-sm">
-                      Too many attempts. Please wait {Math.ceil((rateLimit.cooldownEnd - Date.now()) / 1000)} seconds before trying again.
-                    </div>
-                  )}
-                  {submitStatus === 'success' && (
-                    <div className="text-green-600 font-semibold">
-                      ✓ You&apos;ve been added to the waitlist!
-                    </div>
-                  )}
-                  {submitStatus === 'error' && (
-                    <div className="text-red-600 font-semibold">
-                      {rateLimit.blocked ? 'Too many submission attempts. Please wait before trying again.' : 'Something went wrong. Please try again.'}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                type="submit"
-                disabled={isSubmitting || (!!email && !emailValidation.isValid) || rateLimit.blocked}
-                className={`w-full bg-[#721422] text-white font-bold px-8 py-4 rounded-full transition-colors duration-200 ${
-                  isSubmitting || (!!email && !emailValidation.isValid) || rateLimit.blocked
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-[#8a1a2a] cursor-pointer'
-                }`}
-              >
-                {isSubmitting ? 'Submitting...' : rateLimit.blocked ? 'Rate limited' : 'Join waitlist'}
-              </button>
-            </form>
+            <button
+              onClick={handleStartQuiz}
+              className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
+            >
+              Commencer
+            </button>
           </div>
         </div>
       ) : (
-        <div className="relative z-10 w-[95%] max-w-7xl mx-auto px-4 py-16">
-          <div className="bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/50 max-w-3xl mx-auto">
-            {/* Progress Bar */}
-            <div className="mb-8">
-              <div className="text-sm text-[#721422] mb-2">
-                <div className="text-center mb-1">Question {currentQuestion + 1} of {quizQuestions.length}</div>
-                <div className="font-semibold text-center">{quizQuestions[currentQuestion].title}</div>
+        <div className="relative z-10 w-full min-h-screen">
+          <div className="relative flex min-h-screen w-full flex-col border border-white/50 bg-white/40 px-6 py-10 text-[#721422] backdrop-blur-md md:px-16 md:py-16">
+            <div className="flex flex-1 flex-col items-center gap-6 pt-4 pb-6 md:gap-10 md:pt-0 md:pb-0 justify-start md:justify-center">
+              {/* Progress Bar */}
+              <div className="w-full max-w-2xl">
+                <div className="mb-4 text-sm">
+                  <div className="mb-1 text-center">
+                    Question {currentQuestion + 1} sur {quizQuestions.length}
+                  </div>
+                  <div className="text-center font-semibold">
+                    {quizQuestions[currentQuestion].title}
+                  </div>
+                </div>
+                <div className="h-2 w-full rounded-full bg-white/50">
+                  <div
+                    className="h-1 rounded-full bg-[#721422] transition-all duration-300"
+                    style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-white/50 rounded-full h-2">
-                <div 
-                  className="bg-[#721422] h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
-                />
+
+              {/* Question */}
+              <div className="w-full max-w-2xl text-center">
+                <h2 className="text-2xl font-bold md:text-3xl">
+                  {quizQuestions[currentQuestion].question}
+                </h2>
               </div>
-            </div>
 
-            {/* Question */}
-            <h2 className="text-2xl md:text-3xl font-bold text-[#721422] mb-8 text-center">
-              {quizQuestions[currentQuestion].question}
-            </h2>
-
-            {/* Options */}
-            <div className="space-y-4 mb-8">
-              {quizQuestions[currentQuestion].options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSelectAnswer(option)}
-                  className={`w-full p-4 rounded-xl text-left font-medium transition-all duration-200 ${
-                    currentAnswer === option
-                      ? 'bg-[#721422] text-white shadow-lg'
-                      : 'bg-white/60 text-[#721422] hover:bg-white/80 hover:shadow-md'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-
-            {/* Navigation Buttons */}
-            <div className="flex gap-4 justify-between">
-              <button
-                onClick={handlePrevious}
-                disabled={currentQuestion === 0}
-                className={`px-6 py-3 rounded-full font-bold transition-colors duration-200 ${
-                  currentQuestion === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-white text-[#721422] hover:bg-gray-100'
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={!canProceed}
-                className={`px-6 py-3 rounded-full font-bold transition-colors duration-200 ${
-                  canProceed
-                    ? 'bg-[#721422] text-white hover:bg-[#8a1a2a]'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {currentQuestion === quizQuestions.length - 1 ? 'Submit' : 'Next'}
-              </button>
+              {/* Options */}
+              <div className="w-full max-w-2xl space-y-2">
+                {quizQuestions[currentQuestion].options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSelectAnswer(option)}
+                    disabled={isSubmitting}
+                    className={`w-full rounded-full px-5 py-5 text-center text-md font-medium transition-all duration-200 ${
+                      currentAnswer === option
+                        ? 'bg-[#721422] text-white shadow-lg'
+                        : 'bg-white/60 text-[#721422] hover:bg-white/80 hover:shadow-md'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

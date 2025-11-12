@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { withErrorHandler, Errors } from '@/middleware/errorHandler';
 
 async function resubscribeHandler(req: NextRequest) {
@@ -28,6 +28,7 @@ async function resubscribeHandler(req: NextRequest) {
     const sanitizedEmail = email.trim().toLowerCase();
 
     // Update the waitlist entry to mark as resubscribed
+    const supabaseAdmin = getSupabaseAdmin();
     const { error } = await supabaseAdmin
       .from('waitlist')
       .update({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { extractTechnicalData, getIPGeolocation } from '@/lib/technicalData';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
@@ -82,6 +82,7 @@ async function subscribeHandler(req: NextRequest) {
   }
 
   // First, try to save the email and technical data to Supabase
+  const supabaseAdmin = getSupabaseAdmin();
   const { data: dbData, error: dbError } = await supabaseAdmin
     .from('waitlist')
     .insert([
@@ -153,18 +154,7 @@ async function subscribeHandler(req: NextRequest) {
             </p>
           </div>
 
-          <div style="background:#721422; color:white; padding:24px; border-radius:14px; margin:24px 0; text-align:center;">
-            <h3 style="color:white; margin:0 0 16px; font-size:20px;">🌸 Personalize Your Experience</h3>
-            <p style="margin:0 0 20px; font-size:16px; line-height:1.6;">
-              Complete your profile and become part of our founding community. 
-              You’ll unlock region-specific updates, personalized insights, and exclusive first access before our public launch. 
-              Plus, completing your profile helps shape the future of intimate health for all women.
-            </p>
-            <a href="https://santellehealth.com/complete-profile?email=${sanitizedEmail}" 
-              style="background:#ff4fa3; color:white; padding:16px 32px; text-decoration:none; border-radius:999px; font-weight:bold; display:inline-block;">
-              Complete My Profile
-            </a>
-          </div>
+          
 
           <hr style="border:none; border-top:1px solid #f0e0e3; margin:24px 0;">
 
@@ -177,7 +167,6 @@ async function subscribeHandler(req: NextRequest) {
           <p style="font-size:12px; color:#aaa; text-align:center; margin-top:12px;">
             You're receiving this because you signed up at santellehealth.com. <br>
             <a href="https://santellehealth.com/unsubscribe?email=${sanitizedEmail}" style="color:#721422; text-decoration:underline;">Unsubscribe</a> | 
-            <a href="https://santellehealth.com/complete-profile?email=${sanitizedEmail}" style="color:#721422; text-decoration:underline;">Update Profile</a> | 
             <a href="https://santellehealth.com/resubscribe?email=${sanitizedEmail}" style="color:#721422; text-decoration:underline;">Resubscribe</a>
           </p>
         </div>

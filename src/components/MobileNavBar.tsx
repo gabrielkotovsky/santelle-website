@@ -3,13 +3,18 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const menuItems = [
   { href: '#mobile-stats', label: 'Why Santelle', section: 'stats' },
   { href: '#mobile-meet', label: 'Meet Santelle', section: 'meet' },
   { href: '#mobile-how-it-works', label: 'How It Works', section: 'how-it-works' },
   { href: '#mobile-team', label: 'Our Team', section: 'team' },
+  { href: '/plans', label: 'Shop', section: null },
 ];
+
+const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00';
 
 // Custom smooth scroll function with easing options
 function smoothScrollTo(element: HTMLElement, options: {
@@ -68,6 +73,8 @@ function smoothScrollTo(element: HTMLElement, options: {
 }
 
 export default function MobileNavBar() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -138,28 +145,6 @@ export default function MobileNavBar() {
     }, 300); // Wait for menu close animation
   };
 
-  const handleGetAccess = () => {
-    setIsOpen(false);
-    
-    // Wait for menu close animation, then trigger waitlist
-    setTimeout(() => {
-      window.dispatchEvent(new Event('openWaitlist'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      
-      // Focus on mobile email input if available
-      setTimeout(() => {
-        const mobileEmailInput = document.getElementById('waitlist-email-mobile') as HTMLInputElement;
-        const desktopEmailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-        
-        if (mobileEmailInput) {
-          mobileEmailInput.focus();
-        } else if (desktopEmailInput) {
-          desktopEmailInput.focus();
-        }
-      }, 800); // Wait for scroll to complete (increased for custom animation)
-    }, 300);
-  };
-
   return (
     <>
       {/* Mobile Navigation Bar */}
@@ -174,13 +159,13 @@ export default function MobileNavBar() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image 
-              src="/logo-dark.svg" 
+              src="/logo.svg" 
               alt="Santelle Logo" 
-              width={120} 
-              height={40} 
+              width={150} 
+              height={50} 
               priority 
-              className={`h-8 w-auto transition-all duration-300 ${
-                isOpen ? 'brightness-0 invert' : ''
+              className={`h-12 w-auto transition-all duration-300 ${
+                isOpen ? 'brightness-0 invert' : 'brightness-0'
               }`}
             />
           </Link>
@@ -188,19 +173,25 @@ export default function MobileNavBar() {
           {/* Hamburger Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="touch-target p-2 rounded-lg bg-white/20 backdrop-blur-sm"
+            className="touch-target p-2 relative w-8 h-8"
             aria-label={isOpen ? 'Close menu' : 'Open menu'}
           >
-            <div className="w-6 h-6 flex flex-col justify-center items-center">
-              <span className={`block w-5 h-0.5 transition-all duration-300 ${
-                isOpen ? 'rotate-45 translate-y-1 bg-white' : 'bg-black'
-              }`} />
-              <span className={`block w-5 h-0.5 transition-all duration-300 mt-1 ${
-                isOpen ? 'opacity-0 bg-white' : 'bg-black'
-              }`} />
-              <span className={`block w-5 h-0.5 transition-all duration-300 mt-1 ${
-                isOpen ? '-rotate-45 -translate-y-1 bg-white' : 'bg-black'
-              }`} />
+            {/* Hamburger Icon */}
+            <div className={`absolute inset-0 flex flex-col justify-center items-center transition-opacity duration-300 ${
+              isOpen ? 'opacity-0' : 'opacity-100'
+            }`}>
+              <span className="block w-7 h-0.5 bg-black" />
+              <span className="block w-7 h-0.5 bg-black mt-1.5" />
+              <span className="block w-7 h-0.5 bg-black mt-1.5" />
+            </div>
+            {/* X Icon */}
+            <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+              isOpen ? 'opacity-100' : 'opacity-0'
+            }`}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </div>
           </button>
         </div>
@@ -222,14 +213,28 @@ export default function MobileNavBar() {
             <ul className="space-y-4">
               {menuItems.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={(e) => handleSmoothScroll(e, item.href, item.section)}
-                    className="block text-lg font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-3 touch-target"
-                    aria-label={`Navigate to ${item.label} section`}
-                  >
-                    {item.label}
-                  </Link>
+                  {item.href.startsWith('#') ? (
+                    <Link
+                      href={item.href}
+                      onClick={(e) => handleSmoothScroll(e, item.href, item.section || undefined)}
+                      className="block text-lg font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-3 touch-target"
+                      aria-label={`Navigate to ${item.label} section`}
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => {
+                        setIsOpen(false);
+                        router.push(item.href);
+                      }}
+                      className="block text-lg font-semibold text-white hover:text-gray-300 transition-colors duration-200 py-3 touch-target"
+                      aria-label={`Navigate to ${item.label}`}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -237,19 +242,33 @@ export default function MobileNavBar() {
 
 
 
-          {/* Get Early Access Button */}
-          <button
-            onClick={handleGetAccess}
-            className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
-            aria-label="Get early access to Santelle"
-          >
-            Get Early Access
-          </button>
+          {/* Auth Button */}
+          {!loading && (
+            !user ? (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push('/auth');
+                }}
+                className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
+                aria-label="Sign in to Santelle"
+              >
+                Sign In
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  window.location.href = STRIPE_PORTAL_URL;
+                }}
+                className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
+                aria-label="Account settings"
+              >
+                Account
+              </button>
+            )
+          )}
           
-          {/* Close Menu Hint */}
-          <p className="text-gray-400 text-sm text-center mt-4">
-            Tap outside to close menu
-          </p>
         </div>
       </div>
 

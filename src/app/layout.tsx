@@ -5,6 +5,7 @@ import '../styles/typography.css';
 import '../styles/mobile.css';
 import ConditionalNavigation from '../components/ConditionalNavigation';
 import PageTransitionWrapper from '../components/PageTransitionWrapper';
+import { AuthProvider } from '@/contexts/AuthContext';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -83,8 +84,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={poppins.className}>
+    <html lang="en" className={poppins.className} suppressHydrationWarning>
       <head>
+        {/* Google Tag Manager */}
+        <Script
+          id="google-tag-manager"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WH6CWX4G');`,
+          }}
+        />
+        {/* End Google Tag Manager */}
         <title>Santelle | To Her Health</title>
         <meta name="apple-mobile-web-app-title" content="Santelle" />
         
@@ -92,12 +106,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="theme-color" content="#ffffff" />
         
-        {/* Preload Critical CSS to Eliminate Render-Blocking */}
-        <link rel="preload" href="/globals.css" as="style" />
-        <link rel="preload" href="/styles/typography.css" as="style" />
-        <link rel="preload" href="/styles/mobile.css" as="style" />
-        
-        {/* Google Analytics */}
+        {/* Google Analytics 
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script
@@ -114,6 +123,7 @@ export default function RootLayout({
             </Script>
           </>
         )}
+          */}
 
         {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -215,8 +225,20 @@ export default function RootLayout({
         />
       </head>
       <body className={`antialiased`}>
-        <ConditionalNavigation />
-        <PageTransitionWrapper>{children}</PageTransitionWrapper>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-WH6CWX4G"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
+        <AuthProvider>
+          <ConditionalNavigation />
+          <PageTransitionWrapper>{children}</PageTransitionWrapper>
+        </AuthProvider>
       </body>
     </html>
   );

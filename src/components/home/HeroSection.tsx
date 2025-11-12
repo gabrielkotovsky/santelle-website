@@ -134,7 +134,7 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
       <div className="hidden md:flex flex-col items-center justify-center w-full h-full absolute top-0 left-0 z-10" style={{ opacity: heroFadeOpacity, transition: 'opacity 0.3s ease-out' }}>
         <div className="flex flex-col items-center w-[680px] max-w-full mx-auto">
           <Image
-            src="/logo-dark.svg"
+            src="/hero.svg"
             alt="Santelle Logo"
             width={1020}
             height={360}
@@ -144,15 +144,6 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
               height: 'auto'
             }}
           />
-          <h2 
-            className="mt-2 mb-2 text-black text-right"
-            style={{
-              fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
-              width: 'clamp(300px, 50vw, 680px)'
-            }}
-          >
-            To Her Health
-          </h2>
         </div>
         
         {/* Desktop Take the quiz to discover your ideal plan Button and Email Form Container */}
@@ -172,7 +163,7 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
                 }}
                 onClick={focusHeroEmailInput}
               >
-                Take the quiz to discover your ideal plan
+                Take the quiz to find your ideal plan
               </button>
               <button
                 className="bg-white text-[#721422] font-bold rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white"
@@ -232,13 +223,13 @@ export default function HeroSection({ onEmailFormToggle, showEmailForm }: HeroSe
             <div className={`absolute inset-0 transition-all duration-700 ease-in-out ${showEmailForm ? 'opacity-0 scale-95 -translate-y-2 pointer-events-none' : 'opacity-100 scale-100 translate-y-0'}`}>
               <div className="flex flex-col gap-4 w-full">
                 <button
-                  className="bg-[#721422] text-white font-bold text-sm px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target flex items-center justify-center text-center w-full"
+                  className="bg-[#721422] text-white font-bold text-base px-6 py-4 rounded-full shadow-lg hover:bg-[#8a1a2a] transition-all duration-300 ease-in-out cursor-pointer get-access-pulse touch-target flex items-center justify-center text-center w-full"
                   onClick={focusHeroEmailInput}
                 >
                   Take the quiz to discover your ideal plan
                 </button>
                 <button
-                  className="bg-white text-[#721422] font-bold text-sm px-6 py-4 rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white touch-target w-full"
+                  className="bg-white text-[#721422] font-bold text-base px-6 py-4 rounded-full shadow-lg border-2 border-[#721422] focus:outline-none focus:ring-4 focus:ring-[#721422]/40 transition-all duration-300 cursor-pointer hover:bg-[#721422] hover:text-white touch-target w-full"
                   onClick={() => {
                     const unifiedCard = document.getElementById('mobile-unified-card');
                     const statsSection = unifiedCard?.querySelector('[data-section="stats"]');

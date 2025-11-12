@@ -5,6 +5,28 @@ import { useEffect, useState } from 'react';
 import NavBar from './NavBar';
 import MobileNavBar from './MobileNavBar';
 
+const shouldHideNavigation = (pathname: string | null) => {
+  if (!pathname) return false;
+  if (
+    pathname === '/complete-profile' ||
+    pathname === '/unsubscribe' ||
+    pathname === '/resubscribe' ||
+    pathname === '/account'
+  ) {
+    return true;
+  }
+
+  if (pathname.startsWith('/auth')) {
+    return true;
+  }
+
+  if (pathname.startsWith('/quiz') || pathname.startsWith('/plans')) {
+    return true;
+  }
+
+  return false;
+};
+
 export default function ConditionalNavigation() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
@@ -15,6 +37,10 @@ export default function ConditionalNavigation() {
   
   // Don't render anything until client-side hydration is complete
   if (!mounted) {
+    if (shouldHideNavigation(pathname)) {
+      return null;
+    }
+
     return (
       <>
         {/* Desktop Navigation */}
@@ -30,8 +56,8 @@ export default function ConditionalNavigation() {
     );
   }
   
-  // Hide navigation on complete-profile, unsubscribe, and resubscribe pages after hydration
-  if (pathname === '/complete-profile' || pathname === '/unsubscribe' || pathname === '/resubscribe') {
+  // Hide navigation on complete-profile, unsubscribe, resubscribe, and account pages after hydration
+  if (shouldHideNavigation(pathname)) {
     return null;
   }
 
