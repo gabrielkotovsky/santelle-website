@@ -74,9 +74,10 @@ const allPlans = [
 ];
 
 const commonFeatures = [
-  'Accès complet à l’application',
-  'Suivi et personnalisation',
-  '-30 % sur les kits supplémentaires'
+  'Accès illimité à l’app Santelle et à la communauté - ton espace d’échange, d’apprentissage et de soutien.',
+  'Suivi intelligent de ton équilibre intime avec des recommandations personnalisées à chaque test',
+  'Contenus exclusifs : conseils d’expertes, ressources éducatives et rappels adaptés à ton profil',
+  '-30 % sur les kits supplémentaires',
 ];
 
 const oneOffVariants = [
