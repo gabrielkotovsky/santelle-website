@@ -4,12 +4,15 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
+
+type GTMEventValue = string | number | boolean | null | undefined;
+type GTMEventData = Record<string, GTMEventValue>;
+type GTMWindow = Window & { dataLayer?: Array<GTMEventData & { event?: string }> };
 
 // GTM Event Tracking Helper
-const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
+const trackGTMEvent = (eventName: string, eventData: GTMEventData) => {
   if (typeof window !== 'undefined') {
-    const dataLayer = (window as any).dataLayer as Array<Record<string, any>> | undefined;
+    const dataLayer = (window as GTMWindow).dataLayer;
     if (dataLayer) {
       dataLayer.push({
         event: eventName,
@@ -70,11 +73,6 @@ const allPlans = [
   }
 ];
 
-const preOrderFeatures = [
-  'Accès anticipé à l’application',
-  'Expédition immédiate pour les 15 premières abonnées'
-];
-
 const commonFeatures = [
   'Accès complet à l’application',
   'Suivi et personnalisation',
@@ -116,7 +114,7 @@ function PlansContent() {
   const searchParams = useSearchParams();
   const recommendedParam = searchParams.get('recommended');
   const recommendedPlanIndex = recommendedParam ? parseInt(recommendedParam) : null;
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   
   // Debug logging
   console.log('Plans page loaded with:', { recommendedParam, recommendedPlanIndex });
@@ -259,7 +257,7 @@ function PlansContent() {
   const proactivePlan = sortedPlans.find(plan => plan.cycleLookupKey === 'proactive-monthly') || null;
   const oneOffPlan = sortedPlans.find(plan => plan.cycleLookupKey === '1pack') || null;
 
-  let basePlans: typeof allPlans = [];
+  const basePlans: typeof allPlans = [];
   if (proactivePlan) {
     basePlans.push(proactivePlan);
   }
@@ -312,8 +310,9 @@ function PlansContent() {
           }
           setCheckoutTracked(true);
         })
-        .catch((err) => {
-          setDetailsError(err.message || 'Failed to upsert profile.');
+        .catch((err: unknown) => {
+          const message = err instanceof Error ? err.message : 'Failed to upsert profile.';
+          setDetailsError(message);
           // Still mark as tracked to avoid duplicate events
           setCheckoutTracked(true);
         })

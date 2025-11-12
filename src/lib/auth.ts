@@ -45,8 +45,9 @@ export async function signInWithApple(identityToken: string, nonce: string) {
         message: 'Successfully signed in with Apple!',
         user: data.user
       };
-    } catch (error) {
-      // Handle unexpected error
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Unexpected error during Apple sign-in:', message);
       return {
         success: false,
         message: 'An unexpected error occurred during Apple sign-in.'
@@ -77,7 +78,9 @@ export async function getUser() {
 // should be moved to API routes or server components
 // These functions are kept here for reference but may need server-side implementation
 
-export async function updateUserMetadata(metadata: Record<string, any>) {
+export type UserMetadata = Record<string, string | number | boolean | null | undefined>;
+
+export async function updateUserMetadata(metadata: UserMetadata) {
     const { data, error } = await supabase.auth.updateUser({
         data: metadata
     });

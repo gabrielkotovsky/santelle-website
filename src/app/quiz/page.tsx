@@ -2,10 +2,18 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+type GTMPrimitive = string | number | boolean | null | undefined;
+type GTMStructuredValue =
+  | GTMPrimitive
+  | GTMPrimitive[]
+  | Record<string, GTMPrimitive | GTMPrimitive[]>;
+type GTMEventData = Record<string, GTMStructuredValue>;
+type GTMWindow = Window & { dataLayer?: Array<GTMEventData & { event?: string }> };
+
 // GTM Event Tracking Helper
-const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
+const trackGTMEvent = (eventName: string, eventData: GTMEventData) => {
   if (typeof window !== 'undefined') {
-    const dataLayer = (window as any).dataLayer as Array<Record<string, any>> | undefined;
+    const dataLayer = (window as GTMWindow).dataLayer;
     if (dataLayer) {
       dataLayer.push({
         event: eventName,
@@ -254,7 +262,7 @@ export default function QuizPage() {
 
       setIsSubmitting(false);
       window.location.href = `/plans?recommended=${recommendedPlan}`;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving quiz:', error);
       setIsSubmitting(false);
       window.location.href = '/plans';
@@ -393,7 +401,7 @@ export default function QuizPage() {
     }
 
     // Calculate total score
-    let totalScore = baseScore + motivationModifier + confidenceAdjustment + involvementAdjustment;
+    const totalScore = baseScore + motivationModifier + confidenceAdjustment + involvementAdjustment;
 
     // Rule 4: Determine initial recommendation based on score
     let recommendation = 2; // Default to Quarterly

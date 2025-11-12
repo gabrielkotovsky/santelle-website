@@ -62,10 +62,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       url: portalSession.url,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error creating portal session:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: message },
       { status: 500 }
     );
   }

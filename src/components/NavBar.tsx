@@ -13,6 +13,8 @@ const menuItems = [
   { href: '/plans', label: 'Shop' },
 ];
 
+const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00';
+
 const navLinkBase =
   'font-bold transition duration-500 flex items-center h-full';
 const navLinkNormal = 'text-black hover:text-black/80';
@@ -77,7 +79,7 @@ function smoothScrollTo(element: HTMLElement, options: {
 
 export default function NavBar() {
   const router = useRouter();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [hidden, setHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -251,7 +253,7 @@ export default function NavBar() {
                 height: 'clamp(2.5rem, 4vw, 3rem)'
               }}
               onClick={() => {
-                router.push('/account');
+                window.location.href = STRIPE_PORTAL_URL;
               }}
               type="button"
             >

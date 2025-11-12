@@ -56,10 +56,11 @@ export async function GET(req: NextRequest) {
         created_at: user.created_at,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error fetching account profile:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: message },
       { status: 500 }
     );
   }

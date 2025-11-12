@@ -16,11 +16,6 @@
   status = 200
 
 [[redirects]]
-  from = "/create-portal-session"
-  to = "/.netlify/functions/create-portal-session"
-  status = 200
-
-[[redirects]]
   from = "/webhook"
   to = "/.netlify/functions/stripe-webhook"
   status = 200

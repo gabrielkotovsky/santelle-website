@@ -14,6 +14,8 @@ const menuItems = [
   { href: '/plans', label: 'Shop', section: null },
 ];
 
+const STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00';
+
 // Custom smooth scroll function with easing options
 function smoothScrollTo(element: HTMLElement, options: {
   duration?: number;
@@ -72,7 +74,7 @@ function smoothScrollTo(element: HTMLElement, options: {
 
 export default function MobileNavBar() {
   const router = useRouter();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -141,28 +143,6 @@ export default function MobileNavBar() {
         });
       }
     }, 300); // Wait for menu close animation
-  };
-
-  const handleGetAccess = () => {
-    setIsOpen(false);
-    
-    // Wait for menu close animation, then trigger waitlist
-    setTimeout(() => {
-      window.dispatchEvent(new Event('openWaitlist'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      
-      // Focus on mobile email input if available
-      setTimeout(() => {
-        const mobileEmailInput = document.getElementById('waitlist-email-mobile') as HTMLInputElement;
-        const desktopEmailInput = document.getElementById('waitlist-email') as HTMLInputElement;
-        
-        if (mobileEmailInput) {
-          mobileEmailInput.focus();
-        } else if (desktopEmailInput) {
-          desktopEmailInput.focus();
-        }
-      }, 800); // Wait for scroll to complete (increased for custom animation)
-    }, 300);
   };
 
   return (
@@ -279,7 +259,7 @@ export default function MobileNavBar() {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  router.push('/account');
+                  window.location.href = STRIPE_PORTAL_URL;
                 }}
                 className="w-full bg-white text-black font-bold text-lg py-4 px-6 rounded-full hover:bg-gray-200 transition-colors duration-200 touch-target"
                 aria-label="Account settings"

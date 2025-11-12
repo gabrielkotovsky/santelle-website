@@ -22,8 +22,6 @@ export async function needsOnboarding(userId: string): Promise<boolean> {
 }
 
 export async function needsQuestionnaire(userId: string): Promise<boolean> {
-    const supabaseAdmin = getSupabaseAdmin();
-    
     // Check if user has completed all questionnaire questions
     const isComplete = await hasCompletedQuestionnaire(userId);
     return !isComplete;
@@ -47,7 +45,9 @@ export async function getUserNavigationRoute(userId: string): Promise<string> {
         
         // Both complete, go to home
         return '/';
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error('Error determining user navigation route:', message);
         // If user doesn't exist or any error, return to home
         return '/';
     }

@@ -46,7 +46,6 @@ Santelle_Website/
 ├── netlify/
 │   └── functions/              # Serverless functions
 │       ├── create-checkout-session.ts
-│       ├── create-portal-session.ts
 │       └── stripe-webhook.ts
 ├── public/                     # Static assets
 │   ├── fonts/                 # Custom fonts (Chunko-Bold.otf)

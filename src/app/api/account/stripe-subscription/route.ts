@@ -74,8 +74,6 @@ export async function GET(req: NextRequest) {
     const subscriptionData = {
       id: subscription.id,
       status: subscription.status,
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
       trial_end: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
       cancel_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
       cancel_at_period_end: subscription.cancel_at_period_end,
@@ -88,10 +86,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       subscription: subscriptionData,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error fetching Stripe subscription:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: message },
       { status: 500 }
     );
   }

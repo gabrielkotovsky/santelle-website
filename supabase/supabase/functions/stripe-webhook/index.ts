@@ -186,6 +186,34 @@ Deno.serve(async (req) => {
       return undefined
     }
 
+  const getPaymentMethodLast4FromReference = async (
+    paymentMethodRef: string | Stripe.PaymentMethod | null | undefined
+  ): Promise<string | undefined> => {
+    if (!paymentMethodRef) {
+      return undefined
+    }
+
+    const paymentMethodId =
+      typeof paymentMethodRef === 'string'
+        ? paymentMethodRef
+        : paymentMethodRef.id
+
+    if (!paymentMethodId) {
+      return undefined
+    }
+
+    try {
+      const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId)
+      if (paymentMethod && paymentMethod.card?.last4) {
+        return paymentMethod.card.last4
+      }
+    } catch (err) {
+      console.log('Could not retrieve payment method for customer update:', err)
+    }
+
+    return undefined
+  }
+
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
@@ -915,6 +943,185 @@ Deno.serve(async (req) => {
           current_period_end: current_period_end 
             ? new Date(current_period_end * 1000).toISOString() 
             : null,
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Handle the customer.updated event
+    if (event.type === 'customer.updated') {
+      const customer = event.data.object as Stripe.Customer
+      const previousAttributes = event.data.previous_attributes as Record<string, any> | undefined
+
+      if (!customer || !customer.id) {
+        console.error('customer.updated event missing customer ID')
+        return new Response(
+          JSON.stringify({ error: 'Customer ID missing in customer.updated event' }),
+          { 
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      const customerId = customer.id
+      console.log('Processing customer.updated for customer:', customerId)
+
+      const normalizedEmail = customer.email ? customer.email.toLowerCase().trim() : undefined
+      const shippingDetailsString = customer.shipping ? JSON.stringify(customer.shipping) : null
+      const derivedCountry = customer.address?.country || customer.shipping?.address?.country || undefined
+
+      const profileData: Record<string, any> = {
+        stripe_customer_id: customerId,
+        updated_at: new Date().toISOString(),
+        raw: event.data.object ? JSON.parse(JSON.stringify(event.data.object)) : undefined,
+      }
+
+      if (normalizedEmail) {
+        profileData.email = normalizedEmail
+      } else if (previousAttributes && Object.prototype.hasOwnProperty.call(previousAttributes, 'email')) {
+        profileData.email = null
+      }
+
+      if (customer.name) {
+        profileData.name = customer.name
+      } else if (previousAttributes && Object.prototype.hasOwnProperty.call(previousAttributes, 'name')) {
+        profileData.name = null
+      }
+
+      if (derivedCountry) {
+        profileData.country = derivedCountry
+      } else if (
+        previousAttributes &&
+        (Object.prototype.hasOwnProperty.call(previousAttributes, 'address') ||
+          Object.prototype.hasOwnProperty.call(previousAttributes, 'shipping'))
+      ) {
+        profileData.country = null
+      }
+
+      if (shippingDetailsString) {
+        profileData.shipping_details = shippingDetailsString
+      } else if (previousAttributes && Object.prototype.hasOwnProperty.call(previousAttributes, 'shipping')) {
+        profileData.shipping_details = null
+      }
+
+      const defaultPaymentMethodRef = customer.invoice_settings?.default_payment_method
+      let defaultPaymentMethodLast4: string | null | undefined = undefined
+
+      if (defaultPaymentMethodRef) {
+        defaultPaymentMethodLast4 = await getPaymentMethodLast4FromReference(defaultPaymentMethodRef) || null
+      } else if (
+        previousAttributes?.invoice_settings &&
+        Object.prototype.hasOwnProperty.call(previousAttributes.invoice_settings, 'default_payment_method')
+      ) {
+        defaultPaymentMethodLast4 = null
+      }
+
+      if (defaultPaymentMethodLast4 !== undefined) {
+        profileData.default_payment_method_last4 = defaultPaymentMethodLast4
+      }
+
+      // Remove undefined values to avoid overwriting with undefined
+      Object.keys(profileData).forEach((key) => {
+        if (profileData[key] === undefined) {
+          delete profileData[key]
+        }
+      })
+
+      let updateColumn: 'stripe_customer_id' | 'email' | null = null
+      let updateValue: string | null = null
+      let userId: string | null = null
+
+      const { data: profileByCustomer, error: profileByCustomerError } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('stripe_customer_id', customerId)
+        .single()
+
+      if (profileByCustomerError && profileByCustomerError.code !== 'PGRST116') {
+        console.error('Error looking up profile by customer ID:', profileByCustomerError)
+        return new Response(
+          JSON.stringify({ error: 'Database error fetching profile by customer ID: ' + profileByCustomerError.message }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      if (!profileByCustomerError && profileByCustomer) {
+        updateColumn = 'stripe_customer_id'
+        updateValue = customerId
+        userId = profileByCustomer.user_id
+      }
+
+      if (!updateColumn && normalizedEmail) {
+        const { data: profileByEmail, error: profileByEmailError } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('email', normalizedEmail)
+          .single()
+
+        if (profileByEmailError && profileByEmailError.code !== 'PGRST116') {
+          console.error('Error looking up profile by email:', profileByEmailError)
+          return new Response(
+            JSON.stringify({ error: 'Database error fetching profile by email: ' + profileByEmailError.message }),
+            { 
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          )
+        }
+
+        if (!profileByEmailError && profileByEmail) {
+          updateColumn = 'email'
+          updateValue = normalizedEmail
+          userId = profileByEmail.user_id
+        }
+      }
+
+      if (!updateColumn || !updateValue) {
+        console.log('No matching profile found for customer.updated. customer_id:', customerId, 'email:', normalizedEmail)
+        return new Response(
+          JSON.stringify({
+            received: true,
+            message: 'No matching profile found for customer.updated event',
+            customer_id: customerId,
+          }),
+          { 
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(profileData)
+        .eq(updateColumn, updateValue)
+
+      if (updateError) {
+        console.error('Error updating profile on customer.updated:', updateError)
+        return new Response(
+          JSON.stringify({ error: 'Database error updating profile for customer.updated: ' + updateError.message }),
+          { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        )
+      }
+
+      console.log('Profile updated successfully from customer.updated for user:', userId || 'unknown')
+
+      return new Response(
+        JSON.stringify({
+          received: true,
+          message: 'Customer updated event processed successfully',
+          customer_id: customerId,
+          user_id: userId,
         }),
         { 
           status: 200,

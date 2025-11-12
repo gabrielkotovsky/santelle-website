@@ -5,10 +5,14 @@ import { Suspense, useState } from 'react';
 import { requestEmailOtp, verifyEmailOtp } from '@/lib/auth';
 import { createClient } from '@supabase/supabase-js';
 
+type GTMEventValue = string | number | boolean | null | undefined;
+type GTMEventData = Record<string, GTMEventValue>;
+type GTMWindow = Window & { dataLayer?: Array<GTMEventData & { event?: string }> };
+
 // GTM Event Tracking Helper
-const trackGTMEvent = (eventName: string, eventData: Record<string, any>) => {
+const trackGTMEvent = (eventName: string, eventData: GTMEventData) => {
   if (typeof window !== 'undefined') {
-    const dataLayer = (window as any).dataLayer as Array<Record<string, any>> | undefined;
+    const dataLayer = (window as GTMWindow).dataLayer;
     if (dataLayer) {
       dataLayer.push({
         event: eventName,
@@ -55,13 +59,14 @@ function AuthContent() {
       });
       
       setStep('otp');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error sending OTP:', err);
-      setError(err.message || 'Échec de l’envoi du code de vérification. Veuillez réessayer.');
+      setError(message || 'Échec de l’envoi du code de vérification. Veuillez réessayer.');
       
       // Track OTP send failure
       trackGTMEvent('Auth_OTP_Send_Failed', {
-        error_message: err.message || 'Unknown error',
+        error_message: message,
         has_lookup_key: !!lookupKey,
       });
     } finally {
@@ -138,13 +143,14 @@ function AuthContent() {
           window.location.href = '/';
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
       console.error('Error verifying OTP:', err);
-      setError(err.message || 'Code de vérification invalide. Veuillez réessayer.');
+      setError(message || 'Code de vérification invalide. Veuillez réessayer.');
       
       // Track OTP verification failure
       trackGTMEvent('Auth_OTP_Verification_Failed', {
-        error_message: err.message || 'Unknown error',
+        error_message: message,
         has_lookup_key: !!lookupKey,
       });
       
@@ -269,8 +275,9 @@ function AuthContent() {
                       await requestEmailOtp(email);
                       // Show success message
                       setError('');
-                    } catch (err: any) {
-                      setError(err.message || 'Échec du renvoi du code.');
+                    } catch (err: unknown) {
+                      const message = err instanceof Error ? err.message : 'Échec du renvoi du code.';
+                      setError(message || 'Échec du renvoi du code.');
                     } finally {
                       setIsLoading(false);
                     }

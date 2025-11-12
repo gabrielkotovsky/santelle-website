@@ -57,7 +57,7 @@ export default function ContactUs() {
               🚧 Contact form is temporarily disabled
             </div>
             <p className="text-yellow-700 text-base md:text-lg mb-4">
-              We're currently updating our contact system. Please check back soon or reach out to us through our other channels.
+              We&apos;re currently updating our contact system. Please check back soon or reach out to us through our other channels.
             </p>
             <p className="text-yellow-600 text-sm md:text-base">
               Thank you for your patience!
