@@ -106,11 +106,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="theme-color" content="#ffffff" />
         
-        {/* Preload Critical CSS to Eliminate Render-Blocking */}
-        <link rel="preload" href="/globals.css" as="style" />
-        <link rel="preload" href="/styles/typography.css" as="style" />
-        <link rel="preload" href="/styles/mobile.css" as="style" />
-        
         {/* Google Analytics 
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
