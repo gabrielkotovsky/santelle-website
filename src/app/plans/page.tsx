@@ -448,7 +448,7 @@ function PlansContent() {
 
           {/* Plan Cards */}
           <div
-            className={`grid gap-1 sm:gap-6 ${
+            className={`grid w-full gap-1 sm:gap-6 ${
               displayedPlans.length === 1
                 ? 'grid-cols-1 max-w-2xl mx-auto'
                 : displayedPlans.length === 2
@@ -463,7 +463,7 @@ function PlansContent() {
               return (
                 <div
                   key={plan.name}
-                  className={`bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col ${
+                  className={`w-full bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col ${
                     showRecommendedBadge ? 'border-[#721422] shadow-lg' : isOneOff ? 'border-[#721422]/60' : 'border-white/50'
                   }`}
                 >

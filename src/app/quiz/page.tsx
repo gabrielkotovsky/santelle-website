@@ -297,6 +297,17 @@ export default function QuizPage() {
     }
   };
 
+  const handleSkipQuiz = () => {
+    // Track quiz skip
+    trackGTMEvent('Quiz_Skipped', {
+      quiz_name: 'Santelle Plan Quiz',
+      total_questions: quizQuestions.length,
+    });
+
+    // Redirect to plans page without a recommended plan
+    window.location.href = '/plans';
+  };
+
   const handleSelectAnswer = async (answer: string) => {
     if (isSubmitting) {
       return;
@@ -544,12 +555,20 @@ export default function QuizPage() {
             <p className="text-xl text-[#721422]/80 mb-10">
               Répondez à cinq questions rapides pour mieux comprendre et prendre soin de votre intimité.
             </p>
-            <button
-              onClick={handleStartQuiz}
-              className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
-            >
-              Commencer
-            </button>
+            <div className="flex flex-col items-center gap-4">
+              <button
+                onClick={handleStartQuiz}
+                className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
+              >
+                Commencer le quiz
+              </button>
+              <button
+                onClick={handleSkipQuiz}
+                className="inline-block bg-transparent border-2 border-[#721422] text-[#721422] font-bold px-10 py-4 rounded-full hover:bg-[#721422]/10 transition-colors duration-200 cursor-pointer text-lg"
+              >
+                Acheter
+              </button>
+            </div>
           </div>
         </div>
       ) : (
