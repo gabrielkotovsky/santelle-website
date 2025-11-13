@@ -482,6 +482,129 @@ Deno.serve(async (req) => {
 
       await sendConfirmationEmail()
 
+      // Send notification email to marketing team
+      const sendMarketingNotification = async () => {
+        if (!resendApiKey) {
+          console.log('Resend API key not configured, skipping marketing notification')
+          return
+        }
+
+        const isSubscription = session.mode === 'subscription'
+        const planType = isSubscription ? 'Abonnement' : 'Kit ponctuel'
+        const amountTotal = session.amount_total ? (session.amount_total / 100).toFixed(2) : 'N/A'
+        const currency = session.currency?.toUpperCase() || 'EUR'
+
+        const html = `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nouvelle commande Santelle</title>
+    <style>
+      body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #3b0f16; margin: 0; padding: 0; background-color: #fff9f9; }
+      .container { max-width: 600px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 24px 60px rgba(123,22,34,0.1); }
+      h1 { font-size: 24px; margin: 24px 0 16px; color: #721422; }
+      h2 { font-size: 20px; margin: 20px 0 12px; color: #721422; }
+      p { font-size: 16px; line-height: 1.6; margin: 12px 0; }
+      .info-box { background-color: #fff5f6; border: 1px solid #f3d7db; padding: 16px; border-radius: 12px; margin: 16px 0; }
+      .info-row { margin: 8px 0; }
+      .label { font-weight: 600; color: #721422; }
+      .value { color: #333; }
+      .footer { margin-top: 40px; font-size: 13px; color: #9c5c67; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎉 Nouvelle commande Santelle</h1>
+      <p>Une nouvelle commande a été complétée avec succès.</p>
+      
+      <div class="info-box">
+        <h2>Détails de la commande</h2>
+        <div class="info-row">
+          <span class="label">Type:</span>
+          <span class="value">${planType}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Montant:</span>
+          <span class="value">${amountTotal} ${currency}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email client:</span>
+          <span class="value">${email || 'N/A'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Nom:</span>
+          <span class="value">${name || 'N/A'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Pays:</span>
+          <span class="value">${country || 'N/A'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">ID Session Stripe:</span>
+          <span class="value">${session.id}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">ID Client Stripe:</span>
+          <span class="value">${customerId || 'N/A'}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">ID Utilisateur:</span>
+          <span class="value">${user_id}</span>
+        </div>
+        ${subscription ? `
+        <div class="info-row">
+          <span class="label">ID Abonnement:</span>
+          <span class="value">${subscription.id}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Statut abonnement:</span>
+          <span class="value">${subscription.status || 'N/A'}</span>
+        </div>
+        ` : ''}
+        ${lookup_key ? `
+        <div class="info-row">
+          <span class="label">Clé de plan:</span>
+          <span class="value">${lookup_key}</span>
+        </div>
+        ` : ''}
+      </div>
+
+      <p class="footer">Cette notification est générée automatiquement par le système de webhook Stripe.</p>
+    </div>
+  </body>
+</html>
+        `.trim()
+
+        try {
+          const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: 'Santelle <notifications@santellehealth.com>',
+              to: ['marketing@santellehealth.com'],
+              subject: `Nouvelle commande Santelle - ${planType} - ${amountTotal} ${currency}`,
+              html,
+            }),
+          })
+
+          if (!response.ok) {
+            const text = await response.text()
+            console.error('Failed to send marketing notification email via Resend', response.status, text)
+          } else {
+            console.log('Marketing notification email sent successfully')
+          }
+        } catch (err) {
+          console.error('Error sending marketing notification email:', err)
+        }
+      }
+
+      await sendMarketingNotification()
+
       return new Response(
         JSON.stringify({ 
           received: true, 

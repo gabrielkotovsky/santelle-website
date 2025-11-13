@@ -544,12 +544,25 @@ export default function QuizPage() {
             <p className="text-xl text-[#721422]/80 mb-10">
               Répondez à cinq questions rapides pour mieux comprendre et prendre soin de votre intimité.
             </p>
-            <button
-              onClick={handleStartQuiz}
-              className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
-            >
-              Commencer
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+              <button
+                onClick={handleStartQuiz}
+                className="inline-block bg-[#721422] text-white font-bold px-10 py-4 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 cursor-pointer text-lg"
+              >
+                Commencer le quiz
+              </button>
+              <button
+                onClick={() => {
+                  trackGTMEvent('Quiz_Skipped', {
+                    quiz_name: 'Santelle Plan Quiz',
+                  });
+                  window.location.href = '/plans';
+                }}
+                className="inline-block bg-white/60 text-[#721422] font-bold px-10 py-4 rounded-full hover:bg-white/80 transition-colors duration-200 cursor-pointer text-lg border-2 border-[#721422]"
+              >
+                Commander le kit directement
+              </button>
+            </div>
           </div>
         </div>
       ) : (
