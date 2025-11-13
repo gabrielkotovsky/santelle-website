@@ -566,7 +566,7 @@ export default function QuizPage() {
                 onClick={handleSkipQuiz}
                 className="inline-block bg-transparent border-2 border-[#721422] text-[#721422] font-bold px-10 py-4 rounded-full hover:bg-[#721422]/10 transition-colors duration-200 cursor-pointer text-lg"
               >
-                Acheter
+                Commander le kit directement
               </button>
             </div>
           </div>
