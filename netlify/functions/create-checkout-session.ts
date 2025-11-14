@@ -20,46 +20,48 @@ export const handler: Handler = async (event) => {
     // Parse form-encoded data from the request body
     const params = new URLSearchParams(event.body || '');
     const lookup_key = params.get('lookup_key');
-    const user_id = params.get('user_id');
-    const email = params.get('email');
+    const user_id = params.get('user_id'); // Optional - only if user is authenticated
+    const email = params.get('email'); // Optional - Stripe will collect email during checkout
 
-    if (!lookup_key || !user_id || !email) {
+    if (!lookup_key) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing lookup_key, user_id, or email' }),
+        body: JSON.stringify({ error: 'Missing lookup_key' }),
       };
     }
 
-    // Init Supabase Admin
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    // Init Supabase Admin - only if user_id is provided
+    if (user_id && email) {
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
 
-    // Check/create profile entry
-    const { data: profile, error: getProfileError } = await supabaseAdmin
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user_id)
-      .single();
-
-    if (getProfileError && getProfileError.code !== 'PGRST116') {
-      // Not the 'no rows found' code
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'DB error while looking up profile: ' + getProfileError.message }),
-      };
-    }
-    if (!profile) {
-      // Insert
-      const { error: insertError } = await supabaseAdmin
+      // Check/create profile entry
+      const { data: profile, error: getProfileError } = await supabaseAdmin
         .from('profiles')
-        .insert([{ user_id, email }]);
-      if (insertError) {
+        .select('*')
+        .eq('user_id', user_id)
+        .single();
+
+      if (getProfileError && getProfileError.code !== 'PGRST116') {
+        // Not the 'no rows found' code
         return {
           statusCode: 500,
-          body: JSON.stringify({ error: 'DB error while inserting profile: ' + insertError.message }),
+          body: JSON.stringify({ error: 'DB error while looking up profile: ' + getProfileError.message }),
         };
+      }
+      if (!profile) {
+        // Insert
+        const { error: insertError } = await supabaseAdmin
+          .from('profiles')
+          .insert([{ user_id, email }]);
+        if (insertError) {
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'DB error while inserting profile: ' + insertError.message }),
+          };
+        }
       }
     }
 
@@ -99,10 +101,10 @@ export const handler: Handler = async (event) => {
       ],
       success_url: `${YOUR_DOMAIN}/plans?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${YOUR_DOMAIN}/plans?canceled=true`,
-      customer_email: email,
+      customer_email: email || undefined, // Optional - Stripe will collect email during checkout if not provided
       metadata: {
-        user_id,
-        email,
+        ...(user_id ? { user_id } : {}),
+        ...(email ? { email } : {}),
         lookup_key,
         purchase_type: isRecurringPrice ? 'subscription' : 'one_time',
       },
@@ -115,8 +117,8 @@ export const handler: Handler = async (event) => {
         mode: 'subscription',
         subscription_data: {
           metadata: {
-            user_id,
-            email,
+            ...(user_id ? { user_id } : {}),
+            ...(email ? { email } : {}),
             lookup_key,
           },
         },

@@ -210,19 +210,11 @@ Deno.serve(async (req) => {
 
       // Extract metadata
       const user_id = session.metadata?.user_id || session.client_reference_id
-      const email = session.metadata?.email || session.customer_email || session.customer_details?.email
+      // Prioritize customer_details.email as Stripe stores checkout email there
+      const email = session.customer_details?.email || session.customer_email || session.metadata?.email || null
       const lookup_key = session.metadata?.lookup_key
 
-      if (!user_id) {
-        console.error('Missing user_id in checkout session metadata')
-        return new Response(
-          JSON.stringify({ error: 'Missing user_id in checkout session' }),
-          { 
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        )
-      }
+      // user_id is optional - if missing, we'll skip profile operations but still send emails
 
       // Retrieve the subscription details from Stripe
       let subscription: Stripe.Subscription | null = null
@@ -342,62 +334,66 @@ Deno.serve(async (req) => {
         }
       })
 
-      // Update or insert profile
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('user_id', user_id)
-        .single()
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        // Error other than "not found"
-        console.error('Error fetching profile:', fetchError)
-        return new Response(
-          JSON.stringify({ error: 'Database error: ' + fetchError.message }),
-          { 
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        )
-      }
-
-      if (existingProfile) {
-        // Update existing profile
-        const { error: updateError } = await supabase
+      // Update or insert profile - only if user_id is provided
+      if (user_id) {
+        const { data: existingProfile, error: fetchError } = await supabase
           .from('profiles')
-          .update(profileData)
+          .select('user_id')
           .eq('user_id', user_id)
+          .single()
 
-        if (updateError) {
-          console.error('Error updating profile:', updateError)
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          // Error other than "not found"
+          console.error('Error fetching profile:', fetchError)
           return new Response(
-            JSON.stringify({ error: 'Database error updating profile: ' + updateError.message }),
+            JSON.stringify({ error: 'Database error: ' + fetchError.message }),
             { 
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             }
           )
+        }
+
+        if (existingProfile) {
+          // Update existing profile
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update(profileData)
+            .eq('user_id', user_id)
+
+          if (updateError) {
+            console.error('Error updating profile:', updateError)
+            return new Response(
+              JSON.stringify({ error: 'Database error updating profile: ' + updateError.message }),
+              { 
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              }
+            )
+          }
+        } else {
+          // Insert new profile
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([{
+              user_id,
+              ...profileData,
+              created_at: new Date().toISOString(),
+            }])
+
+          if (insertError) {
+            console.error('Error inserting profile:', insertError)
+            return new Response(
+              JSON.stringify({ error: 'Database error inserting profile: ' + insertError.message }),
+              { 
+                status: 500,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              }
+            )
+          }
         }
       } else {
-        // Insert new profile
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert([{
-            user_id,
-            ...profileData,
-            created_at: new Date().toISOString(),
-          }])
-
-        if (insertError) {
-          console.error('Error inserting profile:', insertError)
-          return new Response(
-            JSON.stringify({ error: 'Database error inserting profile: ' + insertError.message }),
-            { 
-              status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            }
-          )
-        }
+        console.log('No user_id provided, skipping profile operations. Email will still be sent.')
       }
 
       const sendConfirmationEmail = async () => {
@@ -411,11 +407,18 @@ Deno.serve(async (req) => {
         const isSubscription = session.mode === 'subscription'
         const subject = isSubscription
           ? 'Votre commande Santelle est confirmée'
-          : 'Votre kit ponctuel Santelle est confirmé'
+          : 'Votre kit Santelle est confirmé'
 
+        // Different content based on mode (subscription vs one-time payment)
         const planDescription = isSubscription
-          ? `Votre commande Santelle est confirmée. Nous vous écrirons avant l’expédition de votre premier kit afin que vous puissiez modifier vos informations si besoin.`
-          : `Merci d’avoir acheté un kit ponctuel Santelle. Vous disposez maintenant de 30 jours d’accès complet à l’application Santelle dès votre connexion.`
+          ? `Votre commande Santelle est confirmée. Nous vous écrirons avant l'expédition de votre premier kit afin que vous puissiez modifier vos informations si besoin.`
+          : `Merci d'avoir acheté un kit Santelle. Vous disposez maintenant de 30 jours d'accès complet à l'application Santelle dès votre connexion.`
+
+        const appLinkMessage = `Notre équipe vous enverra le lien vers l'application sous peu.`
+        
+        const additionalContent = isSubscription
+          ? `Votre abonnement est maintenant actif. Vous recevrez régulièrement vos kits Santelle selon la fréquence que vous avez choisie.`
+          : `Une fois que vous recevrez votre kit et le lien vers l'application, vous pourrez commencer à suivre votre santé vaginale avec nos outils personnalisés.`
 
         const html = `
 <!doctype html>
@@ -431,7 +434,7 @@ Deno.serve(async (req) => {
       p { font-size: 16px; line-height: 1.6; margin: 16px 0; }
       .button { display: inline-block; margin: 24px 0; padding: 14px 28px; background: #721422; color: #ffffff; font-weight: 600; border-radius: 999px; text-decoration: none; }
       .footer { margin-top: 40px; font-size: 13px; color: #9c5c67; text-align: center; }
-      .logo-wrapper { text-align: center; }
+      .logo-wrapper { text-align: center; margin-bottom: 24px; }
     </style>
   </head>
   <body>
@@ -442,15 +445,17 @@ Deno.serve(async (req) => {
       <h1>${subject}</h1>
       <p>Bonjour${name ? ` ${name.split(' ')[0]}` : ''},</p>
       <p>${planDescription}</p>
+      <p>${appLinkMessage}</p>
+      <p>${additionalContent}</p>
       <p>Votre e-mail de connexion : <strong>${safeEmail}</strong></p>
-      <p>Si vous avez des questions ou besoin d’aide pour démarrer, répondez simplement à cet e-mail.</p>
+      <p>Si vous avez des questions ou besoin d'aide pour démarrer, répondez simplement à cet e-mail.</p>
       <p style="margin-top: 32px; font-size: 15px;">
         Besoin de mettre à jour vos informations de paiement ou de consulter votre commande ?
         <a href="https://billing.stripe.com/p/login/00wdRaaLq2nT2Nv9lqcAo00" target="_blank" rel="noopener noreferrer">
           Accédez au portail de compte Santelle
         </a>.
       </p>
-      <p class="footer">Avec gratitude,<br/>L’équipe Santelle</p>
+      <p class="footer">Avec gratitude,<br/>L'équipe Santelle</p>
     </div>
   </body>
 </html>
@@ -490,7 +495,7 @@ Deno.serve(async (req) => {
         }
 
         const isSubscription = session.mode === 'subscription'
-        const planType = isSubscription ? 'Abonnement' : 'Kit ponctuel'
+        const planType = isSubscription ? 'Abonnement' : 'Kit'
         const amountTotal = session.amount_total ? (session.amount_total / 100).toFixed(2) : 'N/A'
         const currency = session.currency?.toUpperCase() || 'EUR'
 
@@ -609,7 +614,8 @@ Deno.serve(async (req) => {
         JSON.stringify({ 
           received: true, 
           message: 'Checkout session processed successfully',
-          user_id,
+          user_id: user_id || null,
+          email: email || null,
         }),
         { 
           status: 200,

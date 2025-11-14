@@ -105,7 +105,7 @@ function PlansContent() {
   const [isMobile, setIsMobile] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  // Handle checkout - direct if logged in, auth page if not
+  // Handle checkout - go directly to checkout without auth requirement
   const initiateCheckout = async (
     lookupKeyParam: string,
     planParam: typeof allPlans[0],
@@ -121,16 +121,17 @@ function PlansContent() {
 
     setIsRedirecting(true);
 
-    if (user && user.email) {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/.netlify/functions/create-checkout-session';
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/.netlify/functions/create-checkout-session';
 
-      const inputLookup = document.createElement('input');
-      inputLookup.type = 'hidden';
-      inputLookup.name = 'lookup_key';
-      inputLookup.value = lookupKeyParam;
+    const inputLookup = document.createElement('input');
+    inputLookup.type = 'hidden';
+    inputLookup.name = 'lookup_key';
+    inputLookup.value = lookupKeyParam;
 
+    // Include user_id and email if user is authenticated
+    if (user && user.email && user.id) {
       const inputUid = document.createElement('input');
       inputUid.type = 'hidden';
       inputUid.name = 'user_id';
@@ -141,14 +142,13 @@ function PlansContent() {
       inputEmail.name = 'email';
       inputEmail.value = user.email;
 
-      form.appendChild(inputLookup);
       form.appendChild(inputUid);
       form.appendChild(inputEmail);
-      document.body.appendChild(form);
-      form.submit();
-    } else {
-      window.location.href = `/auth?lookup_key=${lookupKeyParam}`;
     }
+
+    form.appendChild(inputLookup);
+    document.body.appendChild(form);
+    form.submit();
   };
 
   const handlePreOrder = async (plan: typeof allPlans[0]) => {
