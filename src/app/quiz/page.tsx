@@ -65,17 +65,6 @@ const quizQuestions = [
       'Tester régulièrement ne me dérange pas si cela m’aide à rester équilibrée',
       'Je veux une visibilité complète et des informations personnalisées chaque mois'
     ]
-  },
-  {
-    id: 5,
-    title: 'Intérêt pour le produit',
-    question: 'Seriez-vous intéressée par un abonnement aux kits de test de santé vaginale avec une application compagnon IA ?',
-    options: [
-      'Certainement, j’adorerais !',
-      'Absolument !',
-      'OUIIII !',
-      'Non (je déteste les chiots)'
-    ]
   }
 ];
 
@@ -84,7 +73,6 @@ export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [optOut, setOptOut] = useState(false);
   const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const answersRef = useRef<{ [key: number]: string }>({});
   const questionRef = useRef<number>(currentQuestion);
@@ -251,12 +239,6 @@ export default function QuizPage() {
         answers: answerIndices,
       });
 
-      if (recommendedPlan === -1) {
-        setIsSubmitting(false);
-        setOptOut(true);
-        return;
-      }
-
       sessionStorage.setItem('quizId', quizIdFromResponse.toString());
 
       setIsSubmitting(false);
@@ -344,12 +326,6 @@ export default function QuizPage() {
   };
 
   function calculateRecommendedPlan(answersState: { [key: number]: string }): number {
-    // Check for opt-out first (Q5 = "No (I hate puppies)")
-    const q5Answer = answersState[4];
-    if (q5Answer === 'Non (je déteste les chiots)') {
-      return -1; // Special case for opt-out
-    }
-
     // Get answer indices (0-based)
     const q1Index = quizQuestions[0].options.indexOf(answersState[0]);
     const q2Index = quizQuestions[1].options.indexOf(answersState[1]);
@@ -445,57 +421,6 @@ export default function QuizPage() {
 
   const currentAnswer = answers[currentQuestion];
 
-
-  if (optOut) {
-    return (
-      <main className="relative min-h-[100svh] w-full flex items-center justify-center px-6 py-12">
-        <div className="fixed inset-0 -z-10 flex items-center justify-center">
-          <video
-            src="/background_desktop.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover hidden md:block"
-            style={{ objectFit: 'cover', objectPosition: 'center', width: '100vw', height: '100dvh' }}
-          />
-          <div
-            className="absolute inset-0 w-full h-full block md:hidden"
-            style={{
-              backgroundImage: 'url(/background-mobile.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'scroll',
-              width: '100vw',
-              height: '100svh',
-            }}
-          />
-          <div className="bg-white/30 absolute inset-0 backdrop-blur-lg" />
-        </div>
-        <div className="relative z-10 max-w-xl w-full bg-white/60 backdrop-blur-md border border-white/50 rounded-3xl p-8 text-[#721422] text-center">
-          <h1 className="text-3xl font-bold mb-4">Merci pour votre sincérité</h1>
-          <p className="text-lg mb-6">
-            Nous comprenons que nos solutions ne conviennent pas à tout le monde. Votre retour est précieux,
-            car il nous aide à améliorer l’expérience Santelle.
-          </p>
-          <p className="text-base mb-6">
-            Si vous changez d’avis, n’hésitez pas à revenir pour découvrir comment Santelle peut vous accompagner.
-          </p>
-          <a
-            href="https://santellehealth.com"
-            onClick={() => {
-              sessionStorage.removeItem('quizId');
-            }}
-            className="inline-block bg-[#721422] text-white font-bold px-8 py-3 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200"
-          >
-            Retour à l’accueil
-          </a>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="relative min-h-[100svh] w-full">
       {/* Background - Video for Desktop, Image for Mobile */}
@@ -542,7 +467,7 @@ export default function QuizPage() {
               Trouvons l’offre Santelle idéale pour vous.
             </h1>
             <p className="text-xl text-[#721422]/80 mb-10">
-              Répondez à cinq questions rapides pour mieux comprendre et prendre soin de votre intimité.
+              Répondez à quatre questions rapides pour mieux comprendre et prendre soin de votre intimité.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
               <button
