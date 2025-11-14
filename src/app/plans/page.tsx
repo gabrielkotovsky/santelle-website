@@ -105,6 +105,11 @@ function PlansContent() {
   const [isMobile, setIsMobile] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
+  // Waitlist form state
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [isSubmittingWaitlist, setIsSubmittingWaitlist] = useState(false);
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  
   // Handle checkout - go directly to checkout without auth requirement
   const initiateCheckout = async (
     lookupKeyParam: string,
@@ -160,6 +165,42 @@ function PlansContent() {
     });
     const billingPeriod = isOneOff ? 'one_time' : 'cycle';
     await initiateCheckout(plan.cycleLookupKey, plan, billingPeriod);
+  };
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!waitlistEmail || isSubmittingWaitlist) {
+      return;
+    }
+
+    setIsSubmittingWaitlist(true);
+    setWaitlistStatus('idle');
+
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: waitlistEmail }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to join waitlist');
+      }
+
+      trackGTMEvent('Waitlist_Signed_Up', {
+        source: 'plans_page',
+        email_provided: true,
+      });
+
+      setWaitlistStatus('success');
+      setWaitlistEmail('');
+    } catch (error) {
+      console.error('Waitlist submission error:', error);
+      setWaitlistStatus('error');
+    } finally {
+      setIsSubmittingWaitlist(false);
+    }
   };
   
   useEffect(() => {
@@ -530,7 +571,53 @@ function PlansContent() {
             })}
           </div>
 
-          
+          {/* Waitlist Section */}
+          <div className="flex justify-center">
+            <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/50 max-w-2xl w-full">
+              <div className="text-center mb-6">
+                <h3 className="text-xl md:text-2xl font-bold text-[#721422] mb-2">
+                  Ou rejoignez la liste d'attente
+                </h3>
+                <p className="text-[#721422]/80 text-sm md:text-base">
+                  Pour rester informée
+                </p>
+              </div>
+
+              {waitlistStatus === 'success' ? (
+                <div className="text-center py-4">
+                  <div className="text-4xl mb-2">🎉</div>
+                  <p className="text-[#721422] font-semibold">
+                    Merci ! Vous êtes sur la liste d'attente.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleWaitlistSubmit} className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="email"
+                    value={waitlistEmail}
+                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                    placeholder="Votre adresse e-mail"
+                    required
+                    disabled={isSubmittingWaitlist}
+                    className="flex-1 px-4 py-3 rounded-full border-2 border-[#721422]/30 bg-white/50 text-[#721422] placeholder-[#721422]/40 focus:outline-none focus:ring-2 focus:ring-[#721422] disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmittingWaitlist || !waitlistEmail}
+                    className="bg-[#721422] text-white font-bold px-6 py-3 rounded-full hover:bg-[#8a1a2a] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    {isSubmittingWaitlist ? 'Envoi...' : 'Rejoindre'}
+                  </button>
+                </form>
+              )}
+
+              {waitlistStatus === 'error' && (
+                <p className="text-red-600 text-sm text-center mt-3">
+                  Une erreur s'est produite. Veuillez réessayer.
+                </p>
+              )}
+            </div>
+          </div>
 
           {/* Pre-Order Features and Common Features - Below Plan Cards */}
           <div className="flex flex-col gap-6">
@@ -541,7 +628,7 @@ function PlansContent() {
               {/* Common Features Card */}
               <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
                 <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                  Avantages de l’abonnement
+                  Avantages de l'abonnement
                 </h3>
                 <ul className="flex flex-col gap-4 justify-center">
                   {commonFeatures.map((feature, idx) => (
