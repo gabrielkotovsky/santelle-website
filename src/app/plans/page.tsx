@@ -544,8 +544,12 @@ function PlansContent() {
                   {/* Kit Image at top */}
                   <div className="relative h-[180px] sm:h-[250px] flex items-center justify-center pt-6">
                     <Image
-                      src="/Kit.png"
-                      alt="Santelle Kit"
+                      src={isOneOff ? "/one-shot.png" : "/subscription.png"}
+                      alt={
+                        isOneOff
+                          ? "Santelle Kit - Achat unique"
+                          : "Santelle Kit - Abonnement mensuel"
+                      }
                       width={150}
                       height={150}
                       className="object-contain"
