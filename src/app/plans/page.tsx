@@ -478,7 +478,7 @@ function PlansContent() {
         <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
             ? 'Selon vos réponses, cette offre vous aide à rester équilibrée et sereine.'
-            : 'Choisissez l&apos;offre qui correspond le mieux à vos besoins.'
+            : "Choisissez l'offre qui correspond le mieux à vos besoins."
           }
         </h1>
         
@@ -587,7 +587,7 @@ function PlansContent() {
             <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/50 max-w-2xl w-full">
               <div className="text-center mb-6">
                 <h3 className="text-xl md:text-2xl font-bold text-[#721422] mb-2">
-                  Ou rejoignez la liste d&apos;attente
+                  Ou rejoignez la newsletter
                 </h3>
                 <p className="text-[#721422]/80 text-sm md:text-base">
                   Pour rester informée
