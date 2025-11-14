@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
 type GTMEventValue = string | number | boolean | null | undefined;
@@ -464,10 +465,20 @@ function PlansContent() {
 
       {/* Content */}
       <div className="relative z-10 w-[95%] mx-auto px-1 sm:px-4 py-10">
+        <div className="mb-6 text-center">
+          <a
+            href="https://santellehealth.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-white/60 backdrop-blur-sm text-[#721422] font-semibold px-4 py-2 rounded-full hover:bg-white/80 transition-all duration-200 border border-[#721422]/30"
+          >
+            ← Accueil
+          </a>
+        </div>
         <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-[#721422] mb-10 text-center">
           {recommendedPlanIndex !== null 
             ? 'Selon vos réponses, cette offre vous aide à rester équilibrée et sereine.'
-            : 'Choisissez l’offre qui correspond le mieux à vos besoins.'
+            : 'Choisissez l&apos;offre qui correspond le mieux à vos besoins.'
           }
         </h1>
         
