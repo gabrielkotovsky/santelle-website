@@ -586,7 +586,7 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify({
               from: 'Santelle <notifications@santellehealth.com>',
-              to: ['marketing@santellehealth.com'],
+              to: ['marketing@santellehealth.com', 'gabrielkotovsky@hotmail.com'],
               subject: `Nouvelle commande Santelle - ${planType} - ${amountTotal} ${currency}`,
               html,
             }),
