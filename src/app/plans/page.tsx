@@ -576,7 +576,7 @@ function PlansContent() {
             <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/50 max-w-2xl w-full">
               <div className="text-center mb-6">
                 <h3 className="text-xl md:text-2xl font-bold text-[#721422] mb-2">
-                  Ou rejoignez la liste d'attente
+                  Ou rejoignez la liste d&apos;attente
                 </h3>
                 <p className="text-[#721422]/80 text-sm md:text-base">
                   Pour rester informée
@@ -587,7 +587,7 @@ function PlansContent() {
                 <div className="text-center py-4">
                   <div className="text-4xl mb-2">🎉</div>
                   <p className="text-[#721422] font-semibold">
-                    Merci ! Vous êtes sur la liste d'attente.
+                    Merci ! Vous êtes sur la liste d&apos;attente.
                   </p>
                 </div>
               ) : (
@@ -613,7 +613,7 @@ function PlansContent() {
 
               {waitlistStatus === 'error' && (
                 <p className="text-red-600 text-sm text-center mt-3">
-                  Une erreur s'est produite. Veuillez réessayer.
+                  Une erreur s&apos;est produite. Veuillez réessayer.
                 </p>
               )}
             </div>
@@ -628,7 +628,7 @@ function PlansContent() {
               {/* Common Features Card */}
               <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
                 <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                  Avantages de l'abonnement
+                  Avantages de l&apos;abonnement
                 </h3>
                 <ul className="flex flex-col gap-4 justify-center">
                   {commonFeatures.map((feature, idx) => (
