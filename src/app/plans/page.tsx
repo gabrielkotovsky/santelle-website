@@ -558,7 +558,7 @@ function PlansContent() {
                   </div>
 
                   {/* Content */}
-                  <div className="px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 flex flex-col gap-4 sm:gap-5 md:gap-6">
+                  <div className="px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 flex flex-col gap-4 sm:gap-5 md:gap-6 flex-1">
                     {/* Title and Subtitle */}
                     <div className="text-center">
                       <h2
@@ -640,7 +640,7 @@ function PlansContent() {
                     {/* CTA Button */}
                     <button
                       onClick={() => handlePreOrder(plan)}
-                      className={`w-full py-2.5 sm:py-3 md:py-4 px-4 sm:px-6 md:px-8 rounded-full font-semibold text-[10px] sm:text-xs md:text-sm transition-colors duration-200 ${
+                      className={`mt-auto w-full py-2.5 sm:py-3 md:py-4 px-4 sm:px-6 md:px-8 rounded-full font-semibold text-[10px] sm:text-xs md:text-sm transition-colors duration-200 ${
                         isOneOff
                           ? "bg-[#721423] text-white hover:bg-[#8a1a2a]"
                           : "bg-white text-[#721423] hover:bg-white/90"
