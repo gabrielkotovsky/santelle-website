@@ -83,13 +83,25 @@ const commonFeatures = [
 ];
 
 const kitContents = [
-  "6 biomarqueurs pour 4 types d’infections, l’inflammation et la flore protectrice",
+  "Un écouvillon pour prélever la sécrétion",
+  {
+    main: "Un test multi-biomarqueurs qui indique si tes résultats sont compatibles avec:",
+    subItems: [
+      "une mycose",
+      "⁠une vaginose",
+      "⁠une infection aérobie",
+      "⁠une inflammation ou une irritation",
+      "⁠un déséquilibre de la flore protectrice"
+    ],
+  },
 ];
 
 const appFeatures = [
-  "Analyse de vos résultats par IA",
-  "Contenus éducatifs personnalisés et concis",
-  "(Analyses avancées bientôt disponibles)",
+  "Analyse instantanée de ton test",
+  "Interprétation simple avec des explications visuelles",
+  "Recommandations personnalisées selon ton profil",
+  "Suivi dans le temps pour repérer les changements tôt",
+  "Contenus éducatifs courts pour comprendre ton corps",
 ];
 
 function PlansContent() {
@@ -712,18 +724,20 @@ function PlansContent() {
               {/* Pre-Order Features Card */}
 
               {/* Common Features Card */}
-              <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 flex-1 max-w-md">
-                <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
-                  Avantages de l&apos;abonnement
-                </h3>
-                <ul className="flex flex-col gap-4 justify-center">
-                  {commonFeatures.map((feature, idx) => (
-                    <li key={idx} className="text-[#721422] flex items-center">
-                      <span className="mr-2 text-lg">✓</span>
-                      <span className="text-base">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="flex justify-center w-full">
+                <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 border border-white/50 max-w-2xl w-full">
+                  <h3 className="text-xl font-bold text-[#721422] mb-4 text-center">
+                    Avantages de l&apos;abonnement
+                  </h3>
+                  <ul className="flex flex-col gap-4 justify-center">
+                    {commonFeatures.map((feature, idx) => (
+                      <li key={idx} className="text-[#721422] flex items-center">
+                        <span className="mr-2 text-lg">✓</span>
+                        <span className="text-base">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -792,15 +806,33 @@ function PlansContent() {
                         Kit Santelle :
                       </h4>
                       <ul className="flex flex-col gap-4 justify-center">
-                        {kitContents.map((content, idx) => (
-                          <li
-                            key={idx}
-                            className="text-[#721422] flex items-center"
-                          >
-                            <span className="mr-2 text-lg">✓</span>
-                            <span className="text-base">{content}</span>
-                          </li>
-                        ))}
+                        {kitContents.map((content, idx) => {
+                          const isObject = typeof content === "object";
+                          const mainText = isObject ? content.main : content;
+                          const subItems = isObject ? content.subItems : null;
+
+                          return (
+                            <li key={idx} className="text-[#721422]">
+                              <div className="flex items-center">
+                                <span className="mr-2 text-lg">✓</span>
+                                <span className="text-base">{mainText}</span>
+                              </div>
+                              {subItems && (
+                                <ul className="ml-6 mt-2 flex flex-col gap-2">
+                                  {subItems.map((subItem, subIdx) => (
+                                    <li
+                                      key={subIdx}
+                                      className="text-[#721422] flex items-center"
+                                    >
+                                      <span className="mr-2 text-sm">•</span>
+                                      <span className="text-sm">{subItem}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
 
