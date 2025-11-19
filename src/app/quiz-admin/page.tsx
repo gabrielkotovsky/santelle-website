@@ -291,7 +291,7 @@ export default function QuizAdminPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-[#721422] mb-4">Responses Over Time</h2>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData.timeData}>
+                  <LineChart data={chartData.timeData.filter(d => d.date !== 'Nov 12')}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />

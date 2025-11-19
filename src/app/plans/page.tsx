@@ -671,11 +671,8 @@ function PlansContent() {
             <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/50 max-w-2xl w-full">
               <div className="text-center mb-6">
                 <h3 className="text-xl md:text-2xl font-bold text-[#721422] mb-2">
-                  Ou rejoignez la newsletter
+                  Rejoignez la newsletter pour obtenir 15% de réduction sur votre premier kit.
                 </h3>
-                <p className="text-[#721422]/80 text-sm md:text-base">
-                  Pour rester informée
-                </p>
               </div>
 
               {waitlistStatus === "success" ? (
