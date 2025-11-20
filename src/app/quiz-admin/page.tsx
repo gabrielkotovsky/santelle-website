@@ -72,21 +72,6 @@ const quizQuestions = [
   }
 ];
 
-function getAnswerText(questionId: number, answerValue: number | null): string {
-  if (answerValue === null) return 'N/A';
-  
-  const question = quizQuestions.find(q => q.id === questionId);
-  if (!question) return `Q${questionId}: ${answerValue}`;
-  
-  // Answers are stored as 1-indexed, convert to 0-indexed for array access
-  const optionIndex = answerValue - 1;
-  if (optionIndex >= 0 && optionIndex < question.options.length) {
-    return question.options[optionIndex];
-  }
-  
-  return `Invalid (${answerValue})`;
-}
-
 const PASSWORD = 'Santelle2025!';
 
 export default function QuizAdminPage() {
@@ -218,7 +203,7 @@ export default function QuizAdminPage() {
       questionDistributions,
       timeData,
     };
-  }, [quizResponses, stats]);
+  }, [quizResponses]);
 
   // Show password form if not authenticated
   if (!isAuthenticated) {
