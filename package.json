@@ -17,9 +17,10 @@
     "framer-motion": "^12.23.12",
     "jsdom": "^26.1.0",
     "lottie-react": "^2.4.1",
-    "next": "15.4.1",
+    "next": "^16.0.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-pay-icons": "^4.0.0",
     "recharts": "^3.4.1",
     "resend": "^4.7.0",
     "stripe": "^19.1.0",
@@ -38,7 +39,7 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
-    "netlify-cli": "^23.9.1",
+    "netlify-cli": "^23.11.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
