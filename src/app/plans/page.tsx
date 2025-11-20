@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import { Visa, Mastercard, Amex, Paypal } from "react-pay-icons";
 
 type GTMEventValue = string | number | boolean | null | undefined;
 type GTMEventData = Record<string, GTMEventValue>;
@@ -562,8 +563,8 @@ function PlansContent() {
                           ? "Santelle Kit - Achat unique"
                           : "Santelle Kit - Abonnement mensuel"
                       }
-                      width={150}
-                      height={150}
+                      width={250}
+                      height={250}
                       className="object-contain"
                       style={{ maxHeight: "200px", width: "auto" }}
                     />
@@ -664,6 +665,139 @@ function PlansContent() {
                 </div>
               );
             })}
+          </div>
+
+          {/* Trust & Reassurance Section */}
+          <div className="flex justify-center mt-6">
+            <div className="bg-white/40 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-white/50 max-w-4xl w-full">
+              {/* Payment Badges */}
+              <div className="text-center mb-6">
+                <h3 className="text-base md:text-lg font-semibold text-[#721422] mb-4">
+                  Paiement 100% sécurisé
+                </h3>
+                <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                  <div className="bg-white rounded-lg px-3 py-2 shadow-sm h-12 md:h-14 flex items-center justify-center">
+                    <Visa
+                      style={{ height: "24px", width: "auto" }}
+                      className="md:h-8"
+                    />
+                  </div>
+                  <div className="bg-white rounded-lg px-3 py-2 shadow-sm h-12 md:h-14 flex items-center justify-center">
+                    <Mastercard
+                      style={{ height: "24px", width: "auto" }}
+                      className="md:h-8"
+                    />
+                  </div>
+                  <div className="bg-white rounded-lg px-3 py-2 shadow-sm h-12 md:h-14 flex items-center justify-center">
+                    <Amex
+                      style={{ height: "24px", width: "auto" }}
+                      className="md:h-8"
+                    />
+                  </div>
+                  <div className="bg-white rounded-lg px-3 py-2 shadow-sm h-12 md:h-14 flex items-center justify-center">
+                    <Paypal
+                      style={{ height: "24px", width: "auto" }}
+                      className="md:h-8"
+                    />
+                  </div>
+                  {/* Twint - Using custom SVG as not available in library */}
+                  <div className="bg-white rounded-lg px-3 py-2 shadow-sm h-12 md:h-14 flex items-center justify-center">
+                    <svg
+                      className="h-6 md:h-8 w-auto"
+                      viewBox="0 0 48 32"
+                      fill="none"
+                    >
+                      <rect width="48" height="32" rx="4" fill="white" />
+                      <path
+                        d="M13 11v10h3v-7l2 7h2l2-7v7h3V11h-4l-2 6-2-6h-4zm14 0v10h3v-3h2l2 3h3l-2-3c1-1 2-2 2-3 0-2-2-4-4-4h-6zm3 3h3c1 0 1 1 1 2s0 2-1 2h-3v-4z"
+                        fill="#1E3A8A"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Separator */}
+              <div className="w-full h-px bg-[#721422]/10 my-6" />
+
+              {/* Guarantees */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Free Delivery */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#721422]/10 flex items-center justify-center mb-3">
+                    <svg
+                      className="w-6 h-6 md:w-7 md:h-7 text-[#721422]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                      />
+                    </svg>
+                  </div>
+                  <h4 className="font-semibold text-[#721422] mb-1 text-sm md:text-base">
+                    Livraison gratuite
+                  </h4>
+                  <p className="text-[#721422]/70 text-xs md:text-sm">
+                    En Suisse sous 7 jours ouvrés
+                  </p>
+                </div>
+
+                {/* Free Returns */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#721422]/10 flex items-center justify-center mb-3">
+                    <svg
+                      className="w-6 h-6 md:w-7 md:h-7 text-[#721422]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                      />
+                    </svg>
+                  </div>
+                  <h4 className="font-semibold text-[#721422] mb-1 text-sm md:text-base">
+                    Retour gratuit
+                  </h4>
+                  <p className="text-[#721422]/70 text-xs md:text-sm">
+                    Sous 15 jours
+                  </p>
+                </div>
+
+                {/* Secure Payment */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#721422]/10 flex items-center justify-center mb-3">
+                    <svg
+                      className="w-6 h-6 md:w-7 md:h-7 text-[#721422]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                      />
+                    </svg>
+                  </div>
+                  <h4 className="font-semibold text-[#721422] mb-1 text-sm md:text-base">
+                    Paiement sécurisé
+                  </h4>
+                  <p className="text-[#721422]/70 text-xs md:text-sm">
+                    Protection de vos données
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Waitlist Section */}

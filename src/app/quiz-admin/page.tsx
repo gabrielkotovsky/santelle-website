@@ -81,12 +81,6 @@ export default function QuizAdminPage() {
   const [quizResponses, setQuizResponses] = useState<QuizResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    total: 0,
-    withSignup: 0,
-    withEmail: 0,
-    withPlan: 0,
-  });
 
   useEffect(() => {
     // Check if already authenticated from sessionStorage
@@ -115,14 +109,6 @@ export default function QuizAdminPage() {
         const result = await response.json();
         if (result.success && result.data) {
           setQuizResponses(result.data);
-          
-          // Calculate stats
-          setStats({
-            total: result.data.length,
-            withSignup: result.data.filter((r: QuizResponse) => r['signup?'] === true).length,
-            withEmail: result.data.filter((r: QuizResponse) => r.email).length,
-            withPlan: result.data.filter((r: QuizResponse) => r.plan).length,
-          });
         }
       } catch (err) {
         console.error('Error fetching quiz responses:', err);
@@ -151,6 +137,9 @@ export default function QuizAdminPage() {
   // Calculate chart data
   const chartData = useMemo(() => {
     if (quizResponses.length === 0) return null;
+
+    // Date threshold for filtering (Nov 13 onwards)
+    const nov13Threshold = new Date('2024-11-13T00:00:00Z').getTime();
 
     // Answer distribution for each question
     const questionDistributions = quizQuestions.map((question) => {
@@ -181,27 +170,134 @@ export default function QuizAdminPage() {
       };
     });
 
-    // Responses over time (grouped by date)
+    // Responses over time (grouped by date, from Nov 13 onwards)
     const timeDistribution: Record<string, { count: number; timestamp: number }> = {};
-    quizResponses.forEach((response) => {
-      const dateObj = new Date(response.created_at);
-      const date = dateObj.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
+    quizResponses
+      .filter((response) => {
+        const responseDate = new Date(response.created_at).getTime();
+        return responseDate >= nov13Threshold;
+      })
+      .forEach((response) => {
+        const dateObj = new Date(response.created_at);
+        const date = dateObj.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        });
+        if (!timeDistribution[date]) {
+          timeDistribution[date] = { count: 0, timestamp: dateObj.getTime() };
+        }
+        timeDistribution[date].count += 1;
       });
-      if (!timeDistribution[date]) {
-        timeDistribution[date] = { count: 0, timestamp: dateObj.getTime() };
-      }
-      timeDistribution[date].count += 1;
-    });
     const timeData = Object.entries(timeDistribution)
       .map(([date, data]) => ({ date, count: data.count, timestamp: data.timestamp }))
       .sort((a, b) => a.timestamp - b.timestamp)
       .map(({ date, count }) => ({ date, count }));
 
+    // Most common answer per question per day (from Nov 13 onwards)
+    const filteredResponses = quizResponses.filter((response) => {
+      const responseDate = new Date(response.created_at).getTime();
+      return responseDate >= nov13Threshold;
+    });
+
+    // Group responses by date
+    const responsesByDate: Record<string, QuizResponse[]> = {};
+    filteredResponses.forEach((response) => {
+      const dateObj = new Date(response.created_at);
+      const date = dateObj.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+      if (!responsesByDate[date]) {
+        responsesByDate[date] = [];
+      }
+      responsesByDate[date].push(response);
+    });
+
+    // For each date, find the most common answer for each question
+    const dailyMostCommonAnswers: Array<{
+      date: string;
+      timestamp: number;
+      question1: string;
+      question2: string;
+      question3: string;
+      question4: string;
+      q1Count: number;
+      q2Count: number;
+      q3Count: number;
+      q4Count: number;
+    }> = [];
+
+    Object.entries(responsesByDate).forEach(([date, responses]) => {
+      const dateObj = new Date(responses[0].created_at);
+      const timestamp = dateObj.getTime();
+
+      const dailyAnswers: Record<string, Record<number, number>> = {
+        q1: {},
+        q2: {},
+        q3: {},
+        q4: {},
+      };
+
+      // Count answers for each question on this date
+      responses.forEach((response) => {
+        [1, 2, 3, 4].forEach((qNum) => {
+          const questionKey = `q${qNum}` as keyof QuizResponse;
+          const answerValue = response[questionKey] as number | null;
+          if (answerValue !== null) {
+            const key = `q${qNum}`;
+            dailyAnswers[key][answerValue] = (dailyAnswers[key][answerValue] || 0) + 1;
+          }
+        });
+      });
+
+      // Find most common answer for each question
+      const getMostCommon = (qNum: number): { answer: string; count: number } => {
+        const counts = dailyAnswers[`q${qNum}`];
+        if (Object.keys(counts).length === 0) return { answer: 'N/A', count: 0 };
+        
+        const [mostCommonValue, count] = Object.entries(counts).reduce((a, b) => 
+          counts[parseInt(b[0])] > counts[parseInt(a[0])] ? b : a
+        );
+        
+        // count is already a number from Object.entries, but TypeScript sees it as string | number
+        const countNum = typeof count === 'number' ? count : parseInt(count);
+        
+        const question = quizQuestions.find((q) => q.id === qNum);
+        if (!question) return { answer: `Q${qNum}: ${mostCommonValue}`, count: countNum };
+        
+        const optionIndex = parseInt(mostCommonValue) - 1;
+        if (optionIndex >= 0 && optionIndex < question.options.length) {
+          return { answer: question.options[optionIndex], count: countNum };
+        }
+        return { answer: 'N/A', count: 0 };
+      };
+
+      const q1 = getMostCommon(1);
+      const q2 = getMostCommon(2);
+      const q3 = getMostCommon(3);
+      const q4 = getMostCommon(4);
+
+      dailyMostCommonAnswers.push({
+        date,
+        timestamp,
+        question1: q1.answer,
+        question2: q2.answer,
+        question3: q3.answer,
+        question4: q4.answer,
+        q1Count: q1.count,
+        q2Count: q2.count,
+        q3Count: q3.count,
+        q4Count: q4.count,
+      });
+    });
+
+    // Sort by timestamp
+    dailyMostCommonAnswers.sort((a, b) => a.timestamp - b.timestamp);
+
     return {
       questionDistributions,
       timeData,
+      dailyMostCommonAnswers,
     };
   }, [quizResponses]);
 
@@ -276,7 +372,7 @@ export default function QuizAdminPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-[#721422] mb-4">Responses Over Time</h2>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData.timeData.filter(d => d.date !== 'Nov 12')}>
+                  <LineChart data={chartData.timeData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />
@@ -291,6 +387,87 @@ export default function QuizAdminPage() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Most Common Answer Per Question Per Day (From Nov 13) */}
+            {chartData.dailyMostCommonAnswers && chartData.dailyMostCommonAnswers.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h2 className="text-xl font-bold text-[#721422] mb-2">
+                  Most Common Answer Per Question Per Day (From Nov 13)
+                </h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Shows the most selected answer for each question on each day since November 13
+                </p>
+                <div className="overflow-x-auto mb-6">
+                  <div style={{ minWidth: '800px' }}>
+                    <ResponsiveContainer width="100%" height={Math.max(400, chartData.dailyMostCommonAnswers.length * 50)}>
+                      <BarChart
+                        data={chartData.dailyMostCommonAnswers}
+                        layout="vertical"
+                        margin={{ left: 120, right: 20, top: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" domain={[0, 'dataMax']} />
+                        <YAxis
+                          dataKey="date"
+                          type="category"
+                          width={100}
+                          tick={{ fontSize: 11 }}
+                        />
+                        <Tooltip
+                          formatter={(value: number, name: string) => [`${value} responses`, name]}
+                          labelStyle={{ color: '#721422', fontWeight: 'bold' }}
+                        />
+                        <Legend />
+                        <Bar dataKey="q1Count" fill="#721422" name="Q1: Fréquence" />
+                        <Bar dataKey="q2Count" fill="#a8324f" name="Q2: Confiance" />
+                        <Bar dataKey="q3Count" fill="#d45a7a" name="Q3: Motivation" />
+                        <Bar dataKey="q4Count" fill="#e88ba5" name="Q4: Implication" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-2 px-3 font-semibold text-[#721422]">Date</th>
+                        <th className="text-left py-2 px-3 font-semibold text-[#721422]">Q1: Fréquence</th>
+                        <th className="text-left py-2 px-3 font-semibold text-[#721422]">Q2: Confiance</th>
+                        <th className="text-left py-2 px-3 font-semibold text-[#721422]">Q3: Motivation</th>
+                        <th className="text-left py-2 px-3 font-semibold text-[#721422]">Q4: Implication</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chartData.dailyMostCommonAnswers.map((day, index) => (
+                        <tr key={day.date} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                          <td className="py-2 px-3 font-medium text-gray-900">{day.date}</td>
+                          <td className="py-2 px-3 text-gray-600 max-w-xs">
+                            <div className="truncate" title={day.question1}>
+                              {day.question1} <span className="text-gray-400">({day.q1Count})</span>
+                            </div>
+                          </td>
+                          <td className="py-2 px-3 text-gray-600 max-w-xs">
+                            <div className="truncate" title={day.question2}>
+                              {day.question2} <span className="text-gray-400">({day.q2Count})</span>
+                            </div>
+                          </td>
+                          <td className="py-2 px-3 text-gray-600 max-w-xs">
+                            <div className="truncate" title={day.question3}>
+                              {day.question3} <span className="text-gray-400">({day.q3Count})</span>
+                            </div>
+                          </td>
+                          <td className="py-2 px-3 text-gray-600 max-w-xs">
+                            <div className="truncate" title={day.question4}>
+                              {day.question4} <span className="text-gray-400">({day.q4Count})</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
