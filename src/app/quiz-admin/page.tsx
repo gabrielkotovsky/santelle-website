@@ -72,21 +72,6 @@ const quizQuestions = [
   }
 ];
 
-function getAnswerText(questionId: number, answerValue: number | null): string {
-  if (answerValue === null) return 'N/A';
-  
-  const question = quizQuestions.find(q => q.id === questionId);
-  if (!question) return `Q${questionId}: ${answerValue}`;
-  
-  // Answers are stored as 1-indexed, convert to 0-indexed for array access
-  const optionIndex = answerValue - 1;
-  if (optionIndex >= 0 && optionIndex < question.options.length) {
-    return question.options[optionIndex];
-  }
-  
-  return `Invalid (${answerValue})`;
-}
-
 const PASSWORD = 'Santelle2025!';
 
 export default function QuizAdminPage() {
@@ -96,12 +81,6 @@ export default function QuizAdminPage() {
   const [quizResponses, setQuizResponses] = useState<QuizResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    total: 0,
-    withSignup: 0,
-    withEmail: 0,
-    withPlan: 0,
-  });
 
   useEffect(() => {
     // Check if already authenticated from sessionStorage
@@ -130,14 +109,6 @@ export default function QuizAdminPage() {
         const result = await response.json();
         if (result.success && result.data) {
           setQuizResponses(result.data);
-          
-          // Calculate stats
-          setStats({
-            total: result.data.length,
-            withSignup: result.data.filter((r: QuizResponse) => r['signup?'] === true).length,
-            withEmail: result.data.filter((r: QuizResponse) => r.email).length,
-            withPlan: result.data.filter((r: QuizResponse) => r.plan).length,
-          });
         }
       } catch (err) {
         console.error('Error fetching quiz responses:', err);
@@ -288,12 +259,15 @@ export default function QuizAdminPage() {
           counts[parseInt(b[0])] > counts[parseInt(a[0])] ? b : a
         );
         
+        // count is already a number from Object.entries, but TypeScript sees it as string | number
+        const countNum = typeof count === 'number' ? count : parseInt(count);
+        
         const question = quizQuestions.find((q) => q.id === qNum);
-        if (!question) return { answer: `Q${qNum}: ${mostCommonValue}`, count: parseInt(count) };
+        if (!question) return { answer: `Q${qNum}: ${mostCommonValue}`, count: countNum };
         
         const optionIndex = parseInt(mostCommonValue) - 1;
         if (optionIndex >= 0 && optionIndex < question.options.length) {
-          return { answer: question.options[optionIndex], count: parseInt(count) };
+          return { answer: question.options[optionIndex], count: countNum };
         }
         return { answer: 'N/A', count: 0 };
       };
@@ -325,7 +299,7 @@ export default function QuizAdminPage() {
       timeData,
       dailyMostCommonAnswers,
     };
-  }, [quizResponses, stats]);
+  }, [quizResponses]);
 
   // Show password form if not authenticated
   if (!isAuthenticated) {
